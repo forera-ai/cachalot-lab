@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.1.0] - 2026-09-28
+## [0.1.0] - 2026-09-29
 
 - Native Apple Silicon macOS app with Cockpit, Chat, API, Doctor, Settings, and command palette.
 - Local Cachalot connection with optional API key, health checks, live runtime metrics, streaming responses, reasoning display, and generation stop.

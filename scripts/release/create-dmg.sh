@@ -54,6 +54,7 @@ on run argv
     set text size of viewOptions to 13
     set label position of viewOptions to bottom
     set background picture of viewOptions to backgroundFile
+    set position of item ".background.png" of volumeFolder to {605, 105}
     set position of item "Cachalot Studio.app" of volumeFolder to {188, 262}
     set position of item "Applications" of volumeFolder to {530, 262}
     update volumeFolder without registering applications
@@ -63,6 +64,7 @@ on run argv
 end run
 APPLESCRIPT
 
+rm -rf "$MOUNT/.fseventsd" "$MOUNT/.Trashes" "$MOUNT/.Spotlight-V100"
 /usr/sbin/diskutil renameVolume "$MOUNT" "$VOLUME_NAME" >/dev/null
 sync
 hdiutil detach "$MOUNT" -quiet
