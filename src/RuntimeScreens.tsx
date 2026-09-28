@@ -1,6 +1,7 @@
 import { Copy, PlugZap } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 
+import { apiExamples, type ApiExampleLanguage } from './apiExamples'
 import { DEFAULT_ENDPOINT, type RuntimeConnection } from './runtime'
 
 export function ConnectionPanel({ runtime }: { runtime: RuntimeConnection }) {
@@ -104,11 +105,20 @@ export function ConnectionPanel({ runtime }: { runtime: RuntimeConnection }) {
 
 export function ApiScreen({ runtime }: { runtime: RuntimeConnection }) {
   const { snapshot } = runtime
-  const snippet = [
-    `curl ${snapshot.endpoint || DEFAULT_ENDPOINT}/v1/chat/completions ${String.fromCharCode(92)}`,
-    `  -H 'Content-Type: application/json' ${String.fromCharCode(92)}`,
-    `  -d '{"model":"${snapshot.model_id || 'your-model-id'}","messages":[{"role":"user","content":"Hello"}]}'`,
-  ].join('\n')
+  const [language, setLanguage] = useState<ApiExampleLanguage>('curl')
+  const [copyStatus, setCopyStatus] = useState<'idle' | 'copied' | 'error'>(
+    'idle',
+  )
+  const snippet = apiExamples(snapshot.endpoint, snapshot.model_id)[language]
+
+  async function copyExample() {
+    try {
+      await navigator.clipboard.writeText(snippet)
+      setCopyStatus('copied')
+    } catch {
+      setCopyStatus('error')
+    }
+  }
 
   return (
     <div className="page detail-page">
@@ -126,18 +136,56 @@ export function ApiScreen({ runtime }: { runtime: RuntimeConnection }) {
         <span className="section-kicker">OPENAI-COMPATIBLE</span>
         <h2>Chat completions</h2>
         <p className="panel-intro">
-          Use the endpoint in any compatible client. If your server requires a
-          key, add an Authorization bearer header.
+          Copy an example for your client. Set CACHALOT_API_KEY in your shell
+          only if the server requires a key. Studio never inserts its in-memory
+          key into copied code.
         </p>
-        <pre>
+        <div
+          className="api-example-tabs"
+          role="tablist"
+          aria-label="API example language"
+        >
+          {(['curl', 'python', 'javascript'] as const).map((option) => (
+            <button
+              key={option}
+              id={`api-example-${option}`}
+              type="button"
+              role="tab"
+              aria-selected={language === option}
+              aria-controls="api-example-code"
+              onClick={() => {
+                setLanguage(option)
+                setCopyStatus('idle')
+              }}
+            >
+              {option === 'curl'
+                ? 'curl'
+                : option === 'python'
+                  ? 'Python'
+                  : 'JavaScript'}
+            </button>
+          ))}
+        </div>
+        <pre
+          id="api-example-code"
+          role="tabpanel"
+          aria-labelledby={`api-example-${language}`}
+        >
           <code>{snippet}</code>
         </pre>
         <button
           className="text-button"
-          onClick={() => void navigator.clipboard.writeText(snippet)}
+          type="button"
+          onClick={() => void copyExample()}
         >
-          <Copy size={15} /> Copy example
+          <Copy size={15} />{' '}
+          {copyStatus === 'copied' ? 'Copied' : 'Copy example'}
         </button>
+        {copyStatus === 'error' && (
+          <p className="inline-error" role="alert">
+            Could not copy. Select the example above and copy it manually.
+          </p>
+        )}
       </section>
     </div>
   )
