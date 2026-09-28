@@ -39,7 +39,7 @@ python -m cachalot.cli serve --model /path/to/your/model --port 8011
 
 The published 0.1.0 download keeps chats only for the current app session. Development builds with the **Unreleased** saved-chat feature store conversations in Studio's local app data, reopen them after restart, and keep chats tied to their original server and model. Runtime launch, profiles, model discovery, logs, and automatic updates remain [planned](docs/PLAN.md). See [Privacy](PRIVACY.md).
 
-The upcoming release adds copy-ready curl, Python, and JavaScript API examples. They use the connected model and endpoint; the optional API key remains in memory and is never inserted into copied code.
+The upcoming release adds copy-ready curl, Python OpenAI SDK, and JavaScript OpenAI SDK API examples. They use the connected model and endpoint; the optional API key remains in memory and is never inserted into copied code.
 
 ## Develop
 
