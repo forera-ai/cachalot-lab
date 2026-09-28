@@ -2,7 +2,7 @@
 
 ## 0.1.0 Foundation
 
-1. Select one of three vector brand directions. Finalize runtime and Studio marks, icon exports, wordmarks, and usage rules.
+1. Owner-selected mark: traced its graphic shape into `assets/logo/` and exported theme/size variants. Studio-specific icon treatment and usage refinements remain.
 2. Define primitive, semantic, and component tokens for Abyss and Surface. Create high-fidelity static mockups for ten named surfaces in both themes. Review before screen implementation.
 3. Scaffold Tauri 2, React 19, TypeScript, Vite, and Tailwind CSS v4. Add navigation, theme control, command palette, and a development style guide.
 4. Add a controllable mock HTTP runtime with slow startup, long prefill keep-alives, missing telemetry fields, auth failures, queueing, and crashes. Cover mock behavior with tests.
@@ -20,4 +20,4 @@
 
 ## Gates
 
-Brand selection precedes tokens and screen design. Mockup review precedes screen implementation. Signing and remote publication need owner approval. Real model performance claims require measured results.
+The owner-selected graphic mark anchors tokens and screen design. Mockup review precedes screen implementation. Signing and remote publication need owner approval. Real model performance claims require measured results.

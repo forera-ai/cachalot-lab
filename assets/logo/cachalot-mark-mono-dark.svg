@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="620 260 1100 1100" role="img" aria-label="Cachalot logo mark">
+  <defs>
+    <mask id="opening" maskUnits="userSpaceOnUse" x="620" y="260" width="1100" height="1100">
+      <rect x="620" y="260" width="1100" height="1100" fill="#fff"/>
+      <path fill="#000" d="M620 620H679C675 630 673 640 672 650A109 109 0 0 0 780 774H1110V838H780A109 109 0 0 0 672 962C673 972 675 982 679 992H620Z"/>
+      <path fill="#000" d="M1293 596C1293 716 1447 807 1493 807C1447 807 1293 897 1293 1017C1293 922 1190 838 1106 838V774C1190 774 1293 691 1293 596Z"/>
+    </mask>
+  </defs>
+  <g mask="url(#opening)">
+    <circle cx="1161" cy="806" r="517" fill="#eafaff"/>
+    <circle cx="1230" cy="806" r="394" fill="#eafaff"/>
+    <circle cx="1292" cy="806" r="276" fill="#eafaff"/>
+  </g>
+</svg>

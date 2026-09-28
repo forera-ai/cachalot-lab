@@ -4,7 +4,7 @@ Mac desktop instrument panel for the [Cachalot](https://github.com/prooshani/cac
 
 ## Status
 
-Foundation in progress. Repository and three brand directions exist. Application code follows brand selection. No runtime or model files are modified by this repository.
+Foundation in progress. The owner-selected graphic mark is available in [assets/logo](assets/logo/README.md), with vector and raster variants for both themes. Earlier brand explorations remain in `design/brand/`. No runtime or model files are modified by this repository.
 
 ## Product
 
