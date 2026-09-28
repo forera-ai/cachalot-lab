@@ -1,0 +1,13 @@
+.DS_Store
+__pycache__/
+*.pyc
+node_modules/
+dist/
+coverage/
+playwright-report/
+test-results/
+src-tauri/target/
+*.log
+.env
+.env.*
+!.env.example

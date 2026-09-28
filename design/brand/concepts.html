@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Cachalot — brand directions</title>
+    <style>
+      :root { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #eaf7f6; background: #07131b; }
+      * { box-sizing: border-box; }
+      body { margin: 0; min-width: 320px; }
+      .page { max-width: 1480px; margin: auto; padding: 54px 46px 90px; }
+      .eyebrow { color: #83d9cf; font-size: 11px; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; }
+      header { display: flex; align-items: end; justify-content: space-between; gap: 28px; border-bottom: 1px solid #29404b; padding-bottom: 30px; }
+      h1 { margin: 14px 0 10px; font-size: clamp(36px, 4vw, 60px); line-height: 1; letter-spacing: -.055em; font-weight: 620; }
+      .intro { margin: 0; max-width: 590px; color: #9db2b9; font-size: 15px; line-height: 1.6; }
+      .status { flex: none; border: 1px solid #407f7e; color: #97e4d7; border-radius: 999px; padding: 9px 14px; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
+      .grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 16px; margin-top: 28px; }
+      article { overflow: hidden; border: 1px solid #29404b; border-radius: 22px; background: #0b1d27; }
+      article.recommended { border-color: #a9dcd0; box-shadow: inset 0 0 0 1px #a9dcd040; }
+      .cardhead { padding: 24px 25px 19px; min-height: 152px; }
+      .cardhead .number { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; color: #82b8b4; font-size: 12px; }
+      h2 { margin: 12px 0 8px; font-size: 25px; font-weight: 620; letter-spacing: -.04em; }
+      .cardhead p { margin: 0; color: #a8bcc0; font-size: 13px; line-height: 1.5; }
+      .surfaces { display: grid; grid-template-columns: 1fr 1fr; }
+      .surface { height: 222px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 16px; }
+      .surface.dark { color: #e4fbf6; background: #06151e; }
+      .surface.light { color: #113743; background: #e9f4f1; }
+      .mark { width: 126px; height: 126px; }
+      .surface span { font-size: 10px; letter-spacing: .2em; text-transform: uppercase; opacity: .6; }
+      .details { padding: 20px 25px 25px; }
+      .mini { display: flex; align-items: center; gap: 13px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; color: #a9c0c3; font-size: 11px; }
+      .mini .tile { width: 30px; height: 30px; display: grid; place-items: center; background: #e9f4f1; border-radius: 6px; color: #0b3442; }
+      .mini svg { width: 16px; height: 16px; }
+      .mini .label { color: #a8bcc0; }
+      .rationale { min-height: 62px; margin: 19px 0 0; color: #a8bcc0; font-size: 13px; line-height: 1.5; }
+      .lockup { margin-top: 16px; padding-top: 17px; border-top: 1px solid #29404b; display: flex; align-items: center; gap: 12px; }
+      .lockup svg { width: 37px; height: 37px; flex: none; color: #d9f7f0; }
+      .wordmark strong { display: block; font-size: 20px; letter-spacing: -.045em; line-height: 1; }
+      .wordmark small { display: block; color: #83d9cf; font-size: 10px; letter-spacing: .24em; margin-top: 5px; text-transform: uppercase; }
+      .badge { margin-left: auto; color: #091819; background: #a9dcd0; border-radius: 4px; font-size: 10px; font-weight: 800; padding: 6px 8px; text-transform: uppercase; letter-spacing: .06em; }
+      .footer { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 22px; }
+      .panel { border: 1px solid #29404b; background: #0b1d27; border-radius: 20px; padding: 24px; }
+      .panel h3 { margin: 0 0 17px; font-size: 16px; font-weight: 650; letter-spacing: -.02em; }
+      .iconrow { display: flex; align-items: center; gap: 25px; }
+      .appicon { width: 104px; height: 104px; flex: none; border-radius: 24px; background: radial-gradient(circle at 52% 40%, #28485a 0, #0b1e2a 65%, #07131b 100%); border: 1px solid #5c8188; box-shadow: inset 0 1px 3px #d9f7f033, 0 10px 24px #0008; display: grid; place-items: center; position: relative; }
+      .appicon:before { content: ""; position: absolute; width: 77px; height: 77px; border-radius: 50%; border: 2px solid #7bb9bd88; box-shadow: 0 0 0 5px #091c26; }
+      .appicon svg { width: 67px; height: 67px; color: #d3f7ee; z-index: 1; }
+      .iconrow p, .panel p { color: #a8bcc0; font-size: 13px; line-height: 1.55; margin: 0; }
+      .rules { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 17px; }
+      .rules span { color: #b9d3d3; border: 1px solid #3b5760; border-radius: 99px; padding: 7px 10px; font-size: 11px; }
+      .note { color: #8da9af; font-size: 12px; line-height: 1.6; margin: 20px 0 0; }
+      @media (max-width: 1050px) { .grid { grid-template-columns: 1fr; } .footer { grid-template-columns: 1fr; } .cardhead { min-height: 0; } }
+      @media (max-width: 600px) { .page { padding: 30px 18px 60px; } header { display: block; } .status { display: inline-block; margin-top: 20px; } }
+    </style>
+  </head>
+  <body>
+    <svg width="0" height="0" aria-hidden="true" style="position:absolute;overflow:hidden">
+      <symbol id="sonar" viewBox="0 0 128 128">
+        <path fill="currentColor" d="M24 38c-9 0-14 6-14 15v21c0 8 6 14 15 14h24c16 0 25-6 34-18l13-5 14 10-2-13 9-5-9-5 2-13-14 10-13-5C72 39 61 38 49 38H24Z"/>
+        <path fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" d="M16 26c14-8 31-9 45-4M23 17c16-8 35-8 51 0"/>
+      </symbol>
+      <symbol id="dive" viewBox="0 0 128 128">
+        <path fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" opacity=".42" d="M12 43h28m48 0h28M12 69h28m48 0h28M12 95h28m48 0h28"/>
+        <path fill="currentColor" transform="rotate(-65 64 64)" d="M24 38c-9 0-14 6-14 15v21c0 8 6 14 15 14h24c16 0 25-6 34-18l13-5 14 10-2-13 9-5-9-5 2-13-14 10-13-5C72 39 61 38 49 38H24Z"/>
+      </symbol>
+      <symbol id="monogram" viewBox="0 0 128 128">
+        <path fill="none" stroke="currentColor" stroke-width="20" stroke-linecap="square" d="M99 31C90 21 79 17 64 17 38 17 19 37 19 64s19 47 45 47c15 0 26-4 35-14"/>
+        <path fill="currentColor" d="M48 48h30c9 0 15 6 15 15v15H48c-8 0-13-6-13-14S40 48 48 48Z"/>
+      </symbol>
+    </svg>
+    <main class="page">
+      <header>
+        <div><div class="eyebrow">Cachalot / Identity exploration 01</div><h1>Signals from depth.</h1><p class="intro">Three vector directions for the runtime mark. Each pairs with a porthole-contained Studio icon. Built in one color so small sizes, template icons, and both themes remain viable.</p></div>
+        <div class="status">Selection pending</div>
+      </header>
+      <section class="grid" aria-label="Logo directions">
+        <article>
+          <div class="cardhead"><span class="number">01 / SIGNAL</span><h2>Sonar whale</h2><p>Square-headed profile, with echo arcs emitted into open water.</p></div>
+          <div class="surfaces"><div class="surface dark" style="--cutout:#06151e"><svg class="mark" role="img" aria-label="Sonar whale on dark"><use href="#sonar"/></svg><span>Abyss / one color</span></div><div class="surface light" style="--cutout:#e9f4f1"><svg class="mark" role="img" aria-label="Sonar whale on light"><use href="#sonar"/></svg><span>Surface / one color</span></div></div>
+          <div class="details"><div class="mini"><span class="tile" style="--cutout:#e9f4f1"><svg><use href="#sonar"/></svg></span><span class="label">16 px test / profile and echo</span></div><p class="rationale">Most literal whale reading. Echo arc carries request and cache activity into the visual system.</p><div class="lockup" style="--cutout:#0b1d27"><svg><use href="#sonar"/></svg><div class="wordmark"><strong>Cachalot</strong><small>Studio</small></div></div></div>
+        </article>
+        <article class="recommended">
+          <div class="cardhead"><span class="number">02 / DESCENT</span><h2>The dive</h2><p>Head-first silhouette passing through three memory strata.</p></div>
+          <div class="surfaces"><div class="surface dark" style="--cutout:#06151e"><svg class="mark" role="img" aria-label="The dive on dark"><use href="#dive"/></svg><span>Abyss / one color</span></div><div class="surface light" style="--cutout:#e9f4f1"><svg class="mark" role="img" aria-label="The dive on light"><use href="#dive"/></svg><span>Surface / one color</span></div></div>
+          <div class="details"><div class="mini"><span class="tile" style="--cutout:#e9f4f1"><svg><use href="#dive"/></svg></span><span class="label">16 px test / silhouette survives</span></div><p class="rationale">Clear motion and strongest link to the out-of-memory product story. Depth lines can become a shared motif.</p><div class="lockup" style="--cutout:#0b1d27"><svg><use href="#dive"/></svg><div class="wordmark"><strong>Cachalot</strong><small>Studio</small></div><span class="badge">Recommended</span></div></div>
+        </article>
+        <article>
+          <div class="cardhead"><span class="number">03 / INITIAL</span><h2>C monogram</h2><p>A square-cut C encloses the blunt head and a faint echo.</p></div>
+          <div class="surfaces"><div class="surface dark" style="--cutout:#06151e"><svg class="mark" role="img" aria-label="C monogram on dark"><use href="#monogram"/></svg><span>Abyss / one color</span></div><div class="surface light" style="--cutout:#e9f4f1"><svg class="mark" role="img" aria-label="C monogram on light"><use href="#monogram"/></svg><span>Surface / one color</span></div></div>
+          <div class="details"><div class="mini"><span class="tile" style="--cutout:#e9f4f1"><svg><use href="#monogram"/></svg></span><span class="label">16 px test / initial survives</span></div><p class="rationale">Most compact for toolbar and favicon. Reads as a letter first; whale becomes a discovery at larger sizes.</p><div class="lockup" style="--cutout:#0b1d27"><svg><use href="#monogram"/></svg><div class="wordmark"><strong>Cachalot</strong><small>Studio</small></div></div></div>
+        </article>
+      </section>
+      <section class="footer">
+        <div class="panel"><h3>Studio companion / porthole</h3><div class="iconrow"><div class="appicon" style="--cutout:#0b1e2a"><svg role="img" aria-label="The dive inside a Studio porthole"><use href="#dive"/></svg></div><p>Chosen runtime glyph sits inside a machined porthole. Ring and housing belong only to Studio; runtime mark remains uncontained. Final icon uses approved direction and size-specific vector tuning.</p></div></div>
+        <div class="panel"><h3>Small-size and brand check</h3><p>All three remain one-color vectors without facial details. Shape review compares these directions against the Docker whale and DigitalOcean circle: no containers, droplets, or their established silhouettes are reused.</p><div class="rules"><span>1 color</span><span>Dark + light</span><span>16 px</span><span>Menu-bar template</span><span>Favicon</span></div></div>
+      </section>
+      <p class="note">Exploration uses system type while a licensed bundle font is selected. Final optical corrections, icon assets, and usage rules follow direction approval. Similarity check: <a href="https://www.docker.com/legal/trademark-guidelines/" style="color:#83d9cf">Docker marks</a> and <a href="https://www.digitalocean.com/legal/trademark-usage-guidelines" style="color:#83d9cf">DigitalOcean marks</a>.</p>
+    </main>
+  </body>
+</html>
