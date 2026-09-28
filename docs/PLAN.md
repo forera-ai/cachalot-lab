@@ -15,7 +15,7 @@ Local runtime connection, health and telemetry polling, streaming chat, API setu
 ## Later milestones
 
 - 0.2.0: profile schema and compiler, supervision, Dive, Logs, Doctor.
-- 0.3.0: saved conversations and richer chat controls.
+- 0.3.0: richer chat controls. Local saved conversations were brought forward after 0.1.0 and are currently unreleased.
 - 0.4.0: expanded telemetry, silent running, measured performance.
 - 0.5.0: model discovery and Keychain credential storage.
 - 0.6.0: signed Studio and managed runtime updates with rollback.

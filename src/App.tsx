@@ -14,10 +14,11 @@ import { useEffect, useState } from 'react'
 
 import markDark from '../assets/logo/cachalot-mark-dark.svg'
 import markLight from '../assets/logo/cachalot-mark-light.svg'
+import { ChatScreen } from './ChatScreen'
 import CommandPalette from './CommandPalette'
 import { navigation, type Screen } from './navigation'
 import { loadPlatformInfo, type PlatformInfo } from './platform'
-import { ApiScreen, ChatScreen } from './RuntimeScreens'
+import { ApiScreen } from './RuntimeScreens'
 import { runtimeNumber, useRuntime, type RuntimeConnection } from './runtime'
 import { useStudioStore, type ThemePreference } from './store'
 

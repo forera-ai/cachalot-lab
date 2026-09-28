@@ -4,6 +4,7 @@ Changes are grouped by release. Work on `main` after the latest tag appears unde
 
 ## Unreleased
 
+- Save conversations in Studio's local app data, reopen them after restart, and keep chats bound to their original endpoint and model. Add in-app deletion and a saved-chat list.
 - Repository documentation, contribution guidance, and runtime compatibility workflow for ongoing development.
 
 ## [0.1.0] - 2026-09-29

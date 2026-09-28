@@ -37,7 +37,7 @@ python -m cachalot.cli serve --model /path/to/your/model --port 8011
 - **Doctor and Settings:** connection checks, appearance, and system information available in this release.
 - **Navigation:** Abyss, Surface, or system appearance and a `⌘K` command palette.
 
-Runtime launch, saved conversations, profiles, model discovery, logs, and automatic updates remain [planned](docs/PLAN.md). Studio keeps conversations and the optional API key in memory for the app session. It saves the last endpoint and appearance locally. See [Privacy](PRIVACY.md).
+The published 0.1.0 download keeps chats only for the current app session. Development builds with the **Unreleased** saved-chat feature store conversations in Studio's local app data, reopen them after restart, and keep chats tied to their original server and model. Runtime launch, profiles, model discovery, logs, and automatic updates remain [planned](docs/PLAN.md). See [Privacy](PRIVACY.md).
 
 ## Develop
 
