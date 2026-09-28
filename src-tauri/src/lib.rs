@@ -2,6 +2,7 @@ use std::process::Command;
 
 use serde::Serialize;
 
+mod conversations;
 mod runtime;
 
 #[derive(Serialize)]
@@ -56,8 +57,12 @@ fn platform_info() -> Result<PlatformInfo, String> {
 pub fn run() {
     let result = tauri::Builder::default()
         .manage(runtime::RuntimeState::default())
+        .manage(conversations::ConversationStore::default())
         .invoke_handler(tauri::generate_handler![
             platform_info,
+            conversations::list_conversations,
+            conversations::save_conversation,
+            conversations::delete_conversation,
             runtime::connect_runtime,
             runtime::disconnect_runtime,
             runtime::poll_runtime,
