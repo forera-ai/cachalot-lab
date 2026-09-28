@@ -1,0 +1,47 @@
+// Generated from design/tokens.json. Do not edit by hand.
+export const tokens = {
+  "abyss": {
+    "bgCanvas": "#07131b",
+    "bgRail": "#061018",
+    "bgRaised": "#0b1e29",
+    "bgInset": "#102733",
+    "borderSubtle": "#213a47",
+    "borderStrong": "#365967",
+    "textPrimary": "#eaf7f7",
+    "textSecondary": "#a4c0c7",
+    "textTertiary": "#7f9da7",
+    "textNumeric": "#ffffff",
+    "accent": "#33cfff",
+    "accentStrong": "#027bff",
+    "focus": "#7be0d0",
+    "stateOk": "#7be0d0",
+    "stateWarn": "#efbf76",
+    "stateError": "#ff8580",
+    "tierSurface": "#e9f7f5",
+    "tierTwilight": "#56d1df",
+    "tierMidnight": "#317ed6",
+    "tierAbyss": "#174168"
+  },
+  "surface": {
+    "bgCanvas": "#f2f8fa",
+    "bgRail": "#e4f0f1",
+    "bgRaised": "#ffffff",
+    "bgInset": "#e9f2f3",
+    "borderSubtle": "#cbdde1",
+    "borderStrong": "#9fbfc8",
+    "textPrimary": "#12313f",
+    "textSecondary": "#4d6974",
+    "textTertiary": "#607a84",
+    "textNumeric": "#102c3c",
+    "accent": "#006fa8",
+    "accentStrong": "#0759bc",
+    "focus": "#006f84",
+    "stateOk": "#096f68",
+    "stateWarn": "#8b5417",
+    "stateError": "#a33c42",
+    "tierSurface": "#f8fffd",
+    "tierTwilight": "#3bb4bf",
+    "tierMidnight": "#2a70b5",
+    "tierAbyss": "#1d4260"
+  }
+} as const

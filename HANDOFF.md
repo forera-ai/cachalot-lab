@@ -1,8 +1,9 @@
 # Handoff
 
-- Studio version: 0.1.0, unreleased.
-- Runtime contract reference: Cachalot 0.38.1 brief dated 2026-09-28. Source verification started with the three serve scripts; full contract extraction remains.
-- Done: repository initialized locally, `main` and `origin` configured, baseline documentation, three exploratory concepts, and a traced owner-selected graphic mark in `assets/logo/` with dark/light variants and 16–1024 px exports.
-- Current gate: design tokens and static mockups remain before application screen implementation.
+- Studio version: 0.1.0, release client in preparation.
+- Runtime contract reference: Cachalot HTTP routes verified against `src/cachalot/server/app.py` and the live MiniMax server on 2026-09-28.
+- Done: repository initialized locally, `main` and `origin` configured, baseline documentation, three exploratory concepts, and a traced owner-selected graphic mark in `assets/logo/` with dark/light variants and 16–1024 px exports. Design tokens generate CSS and TypeScript. Tauri 2 + React 19 app includes Cockpit, Chat, API, Doctor, Settings, system/Abyss/Surface themes, and a ⌘K command palette. Vitest UI checks and macOS CI are present.
+- Current state: native app connects to an existing local Cachalot server, reads health and real metrics, streams chat with cancellation, and shows API setup. A controllable Python mock covers startup delay, keep-alives, partial stats, authentication, queueing, and a scripted crash. Runtime supervision and profiles remain later milestones; their empty routes are hidden.
+- Verified locally: Prettier, ESLint, TypeScript, Vitest (2 tests), mock runtime unittest (3 tests), `cargo fmt`, `cargo clippy -D warnings`, `cargo test`, and a Developer ID signed Tauri `.app` build. The native window connected to the mock runtime, streamed a reply, updated telemetry, and retained chat across navigation. CI is configured but has not run remotely.
 - No remote push or tag yet.
-- Next: build design tokens and static mockups, then scaffold application and mock runtime.
+- Next: verify the signed/notarized 0.1.0 installer, then add managed profiles and process supervision. Produce static screen mockups before deeper visual implementation and review them with the owner.

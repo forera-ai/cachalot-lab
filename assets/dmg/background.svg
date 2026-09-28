@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="492" viewBox="0 0 720 492">
+  <defs>
+    <linearGradient id="sea" x2="1" y2="1">
+      <stop stop-color="#07131b"/>
+      <stop offset="1" stop-color="#0b2735"/>
+    </linearGradient>
+    <linearGradient id="beam" x2="1">
+      <stop stop-color="#63dfff" stop-opacity="0"/>
+      <stop offset=".5" stop-color="#63dfff" stop-opacity=".9"/>
+      <stop offset="1" stop-color="#63dfff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="720" height="492" fill="url(#sea)"/>
+  <g fill="none" stroke="#214758" stroke-width="1" opacity=".55">
+    <circle cx="358" cy="258" r="104"/>
+    <circle cx="358" cy="258" r="152"/>
+    <circle cx="358" cy="258" r="205"/>
+    <path d="M0 258h720M358 0v492" opacity=".35"/>
+  </g>
+  <path d="M260 273h198" stroke="url(#beam)" stroke-width="2"/>
+  <path d="m443 262 15 11-15 11" fill="none" stroke="#63dfff" stroke-width="2"/>
+  <text x="48" y="65" fill="#eafaff" font-family="Helvetica Neue, sans-serif" font-size="17" font-weight="700" letter-spacing="3">CACHALOT STUDIO</text>
+  <text x="48" y="89" fill="#89a8b6" font-family="Helvetica Neue, sans-serif" font-size="10" letter-spacing="2">LOCAL INFERENCE ON YOUR MAC</text>
+  <text x="360" y="430" fill="#a9c5cf" font-family="Helvetica Neue, sans-serif" font-size="13" text-anchor="middle">Drag Cachalot Studio to Applications</text>
+  <text x="360" y="451" fill="#658694" font-family="Helvetica Neue, sans-serif" font-size="10" text-anchor="middle">Then open it from Applications</text>
+</svg>

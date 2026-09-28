@@ -1,26 +1,34 @@
 # Cachalot Studio
 
-Mac desktop instrument panel for the [Cachalot](https://github.com/prooshani/cachalot) out-of-memory inference runtime.
+Native macOS client for the [Cachalot](https://github.com/prooshani/cachalot) local inference server. The first release connects to an existing server on this Mac and provides live health, cache telemetry, streaming chat, and API connection details.
 
-## Status
+## Install
 
-Foundation in progress. The owner-selected graphic mark is available in [assets/logo](assets/logo/README.md), with vector and raster variants for both themes. Earlier brand explorations remain in `design/brand/`. No runtime or model files are modified by this repository.
+Requires Apple Silicon and macOS 14 or newer. Open the signed, notarized `Cachalot-Studio-0.1.0-macOS-arm64.dmg`, drag **Cachalot Studio** into **Applications**, then launch it. The release ZIP contains the same notarized app. Source builds and release verification are described in [docs/RELEASE.md](docs/RELEASE.md).
 
-## Product
+Studio is a client: it does not install model weights, Python, or the Cachalot runtime. Start a local Cachalot server first, for example with a model and environment prepared according to the [runtime documentation](https://github.com/prooshani/cachalot):
 
-Studio will supervise one Cachalot server, manage versioned YAML launch profiles, display memory and expert-cache telemetry, provide a streaming chat client, and expose API setup for agent tools. Runtime work remains in the Cachalot repository.
+```sh
+python -m cachalot.cli serve --model /path/to/your/model --port 8011
+```
 
-See [implementation plan](docs/PLAN.md), [architecture](docs/ARCHITECTURE.md), and [handoff](HANDOFF.md).
+Studio tries `http://127.0.0.1:8011` at launch. Use the **API** screen to connect to another loopback port or supply a server API key. The **Chat** screen streams responses and optional reasoning. **Cockpit** shows values reported by the server. Chats stay in app memory for the current session; the last endpoint is saved locally, while API keys are not saved.
 
-## Development prerequisites
+The 0.1.0 installer is arm64 only. Runtime launching, profile management, checkpoint discovery, logs, and automatic updates are planned for later releases. These controls are not shown in this release.
 
-- Apple Silicon Mac running macOS 14 or newer for the desktop runtime.
-- Node.js 22 and pnpm for the frontend.
-- Stable Rust toolchain with `clippy` and `rustfmt` for Tauri.
-- Python 3.12 or newer for the mock runtime and an external Cachalot installation.
+## Develop
 
-The mock runtime will let UI and end-to-end tests run without a model checkpoint.
+Requires Node.js 22, pnpm, a stable Rust toolchain, and Xcode command line tools.
+
+```sh
+pnpm install
+pnpm tauri dev
+```
+
+`pnpm dev` opens a browser preview; local server access and machine data require the native app. The [mock runtime](mock-runtime/README.md) provides a model-free development server.
+
+Run `pnpm format:check`, `pnpm lint`, `pnpm typecheck`, `pnpm test`, and `pnpm build`. In `src-tauri/`, run `cargo fmt --check`, `cargo clippy --all-targets -- -D warnings`, and `cargo test`.
 
 ## Privacy
 
-Telemetry and conversations stay local. Studio will not include analytics or accounts.
+Studio connects only to loopback HTTP addresses. Telemetry and conversations stay on this Mac. Studio has no analytics, accounts, or cloud relay. See [PRIVACY.md](PRIVACY.md).

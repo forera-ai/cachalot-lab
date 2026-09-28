@@ -3,10 +3,13 @@ __pycache__/
 *.pyc
 node_modules/
 dist/
+.release/
+*.tsbuildinfo
 coverage/
 playwright-report/
 test-results/
 src-tauri/target/
+src-tauri/gen/
 *.log
 .env
 .env.*

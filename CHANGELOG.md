@@ -1,10 +1,8 @@
 # Changelog
 
-All notable changes to this project will be documented here. Versions follow Semantic Versioning.
+## [0.1.0] - 2026-09-28
 
-## [0.1.0] - Unreleased
-
-### Added
-
-- Initial repository structure and brand exploration.
-- Owner-selected Cachalot graphic mark as a transparent vector, with dark/light and seven raster sizes per theme.
+- Native Apple Silicon macOS app with Cockpit, Chat, API, Doctor, Settings, and command palette.
+- Local Cachalot connection with optional API key, health checks, live runtime metrics, streaming responses, reasoning display, and generation stop.
+- Owner-approved graphic mark, theme variants, app icon, and Abyss/Surface appearance.
+- Signed and notarized drag-to-Applications release workflow, mock runtime, tests, and CI checks.
