@@ -10,7 +10,7 @@
 
 ## 0.1.0 release client
 
-Local runtime connection, health and telemetry polling, streaming chat, API setup, and a signed/notarized macOS release were brought forward at the owner's request. Placeholder routes are hidden from the distribution build.
+Local runtime connection, health and telemetry polling, streaming chat, API setup, and a signed/notarized macOS release were brought forward at the owner's request. Version 0.1.0 was published on GitHub on 2026-09-29. Placeholder routes are hidden from the distribution build.
 
 ## Later milestones
 
@@ -24,4 +24,4 @@ Local runtime connection, health and telemetry polling, streaming chat, API setu
 
 ## Gates
 
-The owner-selected graphic mark anchors tokens and screen design. The foundation shell follows the owner's updated priority. The owner authorized signing and notarization on 2026-09-28. Remote publication remains a separate action. Real model performance claims require measured results.
+The owner-selected graphic mark anchors tokens and screen design. The foundation shell follows the owner's updated priority. The owner authorized signing and notarization on 2026-09-28 and GitHub publication on 2026-09-29. Real model performance claims require measured results.

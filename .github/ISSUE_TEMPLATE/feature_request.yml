@@ -1,0 +1,21 @@
+name: Feature request
+description: Propose an improvement to Cachalot Studio
+title: 'Feature: '
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem would this solve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+    validations:
+      required: true
+  - type: input
+    id: runtime
+    attributes:
+      label: Required Cachalot route, option, or revision, if known

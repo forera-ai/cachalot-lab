@@ -1,0 +1,45 @@
+name: Bug report
+description: Report a reproducible problem in Cachalot Studio
+title: 'Bug: '
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Please remove API keys, prompts, model paths, and other private data from logs or screenshots before attaching them.
+  - type: input
+    id: version
+    attributes:
+      label: Studio version
+      placeholder: 0.1.0
+    validations:
+      required: true
+  - type: input
+    id: system
+    attributes:
+      label: macOS version and Mac model
+      placeholder: macOS 15, Mac Studio M3 Ultra
+    validations:
+      required: true
+  - type: input
+    id: runtime
+    attributes:
+      label: Cachalot revision or version, if relevant
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: Describe each action and the endpoint state.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected result
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual result
+    validations:
+      required: true

@@ -1,5 +1,11 @@
 # Changelog
 
+Changes are grouped by release. Work on `main` after the latest tag appears under **Unreleased**.
+
+## Unreleased
+
+- Repository documentation, contribution guidance, and runtime compatibility workflow for ongoing development.
+
 ## [0.1.0] - 2026-09-29
 
 - Native Apple Silicon macOS app with Cockpit, Chat, API, Doctor, Settings, and command palette.

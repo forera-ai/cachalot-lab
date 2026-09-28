@@ -2,7 +2,7 @@
 
 ## Scope
 
-The 0.1.0 release is a local client for a separately installed Cachalot runtime. The macOS artifact targets Apple Silicon. The installer does not include Python, checkpoints, or an update service.
+The [0.1.0 release](https://github.com/prooshani/cachalot-studio/releases/tag/v0.1.0) is a local client for a separately installed Cachalot runtime. The macOS artifact targets Apple Silicon. The installer does not include Python, checkpoints, or an update service.
 
 ## One-time signing setup
 
@@ -24,4 +24,10 @@ The script runs frontend and Rust checks, builds a Developer ID signed app with 
 - `Cachalot-Studio-0.1.0-macOS-arm64.zip` containing the notarized app.
 - `SHA256SUMS`, notarization receipts, and `SOURCE_COMMIT`.
 
-The script refuses an existing output directory to prevent accidental overwrite. Before publication, mount the DMG, confirm the drag-to-Applications layout and the installed app, and compare its SHA-256 hash to `SHA256SUMS`. Publishing the artifacts and creating a Git tag are separate maintainer actions.
+The script refuses an existing output directory to prevent accidental overwrite. Before publication, mount the DMG, confirm the drag-to-Applications layout and the installed app, and compare its SHA-256 hash to `SHA256SUMS`.
+
+## Publish a release
+
+Release from the exact commit recorded in `SOURCE_COMMIT`. Keep `README.md` and `CHANGELOG.md` current before the release build. After verification, push that commit and an annotated `v<version>` tag, then create a GitHub Release with the DMG, ZIP, checksums, source commit, notarization receipts, and verification report. Release notes must state minimum macOS, architecture, runtime requirements, working features, and limitations. Do not upload the temporary notary submission ZIP.
+
+After publishing, compare GitHub's asset SHA-256 digests with local `SHA256SUMS`, confirm the release is public, and inspect the repository CI run. The 0.1.0 release used this procedure; its [verification report](https://github.com/prooshani/cachalot-studio/releases/download/v0.1.0/RELEASE-REPORT.md) records the exact commit, hashes, and Apple submission IDs.
