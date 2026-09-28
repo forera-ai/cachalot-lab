@@ -846,6 +846,22 @@ textarea:focus-visible {
   display: flex;
   flex-direction: column;
 }
+.chat-connection-note {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+  padding: 10px 14px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 9px;
+  background: var(--bg-raised);
+  color: var(--text-secondary);
+  font-size: 11px;
+}
+.chat-connection-note .secondary-button {
+  flex: none;
+}
 .chat-workspace {
   display: grid;
   grid-template-columns: 220px minmax(0, 1fr);

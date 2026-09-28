@@ -16,8 +16,8 @@ import {
   titleFromMessage,
   type Conversation,
 } from './conversations'
-import { ConnectionPanel } from './RuntimeScreens'
 import type { RuntimeConnection } from './runtime'
+import { useStudioStore } from './store'
 
 type ChatEvent = {
   chat_id: number
@@ -38,6 +38,7 @@ function updatedConversation(
 }
 
 export function ChatScreen({ runtime }: { runtime: RuntimeConnection }) {
+  const setScreen = useStudioStore((state) => state.setScreen)
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [loaded, setLoaded] = useState(false)
@@ -209,10 +210,9 @@ export function ChatScreen({ runtime }: { runtime: RuntimeConnection }) {
     (selected.endpoint === runtime.snapshot.endpoint &&
       selected.model_id === runtime.snapshot.model_id)
 
-  useEffect(
-    () => bottomRef.current?.scrollIntoView?.({ behavior: 'smooth' }),
-    [messages],
-  )
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView?.({ behavior: 'smooth' })
+  }, [messages])
 
   function selectConversation(id: string | null) {
     if (sending) return
@@ -347,7 +347,14 @@ export function ChatScreen({ runtime }: { runtime: RuntimeConnection }) {
           <MessageSquarePlus size={15} /> New chat
         </button>
       </div>
-      {!runtime.snapshot.healthy && <ConnectionPanel runtime={runtime} />}
+      {!runtime.snapshot.healthy && (
+        <div className="chat-connection-note">
+          <span>Runtime offline. Saved conversations are still available.</span>
+          <button className="secondary-button" onClick={() => setScreen('api')}>
+            Open API setup
+          </button>
+        </div>
+      )}
       <div className="chat-workspace">
         <aside className="conversation-rail" aria-label="Saved conversations">
           <div className="conversation-rail-title">CONVERSATIONS</div>
