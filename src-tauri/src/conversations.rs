@@ -1,4 +1,4 @@
-use std::fs::{self, OpenOptions};
+use std::fs::{self, File, OpenOptions};
 use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::sync::Mutex;
@@ -47,6 +47,42 @@ fn store_path(app: &AppHandle) -> Result<PathBuf, String> {
         .app_data_dir()
         .map(|directory| directory.join("conversations.json"))
         .map_err(|error| format!("Could not locate Studio data directory: {error}"))
+}
+
+fn lock_store(path: &Path) -> Result<File, String> {
+    let directory = path
+        .parent()
+        .ok_or_else(|| "Conversation path has no parent directory.".to_owned())?;
+    fs::create_dir_all(directory)
+        .map_err(|error| format!("Could not create Studio data directory: {error}"))?;
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        fs::set_permissions(directory, fs::Permissions::from_mode(0o700))
+            .map_err(|error| format!("Could not protect Studio data directory: {error}"))?;
+    }
+    let mut options = OpenOptions::new();
+    options.read(true).write(true).create(true);
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::OpenOptionsExt;
+        options.mode(0o600);
+    }
+    let file = options
+        .open(directory.join(".conversations.lock"))
+        .map_err(|error| format!("Could not open conversation lock: {error}"))?;
+    #[cfg(unix)]
+    {
+        use std::os::fd::AsRawFd;
+        let result = unsafe { libc::flock(file.as_raw_fd(), libc::LOCK_EX) };
+        if result != 0 {
+            return Err(format!(
+                "Could not lock conversations: {}",
+                std::io::Error::last_os_error()
+            ));
+        }
+    }
+    Ok(file)
 }
 
 fn read_document(path: &Path) -> Result<Document, String> {
@@ -163,7 +199,9 @@ pub fn list_conversations(
         .0
         .lock()
         .map_err(|_| "Conversation store is unavailable.".to_owned())?;
-    Ok(read_document(&store_path(&app)?)?.conversations)
+    let path = store_path(&app)?;
+    let _file_lock = lock_store(&path)?;
+    Ok(read_document(&path)?.conversations)
 }
 
 #[tauri::command]
@@ -178,6 +216,7 @@ pub fn save_conversation(
         .lock()
         .map_err(|_| "Conversation store is unavailable.".to_owned())?;
     let path = store_path(&app)?;
+    let _file_lock = lock_store(&path)?;
     let mut document = read_document(&path)?;
     document
         .conversations
@@ -200,6 +239,7 @@ pub fn delete_conversation(
         .lock()
         .map_err(|_| "Conversation store is unavailable.".to_owned())?;
     let path = store_path(&app)?;
+    let _file_lock = lock_store(&path)?;
     let mut document = read_document(&path)?;
     document
         .conversations
@@ -263,5 +303,40 @@ mod tests {
         let mut conversation = sample();
         conversation.messages[0].role = "system".to_owned();
         assert!(validate(&conversation).is_err());
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn file_lock_serializes_store_access() {
+        use std::sync::mpsc;
+        use std::time::Duration;
+
+        let directory = std::env::temp_dir().join(format!(
+            "cachalot-lock-test-{}-{}",
+            std::process::id(),
+            SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .expect("clock")
+                .as_nanos()
+        ));
+        let path = directory.join("conversations.json");
+        let first = lock_store(&path).expect("first lock");
+        let (ready_sender, ready_receiver) = mpsc::channel();
+        let (acquired_sender, acquired_receiver) = mpsc::channel();
+        let second = std::thread::spawn(move || {
+            ready_sender.send(()).expect("ready");
+            let _guard = lock_store(&path).expect("second lock");
+            acquired_sender.send(()).expect("acquired");
+        });
+        ready_receiver.recv().expect("worker ready");
+        assert!(acquired_receiver
+            .recv_timeout(Duration::from_millis(50))
+            .is_err());
+        drop(first);
+        acquired_receiver
+            .recv_timeout(Duration::from_secs(2))
+            .expect("second writer proceeds");
+        second.join().expect("worker joins");
+        fs::remove_dir_all(directory).expect("cleanup");
     }
 }

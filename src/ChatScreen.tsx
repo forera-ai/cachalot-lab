@@ -75,8 +75,8 @@ export function ChatScreen({ runtime }: { runtime: RuntimeConnection }) {
   const scheduleSave = useCallback(
     (conversation: Conversation) => {
       pendingSave.current = conversation
-      if (saveTimer.current !== null) window.clearTimeout(saveTimer.current)
-      saveTimer.current = window.setTimeout(flushSave, 350)
+      if (saveTimer.current === null)
+        saveTimer.current = window.setTimeout(flushSave, 1000)
     },
     [flushSave],
   )
