@@ -4,6 +4,7 @@ Changes are grouped by release. Work on `main` after the latest tag appears unde
 
 ## Unreleased
 
+- Keep the connected model, state, decode speed, expert hit rate, and SSD read rate visible in a persistent telemetry strip. Poll runtime stats at 1 Hz while visible and 0.2 Hz while hidden without overlapping scheduled polls.
 - Save conversations in Studio's local app data, reopen them after restart, and keep chats bound to their original endpoint and model. Add in-app deletion and a saved-chat list.
 - Repository documentation, contribution guidance, and runtime compatibility workflow for ongoing development.
 - Copy-ready curl, Python OpenAI SDK, and JavaScript OpenAI SDK chat completion examples using the connected endpoint and model, with safe quoting and optional API key instructions.
