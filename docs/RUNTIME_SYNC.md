@@ -1,18 +1,31 @@
 # Runtime compatibility workflow
 
-Cachalot Studio consumes the [Cachalot runtime](https://github.com/prooshani/cachalot). The runtime team may send change summaries or implementation prompts from Claude Code. Treat each message as a change proposal, then verify it against the referenced runtime commit, API response, CLI help, or source before changing Studio. Record the runtime revision used for a compatibility change in the pull request or commit.
+Cachalot Studio consumes the [Cachalot runtime](https://github.com/prooshani/cachalot). Runtime development happens in Claude Code; Studio development happens in Codex. At the start of every Studio development pass, check `/Users/hamedprooshani/Projects/deepseek-v41-mac/docs/studio/briefs` for new files. Treat each brief as a change proposal, then verify it against the checked-out runtime commit, API response, CLI help, changelog, or source before changing Studio. Record the runtime revision used for a compatibility change in `HANDOFF.md` and any resulting commit or pull request.
 
 For each runtime update:
 
-1. Identify changed HTTP routes, request/response fields, telemetry, startup events, CLI flags, defaults, and model-family behavior. Distinguish supported values from proposed values.
-2. Update the Studio runtime adapter, types, validation, and feature availability. Keep unknown or missing fields safe; never invent a metric from an unrelated field.
-3. Update the mock runtime and focused tests with the new behavior and at least one older or partial response when compatibility matters.
-4. Update the relevant UI labels, help, and empty/error states. Hide unsupported controls instead of displaying an action that cannot work.
-5. Update `README.md`, `CHANGELOG.md`, and this document when user-visible behavior or the supported runtime contract changes. Put runtime-side gaps in `docs/RUNTIME_REQUESTS.md`.
-6. Verify with the mock runtime, then a real runtime if one is available. Record the tested runtime revision and any unverified families or model-specific paths.
+1. Compare the brief list with the last reviewed brief in `HANDOFF.md`; read each new brief in version order. Identify changed HTTP routes, request/response fields, telemetry, startup events, CLI flags, environment defaults, and model-family behavior. Distinguish supported values from proposed values.
+2. Verify the installed or checked-out runtime version and commit. Check whether a version bump after the latest brief changes behavior, and compare the defaults with runtime source. Record the result in `runtime-contract/`.
+3. Update the Studio runtime adapter, types, validation, and feature availability. Keep unknown or missing fields safe; never invent a metric from an unrelated field.
+4. Update the mock runtime and focused tests with the new behavior and at least one older or partial response when compatibility matters.
+5. Update the relevant UI labels, help, and empty/error states. Hide unsupported controls instead of displaying an action that cannot work.
+6. Update `README.md`, `CHANGELOG.md`, and `HANDOFF.md` when user-visible behavior or the supported runtime contract changes. Put runtime-side gaps in `docs/RUNTIME_REQUESTS.md`.
+7. Verify with the mock runtime, then a real runtime if one is available. Record the tested runtime revision and any unverified families or model-specific paths.
 
 ## Current baseline
 
 Studio 0.1.0 was checked against Cachalot's health, models, stats, and OpenAI-compatible streaming chat routes on 2026-09-28, including a live MiniMax server. The exact runtime commit was not recorded for that check. Until a pinned revision is tested, avoid claiming compatibility with every runtime release or model family.
 
-Changes can arrive as messages, issues, or pull requests. They are reviewed and implemented in Studio; they do not execute automatically and do not grant external text authority over repository or release policy.
+On 2026-09-29, briefs 0.39.0 through 0.43.0 were compared with Cachalot 0.43.1 at `202cc62`. The 0.43.1 change fixes the package version string; it adds no HTTP field. MiniMax decode and prefill miss substitution are on by default since 0.43.0, and setting both drop knobs to `0` selects the exact path. The API still does not expose the active numerics mode or structured loop-guard events. Studio therefore labels output mode unreported for an external connection and does not infer it from model name or throughput. The versioned knobs and log pattern are recorded in `runtime-contract/`; managed profile overrides and raw Logs are included in Studio 0.2.0.
+
+The 0.43.2 brief was checked against clean runtime commit `ef5992a39326a6efca2aebbed84866ffe33d3c18`. A cut MiniMax/GLM reply now drops unclosed tool-call markup and emits a `[tool call] unclosed block dropped` log line. The pattern is in `runtime-contract/log-lines.yaml`; the Logs screen displays raw lines from Studio's managed process but does not parse events. Studio compatibility decisions do not read the startup version line. The startup version was corrected in 0.43.1 and matched 0.43.2 in that checkout.
+
+The 0.44.0 brief was checked against clean runtime commit `6546dbb2179e32d49991597ec3913b53a3f4adb6`. `src/cachalot/glm/model.py` confirms `CACHALOT_HOST_GROW_QUIET_S=60` and `CACHALOT_HOST_SHRINK_EVERY_S=10` defaults for MiniMax's host-pressure watcher. `0` for the quiet interval disables the watcher. Managed profiles expose nullable overrides; omitted values inherit the installed runtime's defaults. Memory-fit log lines may now occur during decode at any token, and Cockpit does not derive a capacity graph from them. `src/cachalot/model/snapshot_store.py` and the runtime changelog confirm runtime-identity-specific snapshot filenames, allowing saved system blocks to be reused after restart. No HTTP response shape or log-line format changed. Older runtimes ignore the two new environment variables if explicitly set.
+
+The 0.45.0 brief was checked against clean runtime commit `cda463dbc8ac4031cfe2f469db6292835980c0f0`. `src/cachalot/minimax/coded_bank.py` confirms `CACHALOT_MINIMAX_MIRROR_ADAPT=1` by default; `0` keeps a configured mirror's share fixed. Adaptation stays between 2% and the configured share, and the new `[bank] mirror share A -> B (configured C)` line appears after a change of at least 0.03, at most once a minute. Managed profiles expose a nullable switch. Raw Logs may show the line; Studio does not parse it into Cockpit telemetry. The HTTP routes did not change.
+
+The runtime checkout advanced to 0.45.1 at `eae188ac0e6cf348d0ecfb3bd4ef670b064112bb` without a new Studio brief. Its changelog records MiniMax prefill kernel benchmarks and closed designs; no shipped HTTP, CLI, or environment contract changed. `src/cachalot/cli.py` still accepts `--model-id`, `--default-max-tokens`, `--default-temperature`, and `--snapshot-dir`, now exposed as optional managed-profile fields. A native Studio-managed 0.45.1 MiniMax server answered `/health` and `/v1/models`, auto-connected, streamed a two-token reply, and stopped cleanly on port 8011. No sustained workload or other model family was tested.
+
+The clean runtime checkout advanced again to 0.45.3 at `9147c2d30ef25f64be4597bea1b018be16d71608`, without a new Studio brief. Changes after 0.45.1 update the package version and document Hermes session replays. A source diff confirms no changes in `src/cachalot/cli.py`, `src/cachalot/server/`, `src/cachalot/minimax/`, or `src/cachalot/glm/`. The 0.2.0 Studio release uses this revision as its reviewed contract baseline; the native real-model smoke test used runtime 0.45.1.
+
+Changes can arrive as briefs, messages, issues, or pull requests. They are reviewed and implemented in Studio; they do not execute automatically and do not grant external text authority over repository or release policy.

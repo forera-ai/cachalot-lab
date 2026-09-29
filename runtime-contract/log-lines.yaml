@@ -1,0 +1,16 @@
+patterns:
+  - id: loop_guard
+    since: 0.40.0
+    families: [glm-5.3-flash, minimax-m3]
+    regex: '^\[loop guard\] reply stopped after (?P<tokens>\d+) tokens: a (?P<block>\d+)-token block repeated (?P<repeats>\d+) times$'
+    meaning: The reply looped and was stopped; this precedes its [request] line.
+  - id: unclosed_tool_block_dropped
+    since: 0.43.2
+    families: [glm-5.3-flash, minimax-m3]
+    regex: '^\[tool call\] unclosed block dropped \((?P<chars>\d+) chars\) at a (?P<reason>loop guard|length) stop$'
+    meaning: A cut reply ended inside a tool call; the incomplete call markup was removed from client content. Future Logs UI can show a reply-cut marker with the loop-guard line when present.
+  - id: minimax_mirror_share
+    since: 0.45.0
+    families: [minimax-m3]
+    regex: '^\[bank\] mirror share (?P<old>\d+\.\d+) -> (?P<new>\d+\.\d+) \(configured (?P<cap>\d+\.\d+)\)$'
+    meaning: The adaptive mirror share changed by at least 0.03; emitted at most once a minute. Logs displays it raw; Cockpit does not yet parse or chart it.

@@ -2,7 +2,11 @@ import { Copy, PlugZap } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 
 import { apiExamples, type ApiExampleLanguage } from './apiExamples'
-import { DEFAULT_ENDPOINT, type RuntimeConnection } from './runtime'
+import {
+  DEFAULT_ENDPOINT,
+  DEFAULT_RUNTIME_PORT,
+  type RuntimeConnection,
+} from './runtime'
 
 export function ConnectionPanel({ runtime }: { runtime: RuntimeConnection }) {
   const [endpoint, setEndpoint] = useState(
@@ -37,6 +41,18 @@ export function ConnectionPanel({ runtime }: { runtime: RuntimeConnection }) {
           spellCheck={false}
           placeholder={DEFAULT_ENDPOINT}
         />
+        <div className="connection-default">
+          Default port: {DEFAULT_RUNTIME_PORT}
+          {endpoint !== DEFAULT_ENDPOINT && (
+            <button
+              type="button"
+              className="text-button"
+              onClick={() => setEndpoint(DEFAULT_ENDPOINT)}
+            >
+              Use default address
+            </button>
+          )}
+        </div>
         <label htmlFor="runtime-api-key">
           API key <span>(only if your server requires one)</span>
         </label>

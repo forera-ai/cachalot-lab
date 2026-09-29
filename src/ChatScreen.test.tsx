@@ -57,6 +57,7 @@ const saved: Conversation = {
 
 function runtime(model = 'cachalot-mock'): RuntimeConnection {
   return {
+    history: [],
     snapshot: {
       connected: true,
       healthy: true,

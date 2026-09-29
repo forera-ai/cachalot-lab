@@ -1,7 +1,7 @@
 import { act, renderHook } from '@testing-library/react'
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 
-import { useRuntime, type RuntimeSnapshot } from './runtime'
+import { appendRuntimePoint, useRuntime, type RuntimeSnapshot } from './runtime'
 
 const { invoke } = vi.hoisted(() => ({ invoke: vi.fn() }))
 
@@ -60,4 +60,22 @@ it('polls at the visible and hidden cadences', async () => {
   expect(pollCount()).toBe(3)
 
   unmount()
+})
+
+it('keeps a bounded trace and resets it for another endpoint', () => {
+  const running = { ...snapshot, stats: { decode_tps: 32, ssd_gbps: 0.4 } }
+  const first = appendRuntimePoint([], running, 1000)
+  expect(first[0]?.decode_tps).toBe(32)
+  expect(first[0]?.ssd_gbps).toBe(0.4)
+
+  const stale = appendRuntimePoint(first, running, 122_000)
+  expect(stale).toHaveLength(1)
+
+  const switched = appendRuntimePoint(
+    stale,
+    { ...running, endpoint: 'http://127.0.0.1:8012', stats: {} },
+    123_000,
+  )
+  expect(switched).toHaveLength(1)
+  expect(switched[0]?.decode_tps).toBeNull()
 })

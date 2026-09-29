@@ -19,11 +19,16 @@ for tool in git pnpm cargo xcrun codesign security ditto hdiutil spctl shasum py
   command -v "$tool" >/dev/null || fail "missing $tool"
 done
 [[ -z "$(git -C "$ROOT" status --porcelain)" ]] || fail "commit or discard source changes before building a release"
-python3 - "$ROOT" "$VERSION" <<'PY' || fail "version mismatch"
-import json, pathlib, sys
+python3 - "$ROOT" "$VERSION" <<'PY' || fail "version or release documentation mismatch"
+import json, pathlib, sys, tomllib
 root, version = pathlib.Path(sys.argv[1]), sys.argv[2]
 for file in (root / 'package.json', root / 'src-tauri/tauri.conf.json'):
     assert json.loads(file.read_text())['version'] == version, file
+assert tomllib.loads((root / 'src-tauri/Cargo.toml').read_text())['package']['version'] == version
+lock = tomllib.loads((root / 'src-tauri/Cargo.lock').read_text())
+assert any(p['name'] == 'cachalot-studio' and p['version'] == version for p in lock['package'])
+assert f'## [{version}]' in (root / 'CHANGELOG.md').read_text()
+assert f'/releases/tag/v{version}' in (root / 'README.md').read_text()
 PY
 security find-identity -v -p codesigning | grep -F "$IDENTITY" >/dev/null || fail "Developer ID certificate missing: $IDENTITY"
 xcrun notarytool history --keychain-profile "$PROFILE" >/dev/null || fail "notary profile unavailable: $PROFILE"

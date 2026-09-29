@@ -10,38 +10,41 @@
 [![CI](https://github.com/prooshani/cachalot-studio/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/prooshani/cachalot-studio/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-Studio makes a local Cachalot server easier to use: connect, inspect live health and cache metrics, chat with streaming and reasoning, and copy API details for other clients. It connects only to a server on the same Mac.
+Studio makes a local Cachalot server easier to use: launch or connect, inspect live health and cache metrics, chat with streaming and reasoning, and copy API details for other clients. It connects only to a server on the same Mac.
 
 ## Download
 
-**Current release:** [Cachalot Studio 0.1.0](https://github.com/prooshani/cachalot-studio/releases/tag/v0.1.0) for Apple Silicon, macOS 14 or newer.
+**Current release:** [Cachalot Studio 0.2.0](https://github.com/prooshani/cachalot-studio/releases/tag/v0.2.0) for Apple Silicon, macOS 14 or newer.
 
-1. Download the signed and notarized [DMG](https://github.com/prooshani/cachalot-studio/releases/download/v0.1.0/Cachalot-Studio-0.1.0-macOS-arm64.dmg).
+1. Download the signed and notarized [DMG](https://github.com/prooshani/cachalot-studio/releases/download/v0.2.0/Cachalot-Studio-0.2.0-macOS-arm64.dmg).
 2. Open it and drag **Cachalot Studio** into **Applications**.
-3. Start your Cachalot server, then open Studio. It first tries `http://127.0.0.1:8011`.
-4. If your server uses another loopback port or an API key, enter it in the **API** screen.
+3. Open Studio. It first tries an existing Cachalot server at `http://127.0.0.1:8011`.
+4. Use **Dive** to launch a local runtime, or enter another loopback port and optional API key in **API**.
 
-The release also includes a [ZIP](https://github.com/prooshani/cachalot-studio/releases/download/v0.1.0/Cachalot-Studio-0.1.0-macOS-arm64.zip) and [SHA-256 checksums](https://github.com/prooshani/cachalot-studio/releases/download/v0.1.0/SHA256SUMS). The [release notes](https://github.com/prooshani/cachalot-studio/releases/tag/v0.1.0) state the exact scope and verification.
+The release also includes a [ZIP](https://github.com/prooshani/cachalot-studio/releases/download/v0.2.0/Cachalot-Studio-0.2.0-macOS-arm64.zip) and [SHA-256 checksums](https://github.com/prooshani/cachalot-studio/releases/download/v0.2.0/SHA256SUMS). The [release notes](https://github.com/prooshani/cachalot-studio/releases/tag/v0.2.0) state the exact scope and verification.
 
-Studio does not install Cachalot, Python, or model weights. Prepare a model and environment using the [runtime documentation](https://github.com/prooshani/cachalot), then start its server. One example, after that preparation:
+Studio does not install Cachalot, Python, or model weights. Prepare a model and environment using the [runtime documentation](https://github.com/prooshani/cachalot). Dive needs the absolute path to a Python interpreter with Cachalot installed, the model directory, and any separate expert bank. You can also start the server yourself:
 
 ```sh
 python -m cachalot.cli serve --model /path/to/your/model --port 8011
 ```
 
-## What 0.1.0 includes
+## What 0.2.0 includes
 
-- **Cockpit:** connection state, health, and live metrics reported by the runtime.
-- **Chat:** streaming responses, optional reasoning, generation stop, and conversation retention during the current app session.
-- **API:** local endpoint, optional in-memory API key, and connection details.
-- **Doctor and Settings:** connection checks, appearance, and system information available in this release.
+- **Cockpit:** a compact dashboard with two-minute decode-speed, expert-hit, SSD-read, and resident-expert traces; whole-Mac CPU, GPU, and memory graphs; and macOS hardware details. Missing metrics remain unavailable.
+- **Chat:** streaming responses, optional reasoning, generation stop, and saved local conversations bound to their original endpoint and model.
+- **Dive:** versioned launch profiles, fixed-argument preview, one Studio-owned runtime at a time, readiness checks, automatic connection, and MiniMax bank, mirror, and tuning controls.
+- **API:** local endpoint, optional in-memory API key, and copy-ready curl, Python OpenAI SDK, and JavaScript OpenAI SDK examples.
+- **Doctor and Logs:** connection checks, managed startup state, and a bounded tail of the managed process's private log.
 - **Navigation:** Abyss, Surface, or system appearance and a `⌘K` command palette.
 
-The published 0.1.0 download keeps chats only for the current app session. Development builds with the **Unreleased** saved-chat feature store conversations in Studio's local app data, reopen them after restart, and keep chats tied to their original server and model. Runtime launch, profiles, model discovery, logs, and automatic updates remain [planned](docs/PLAN.md). See [Privacy](PRIVACY.md).
+Studio polls runtime stats at 1 Hz while visible and 0.2 Hz while hidden. Whole-Mac graphs describe the host, not model-specific utilization. The telemetry strip remains visible on screens other than Cockpit while connected.
 
-Development builds also add copy-ready curl, Python OpenAI SDK, and JavaScript OpenAI SDK API examples. They use the connected model and endpoint; the optional API key remains in memory and is never inserted into copied code.
+Managed profiles can set the served model ID, default response length and temperature, and an optional persistent prefix-snapshot directory. Omitted fields inherit the installed runtime's defaults. Studio starts only the process it owns and stops it on normal app exit. After an abrupt exit, an occupied port blocks a new launch; stop the earlier process yourself or choose another port. Studio does not attach to or terminate an unknown process. See [managed runtime](docs/MANAGED_RUNTIME.md).
 
-A compact telemetry strip stays visible across screens while connected. It shows runtime state, model, and live decode, cache hit, and SSD readings when reported by the server. Studio polls at 1 Hz while visible and 0.2 Hz while hidden.
+MiniMax's decode and prefill miss substitution can change outputs. Dive provides explicit overrides; for an external server, the active numerics mode remains unreported because Cachalot does not expose it in `/v1/stats`. Runtime 0.44 added host-memory pressure controls, and 0.45 added adaptive mirror sharing. The brief series through 0.45.0 and runtime source through 0.45.3 were reviewed for this release. The native real-model smoke test used MiniMax 0.45.1. See [runtime compatibility](docs/RUNTIME_SYNC.md).
+
+The optional API key stays in memory and is never inserted into copied API examples. Saved conversations and managed logs remain local; see [Privacy](PRIVACY.md). Model discovery, Keychain credentials, and automatic updates remain [planned](docs/PLAN.md). The [Abyss and Surface Dive mockups](design/mockups/managed-runtime.html) remain a design reference.
 
 ## Develop
 

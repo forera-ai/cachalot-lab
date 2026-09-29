@@ -1,0 +1,165 @@
+# Verified against Cachalot 0.45.3 (9147c2d). Null overrides in Studio profiles
+# inherit the runtime's version-specific default; explicit zero selects exact output.
+knobs:
+  - key: CACHALOT_MINIMAX_MISS_DROP
+    kind: env
+    families: [minimax-m3]
+    type: float
+    default: { minimax-m3: 0.20 }
+    previous_default: { before: 0.43.0, minimax-m3: 0 }
+    range: [0, 0.25]
+    group: speed
+    effect: changes-outputs
+    restart_required: true
+    stability: shipped
+    since: 0.39.0
+    summary: Decode miss substitution. 0 is exact; 0.20 pairs with MISS_SUB=4.
+  - key: CACHALOT_MINIMAX_MISS_SUB
+    kind: env
+    families: [minimax-m3]
+    type: int
+    default: { minimax-m3: 4 }
+    previous_default: { before: 0.43.0, minimax-m3: 0 }
+    range: [0, 8]
+    group: speed
+    effect: changes-outputs
+    restart_required: true
+    stability: shipped
+    since: 0.39.0
+    summary: Resident runner-up search depth for miss substitution.
+  - key: CACHALOT_MINIMAX_MISS_DROP_ARMED
+    kind: env
+    families: [minimax-m3]
+    type: bool
+    default: { minimax-m3: false }
+    group: debug
+    effect: bit-identical
+    restart_required: true
+    stability: debug
+    since: 0.39.0
+    summary: Benchmark instrumentation only; not a Studio profile control.
+  - key: CACHALOT_LOOP_GUARD_REPEATS
+    kind: env
+    families: [glm-5.3-flash, minimax-m3]
+    type: int
+    default: { glm-5.3-flash: 6, minimax-m3: 6 }
+    range: [0, 50]
+    group: decode
+    effect: changes-outputs
+    restart_required: true
+    stability: shipped
+    since: 0.40.0
+    summary: Stop repeated reply blocks; 0 disables the guard.
+  - key: CACHALOT_MINIMAX_DECODE_CACHE_GIB
+    kind: env
+    families: [minimax-m3]
+    type: float
+    default: { minimax-m3: 0.25 }
+    range: [-1, 8]
+    unit: GiB
+    group: memory
+    effect: speed-only
+    restart_required: true
+    stability: shipped
+    since: 0.41.0
+    summary: MLX buffer cache cap during decode; -1 retains the prefill cap.
+  - key: CACHALOT_MINIMAX_SPILL_BLOCKS
+    kind: env
+    families: [minimax-m3]
+    type: bool
+    default: { minimax-m3: true }
+    group: memory
+    effect: speed-only
+    restart_required: true
+    stability: shipped
+    since: 0.41.0
+    summary: Saved system blocks leave memory after a request; 0 keeps them resident.
+  - key: CACHALOT_MINIMAX_PREFILL_MISS_DROP
+    kind: env
+    families: [minimax-m3]
+    type: float
+    default: { minimax-m3: 0.20 }
+    previous_default: { before: 0.43.0, minimax-m3: 0 }
+    range: [0, 0.25]
+    group: speed
+    effect: changes-outputs
+    restart_required: true
+    stability: shipped
+    since: 0.42.0
+    summary: Prefill miss substitution. 0 is exact; 0.20 pairs with MISS_SUB=4.
+  - key: CACHALOT_MINIMAX_PREFILL_SUB_MAX_ROWS
+    kind: env
+    families: [minimax-m3]
+    type: int
+    default: { minimax-m3: 32 }
+    group: speed
+    effect: changes-outputs
+    restart_required: true
+    stability: shipped
+    since: 0.42.0
+    summary: Experts routed to more than this many tokens are always read.
+  - key: CACHALOT_HOST_GROW_QUIET_S
+    kind: env
+    families: [minimax-m3]
+    type: float
+    default: { minimax-m3: 60 }
+    unit: seconds
+    group: memory
+    effect: speed-only
+    restart_required: true
+    stability: shipped
+    since: 0.44.0
+    summary: Quiet host-memory interval before expert-cache growth; 0 disables the pressure watcher and restores the earlier governor.
+  - key: CACHALOT_HOST_SHRINK_EVERY_S
+    kind: env
+    families: [minimax-m3]
+    type: float
+    default: { minimax-m3: 10 }
+    unit: seconds
+    group: memory
+    effect: speed-only
+    restart_required: true
+    stability: shipped
+    since: 0.44.0
+    summary: Minimum interval between pressure-driven expert slab returns.
+  - key: CACHALOT_MINIMAX_MIRROR_ADAPT
+    kind: env
+    families: [minimax-m3]
+    type: bool
+    default: { minimax-m3: true }
+    previous_default: { before: 0.45.0, minimax-m3: false }
+    group: storage
+    effect: speed-only
+    restart_required: true
+    stability: shipped
+    since: 0.45.0
+    summary: With a configured mirror, adjust its read share to measured drive speeds; 0 keeps the configured fraction fixed.
+  - key: CACHALOT_MINIMAX_BANK
+    kind: env
+    families: [minimax-m3]
+    type: absolute-path
+    group: storage
+    effect: speed-only
+    restart_required: true
+    stability: shipped
+    summary: Directory containing the MiniMax coded expert bank and bank.json.
+  - key: CACHALOT_MINIMAX_BANK_MIRROR
+    kind: env
+    families: [minimax-m3]
+    type: absolute-path
+    group: storage
+    effect: speed-only
+    restart_required: true
+    stability: shipped
+    summary: Identical bank copy on another drive; requires CACHALOT_MINIMAX_BANK.
+  - key: CACHALOT_MIRROR_FRACTION
+    kind: env
+    families: [minimax-m3]
+    type: float
+    default: { minimax-m3: 0.10 }
+    range: [0, 0.9]
+    group: storage
+    effect: speed-only
+    restart_required: true
+    stability: shipped
+    summary: Maximum share of each expert read assigned to the mirror; requires a mirror path in Studio.

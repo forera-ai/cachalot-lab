@@ -1,0 +1,17 @@
+# Checked-out runtime: 0.45.3 at 9147c2d. The HTTP response does not expose
+# package version or active numerics mode, so external-server mode stays unknown.
+reviewed_runtime:
+  version: 0.45.3
+  commit: 9147c2d30ef25f64be4597bea1b018be16d71608
+features:
+  minimax_miss_substitution: '>=0.39.0'
+  loop_guard: '>=0.40.0'
+  minimax_decode_cache_cap: '>=0.41.0'
+  minimax_spill_blocks: '>=0.41.0'
+  minimax_prefill_miss_drop: '>=0.42.0'
+  minimax_miss_substitution_default_on: '>=0.43.0'
+  version_string_matches_package: '>=0.43.1'
+  unclosed_tool_block_dropped_on_cut: '>=0.43.2'
+  host_pressure_watch: '>=0.44.0'
+  snapshot_names_include_runtime_identity: '>=0.44.0'
+  minimax_adaptive_mirror_share: '>=0.45.0'

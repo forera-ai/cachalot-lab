@@ -1,25 +1,18 @@
-import {
-  ArrowRight,
-  Check,
-  ChevronRight,
-  Command,
-  Cpu,
-  HardDrive,
-  Moon,
-  Search,
-  Sun,
-  Waves,
-} from 'lucide-react'
+import { Check, ChevronRight, Command, Moon, Search, Sun } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import markDark from '../assets/logo/cachalot-mark-dark.svg'
 import markLight from '../assets/logo/cachalot-mark-light.svg'
 import { ChatScreen } from './ChatScreen'
+import { Cockpit } from './Cockpit'
 import CommandPalette from './CommandPalette'
+import { useHostTelemetry } from './host'
+import { DiveScreen, LogsScreen } from './ManagedScreens'
+import { useManagedRuntime, type ManagedRuntime } from './managed'
 import { navigation, type Screen } from './navigation'
 import { loadPlatformInfo, type PlatformInfo } from './platform'
 import { ApiScreen } from './RuntimeScreens'
-import { runtimeNumber, useRuntime, type RuntimeConnection } from './runtime'
+import { useRuntime, type RuntimeConnection } from './runtime'
 import { useStudioStore, type ThemePreference } from './store'
 import { TelemetryStrip } from './TelemetryStrip'
 
@@ -45,278 +38,16 @@ function useResolvedTheme(preference: ThemePreference) {
   return theme
 }
 
-function Cockpit({
-  platform,
-  platformError,
-  openScreen,
-  runtime,
-}: {
-  platform: PlatformInfo | null
-  platformError: string | null
-  openScreen: (screen: Screen) => void
-  runtime: RuntimeConnection
-}) {
-  const { snapshot } = runtime
-  const hits = runtimeNumber(snapshot.stats, 'expert_hit_rate')
-  const requests = runtimeNumber(snapshot.stats, 'requests_served')
-  const tokens = runtimeNumber(snapshot.stats, 'tokens_generated')
-  const residents = runtimeNumber(snapshot.stats, 'resident_experts')
-  return (
-    <div className="page cockpit-page">
-      <div className="eyebrow">
-        <span className="eyebrow-line" /> STUDIO / 001
-      </div>
-      <div className="page-heading">
-        <div>
-          <h1>Cockpit</h1>
-          <p>Your local inference instrument panel.</p>
-        </div>
-        <span className={`state-pill ${snapshot.healthy ? 'is-online' : ''}`}>
-          <span className="status-dot" />{' '}
-          {snapshot.healthy
-            ? snapshot.busy
-              ? 'Generating'
-              : 'Runtime ready'
-            : 'Runtime offline'}
-        </span>
-      </div>
-
-      <section className="hero-panel" aria-labelledby="hero-title">
-        <div className="hero-copy">
-          <span className="section-kicker">CACHALOT ENGINE</span>
-          <h2 id="hero-title">
-            {snapshot.healthy ? 'Your model is live.' : 'Ready to dive.'}
-          </h2>
-          <p>
-            {snapshot.healthy
-              ? `${snapshot.model_id} is connected on this Mac. Start a conversation or inspect live telemetry.`
-              : 'Connect to a Cachalot server on this Mac to chat and watch its live telemetry.'}
-          </p>
-          <div className="hero-actions">
-            <button
-              className="primary-button"
-              onClick={() => openScreen(snapshot.healthy ? 'chat' : 'api')}
-            >
-              {snapshot.healthy ? 'Open chat' : 'Connect runtime'}{' '}
-              <ArrowRight size={16} />
-            </button>
-            <button
-              className="secondary-button"
-              onClick={() => openScreen('doctor')}
-            >
-              Check this Mac <ChevronRight size={16} />
-            </button>
-          </div>
-        </div>
-        <div className="depth-illustration" aria-hidden="true">
-          <div className="depth-grid" />
-          <div className="depth-ring depth-ring-outer" />
-          <div className="depth-ring depth-ring-middle" />
-          <div className="depth-ring depth-ring-inner" />
-          <div className="depth-core">
-            <img src={markDark} alt="" />
-          </div>
-          <span className="depth-label depth-label-top">
-            SURFACE <b>00</b>
-          </span>
-          <span className="depth-label depth-label-bottom">
-            ABYSS <b>04</b>
-          </span>
-          <span className="depth-cross depth-cross-one">+</span>
-          <span className="depth-cross depth-cross-two">+</span>
-        </div>
-      </section>
-
-      <div className="section-head">
-        <div>
-          <span className="section-kicker">SYSTEM OVERVIEW</span>
-          <h2>At a glance</h2>
-        </div>
-        <span className="section-note">
-          {snapshot.healthy
-            ? `Live from ${snapshot.endpoint}`
-            : 'Values appear when a runtime is connected'}
-        </span>
-      </div>
-      <div className="metric-grid">
-        <Metric
-          title="Requests served"
-          value={requests?.toLocaleString() ?? '—'}
-          unit="total"
-          detail={
-            snapshot.healthy
-              ? 'Since runtime start'
-              : 'Waiting for a running model'
-          }
-          index="01"
-        />
-        <Metric
-          title="Expert hit rate"
-          value={hits === null ? '—' : (hits * 100).toFixed(1)}
-          unit="%"
-          detail={
-            snapshot.healthy
-              ? 'Reported by Cachalot'
-              : 'Waiting for cache telemetry'
-          }
-          index="02"
-        />
-        <Metric
-          title="Tokens generated"
-          value={tokens?.toLocaleString() ?? '—'}
-          unit="total"
-          detail={
-            snapshot.healthy ? 'Since runtime start' : 'Waiting for generation'
-          }
-          index="03"
-        />
-        <Metric
-          title="Resident experts"
-          value={residents?.toLocaleString() ?? '—'}
-          unit="experts"
-          detail={
-            residents !== null
-              ? 'Current runtime cache'
-              : 'Waiting for cache telemetry'
-          }
-          index="04"
-        />
-      </div>
-
-      <div className="lower-grid">
-        <section className="info-panel tier-panel">
-          <div className="panel-title">
-            <span className="section-kicker">THE MEMORY COLUMN</span>
-            <span className="panel-index">01 / 02</span>
-          </div>
-          <h3>Four zones. One machine.</h3>
-          <p className="panel-intro">
-            Cachalot can move model data between memory and storage as a request
-            runs.
-          </p>
-          <div className="tier-list">
-            <Tier
-              color="surface"
-              label="Surface"
-              detail="Resident trunk + hot experts"
-            />
-            <Tier
-              color="twilight"
-              label="Twilight"
-              detail="Wired cache + prefix memory"
-            />
-            <Tier
-              color="midnight"
-              label="Midnight"
-              detail="Page cache + snapshots"
-            />
-            <Tier color="abyss" label="Abyss" detail="SSD + mirror drive" />
-          </div>
-        </section>
-        <section className="info-panel machine-panel">
-          <div className="panel-title">
-            <span className="section-kicker">THIS MAC</span>
-            <span className="panel-index">02 / 02</span>
-          </div>
-          <h3>Local by design.</h3>
-          <p className="panel-intro">
-            Studio runs on your Mac. Model data and telemetry stay here.
-          </p>
-          <div className="machine-rows">
-            <div>
-              <Cpu size={17} />
-              <span>Processor</span>
-              <strong>
-                {platform?.architecture ??
-                  (platformError ? 'Unavailable' : 'Checking…')}
-              </strong>
-            </div>
-            <div>
-              <Waves size={17} />
-              <span>macOS</span>
-              <strong>
-                {platform?.macos_version ??
-                  (platformError ? 'Unavailable' : 'Checking…')}
-              </strong>
-            </div>
-            <div>
-              <HardDrive size={17} />
-              <span>Unified memory</span>
-              <strong>
-                {platform
-                  ? `${platform.memory_gib.toFixed(1)} GiB`
-                  : platformError
-                    ? 'Unavailable'
-                    : 'Checking…'}
-              </strong>
-            </div>
-          </div>
-          <button className="text-button" onClick={() => openScreen('doctor')}>
-            Open Doctor <ArrowRight size={16} />
-          </button>
-        </section>
-      </div>
-    </div>
-  )
-}
-
-function Metric({
-  title,
-  value,
-  unit,
-  detail,
-  index,
-}: {
-  title: string
-  value: string
-  unit: string
-  detail: string
-  index: string
-}) {
-  return (
-    <div className="metric-card">
-      <div className="metric-top">
-        <span>{title}</span>
-        <small>{index}</small>
-      </div>
-      <div className="metric-value">
-        {value}
-        <span>{unit}</span>
-      </div>
-      <div className="metric-detail">
-        <span className="tiny-dot" />
-        {detail}
-      </div>
-    </div>
-  )
-}
-
-function Tier({
-  color,
-  label,
-  detail,
-}: {
-  color: string
-  label: string
-  detail: string
-}) {
-  return (
-    <div className="tier">
-      <span className={`tier-swatch tier-${color}`} />
-      <strong>{label}</strong>
-      <span>{detail}</span>
-    </div>
-  )
-}
-
 function Doctor({
   platform,
   error,
   runtime,
+  managed,
 }: {
   platform: PlatformInfo | null
   error: string | null
   runtime: RuntimeConnection
+  managed: ManagedRuntime
 }) {
   const checks = [
     {
@@ -338,6 +69,15 @@ function Doctor({
       label: 'Local Cachalot server',
       value: runtime.snapshot.healthy ? 'Connected' : 'Not connected',
       ok: runtime.snapshot.healthy,
+    },
+    {
+      label: 'Managed runtime',
+      value: managed.status?.running
+        ? managed.status.ready
+          ? 'Ready'
+          : 'Starting'
+        : 'Not running',
+      ok: Boolean(managed.status?.ready),
     },
   ]
   return (
@@ -372,7 +112,7 @@ function Doctor({
           </div>
         ))}
         <p className="panel-footnote">
-          Model and storage checks will be added with managed runtime profiles.
+          Managed runtime details and startup output appear in Dive and Logs.
         </p>
       </section>
     </div>
@@ -460,6 +200,8 @@ export default function App() {
   const preference = useStudioStore((state) => state.themePreference)
   const theme = useResolvedTheme(preference)
   const runtime = useRuntime()
+  const managed = useManagedRuntime(runtime)
+  const host = useHostTelemetry(screen === 'cockpit')
   const [platform, setPlatform] = useState<PlatformInfo | null>(null)
   const [platformError, setPlatformError] = useState<string | null>(null)
 
@@ -514,7 +256,7 @@ export default function App() {
         </div>
         <div className="sidebar-section-label">WORKSPACE</div>
         <nav className="sidebar-nav">
-          {navigation.slice(0, 3).map((item) => (
+          {navigation.slice(0, 4).map((item) => (
             <NavButton
               key={item.id}
               item={item}
@@ -527,7 +269,7 @@ export default function App() {
           SYSTEM
         </div>
         <nav className="sidebar-nav">
-          {navigation.slice(3).map((item) => (
+          {navigation.slice(4).map((item) => (
             <NavButton
               key={item.id}
               item={item}
@@ -543,13 +285,15 @@ export default function App() {
             <span className="status-dot" />{' '}
             {runtime.snapshot.healthy
               ? 'RUNTIME CONNECTED'
-              : 'NO RUNTIME ACTIVE'}
+              : managed.status?.running
+                ? 'RUNTIME STARTING'
+                : 'NO RUNTIME ACTIVE'}
           </span>
-          <span className="side-version">STUDIO 0.1.0</span>
+          <span className="side-version">STUDIO {studioVersion}</span>
         </div>
       </aside>
       <div
-        className={`main-shell ${runtime.snapshot.connected ? 'with-telemetry' : ''}`}
+        className={`main-shell ${runtime.snapshot.connected && screen !== 'cockpit' ? 'with-telemetry' : ''} ${screen === 'cockpit' ? 'cockpit-shell' : ''}`}
       >
         <header className="topbar" data-tauri-drag-region>
           <div className="breadcrumbs">
@@ -577,25 +321,33 @@ export default function App() {
             <Cockpit
               platform={platform}
               platformError={platformError}
+              host={host}
               openScreen={setScreen}
               runtime={runtime}
             />
           ) : screen === 'api' ? (
             <ApiScreen runtime={runtime} />
+          ) : screen === 'dive' ? (
+            <DiveScreen managed={managed} runtime={runtime} />
           ) : screen === 'doctor' ? (
             <Doctor
               platform={platform}
               error={platformError}
               runtime={runtime}
+              managed={managed}
             />
+          ) : screen === 'logs' ? (
+            <LogsScreen />
           ) : screen === 'settings' ? (
             <Settings />
           ) : null}
         </main>
-        <TelemetryStrip
-          snapshot={runtime.snapshot}
-          openCockpit={() => setScreen('cockpit')}
-        />
+        {screen !== 'cockpit' && (
+          <TelemetryStrip
+            snapshot={runtime.snapshot}
+            openCockpit={() => setScreen('cockpit')}
+          />
+        )}
       </div>
       <CommandPalette />
     </div>
@@ -624,3 +376,4 @@ function NavButton({
     </button>
   )
 }
+import { version as studioVersion } from '../package.json'

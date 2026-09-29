@@ -3,12 +3,15 @@ import {
   Cable,
   CircleHelp,
   HeartPulse,
+  Layers3,
+  ScrollText,
   MessagesSquare,
   Settings2,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
-export type Screen = 'cockpit' | 'chat' | 'api' | 'doctor' | 'settings'
+export type Screen =
+  'cockpit' | 'chat' | 'dive' | 'api' | 'doctor' | 'logs' | 'settings'
 
 export type NavigationItem = {
   id: Screen
@@ -30,12 +33,19 @@ export const navigation: NavigationItem[] = [
     description: 'Conversations',
     icon: MessagesSquare,
   },
+  { id: 'dive', label: 'Dive', description: 'Managed runtime', icon: Layers3 },
   { id: 'api', label: 'API', description: 'Server connection', icon: Cable },
   {
     id: 'doctor',
     label: 'Doctor',
     description: 'Machine readiness',
     icon: HeartPulse,
+  },
+  {
+    id: 'logs',
+    label: 'Logs',
+    description: 'Managed runtime output',
+    icon: ScrollText,
   },
   {
     id: 'settings',

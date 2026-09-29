@@ -1,7 +1,8 @@
 import { invoke, isTauri } from '@tauri-apps/api/core'
 import { useCallback, useEffect, useState } from 'react'
 
-export const DEFAULT_ENDPOINT = 'http://127.0.0.1:8011'
+export const DEFAULT_RUNTIME_PORT = 8011
+export const DEFAULT_ENDPOINT = `http://127.0.0.1:${DEFAULT_RUNTIME_PORT}`
 
 export type RuntimeSnapshot = {
   connected: boolean
@@ -15,11 +16,49 @@ export type RuntimeSnapshot = {
 
 export type RuntimeConnection = {
   snapshot: RuntimeSnapshot
+  history: RuntimePoint[]
   connecting: boolean
   connectError: string | null
-  connect: (endpoint: string, apiKey?: string) => Promise<void>
+  connect: (
+    endpoint: string,
+    apiKey?: string,
+    remember?: boolean,
+  ) => Promise<boolean>
   disconnect: () => Promise<void>
   refresh: () => Promise<void>
+}
+
+export type RuntimePoint = {
+  at: number
+  endpoint: string | null
+  decode_tps: number | null
+  expert_hit_rate: number | null
+  ssd_gbps: number | null
+  requests_served: number | null
+  tokens_generated: number | null
+  queued_requests: number | null
+  resident_experts: number | null
+}
+
+export function appendRuntimePoint(
+  history: RuntimePoint[],
+  snapshot: RuntimeSnapshot,
+  at: number,
+): RuntimePoint[] {
+  if (!snapshot.connected) return []
+  const current = history.at(-1)?.endpoint === snapshot.endpoint ? history : []
+  const point: RuntimePoint = {
+    at,
+    endpoint: snapshot.endpoint,
+    decode_tps: runtimeNumber(snapshot.stats, 'decode_tps'),
+    expert_hit_rate: runtimeNumber(snapshot.stats, 'expert_hit_rate'),
+    ssd_gbps: runtimeNumber(snapshot.stats, 'ssd_gbps'),
+    requests_served: runtimeNumber(snapshot.stats, 'requests_served'),
+    tokens_generated: runtimeNumber(snapshot.stats, 'tokens_generated'),
+    queued_requests: runtimeNumber(snapshot.stats, 'queued_requests'),
+    resident_experts: runtimeNumber(snapshot.stats, 'resident_experts'),
+  }
+  return [...current.filter((sample) => sample.at >= at - 120_000), point]
 }
 
 const disconnected: RuntimeSnapshot = {
@@ -34,43 +73,55 @@ const disconnected: RuntimeSnapshot = {
 
 export function useRuntime(): RuntimeConnection {
   const [snapshot, setSnapshot] = useState<RuntimeSnapshot>(disconnected)
+  const [history, setHistory] = useState<RuntimePoint[]>([])
   const [connecting, setConnecting] = useState(false)
   const [connectError, setConnectError] = useState<string | null>(null)
 
   const refresh = useCallback(async () => {
     if (!isTauri()) return
     try {
-      setSnapshot(await invoke<RuntimeSnapshot>('poll_runtime'))
+      const next = await invoke<RuntimeSnapshot>('poll_runtime')
+      setSnapshot(next)
+      setHistory((previous) => appendRuntimePoint(previous, next, Date.now()))
     } catch (error) {
       setConnectError(String(error))
     }
   }, [])
 
-  const connect = useCallback(async (endpoint: string, apiKey?: string) => {
-    if (!isTauri()) {
-      setConnectError('Open the macOS app to connect to a local runtime.')
-      return
-    }
-    setConnecting(true)
-    setConnectError(null)
-    try {
-      await invoke('connect_runtime', {
-        endpointUrl: endpoint,
-        apiKey: apiKey || null,
-      })
-      localStorage.setItem('cachalot-runtime-endpoint', endpoint)
-      setSnapshot(await invoke<RuntimeSnapshot>('poll_runtime'))
-    } catch (error) {
-      setConnectError(String(error))
-    } finally {
-      setConnecting(false)
-    }
-  }, [])
+  const connect = useCallback(
+    async (endpoint: string, apiKey?: string, remember = true) => {
+      if (!isTauri()) {
+        setConnectError('Open the macOS app to connect to a local runtime.')
+        return false
+      }
+      setConnecting(true)
+      setConnectError(null)
+      try {
+        await invoke('connect_runtime', {
+          endpointUrl: endpoint,
+          apiKey: apiKey || null,
+        })
+        if (remember)
+          localStorage.setItem('cachalot-runtime-endpoint', endpoint)
+        const next = await invoke<RuntimeSnapshot>('poll_runtime')
+        setSnapshot(next)
+        setHistory((previous) => appendRuntimePoint(previous, next, Date.now()))
+        return true
+      } catch (error) {
+        setConnectError(String(error))
+        return false
+      } finally {
+        setConnecting(false)
+      }
+    },
+    [],
+  )
 
   const disconnect = useCallback(async () => {
     if (!isTauri()) return
     await invoke('disconnect_runtime')
     setSnapshot(disconnected)
+    setHistory([])
     setConnectError(null)
   }, [])
 
@@ -107,7 +158,15 @@ export function useRuntime(): RuntimeConnection {
     }
   }, [connect, refresh])
 
-  return { snapshot, connecting, connectError, connect, disconnect, refresh }
+  return {
+    snapshot,
+    history,
+    connecting,
+    connectError,
+    connect,
+    disconnect,
+    refresh,
+  }
 }
 
 export function runtimeNumber(
