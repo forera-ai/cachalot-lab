@@ -21,6 +21,7 @@ import { loadPlatformInfo, type PlatformInfo } from './platform'
 import { ApiScreen } from './RuntimeScreens'
 import { runtimeNumber, useRuntime, type RuntimeConnection } from './runtime'
 import { useStudioStore, type ThemePreference } from './store'
+import { TelemetryStrip } from './TelemetryStrip'
 
 function useResolvedTheme(preference: ThemePreference) {
   const [systemDark, setSystemDark] = useState(
@@ -547,7 +548,9 @@ export default function App() {
           <span className="side-version">STUDIO 0.1.0</span>
         </div>
       </aside>
-      <div className="main-shell">
+      <div
+        className={`main-shell ${runtime.snapshot.connected ? 'with-telemetry' : ''}`}
+      >
         <header className="topbar" data-tauri-drag-region>
           <div className="breadcrumbs">
             <span>STUDIO</span>
@@ -589,6 +592,10 @@ export default function App() {
             <Settings />
           ) : null}
         </main>
+        <TelemetryStrip
+          snapshot={runtime.snapshot}
+          openCockpit={() => setScreen('cockpit')}
+        />
       </div>
       <CommandPalette />
     </div>

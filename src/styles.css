@@ -184,6 +184,109 @@ textarea:focus-visible {
   min-width: 0;
   flex: 1;
 }
+.main-shell.with-telemetry {
+  padding-bottom: 76px;
+}
+.telemetry-strip {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: var(--rail-width);
+  z-index: 15;
+  display: flex;
+  align-items: center;
+  min-height: 66px;
+  gap: 25px;
+  padding: 10px 30px;
+  border-top: 1px solid var(--border-strong);
+  background: var(--bg-rail);
+  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.12);
+}
+.telemetry-source {
+  display: grid;
+  flex: 1 1 220px;
+  min-width: 0;
+  max-width: 340px;
+  gap: 2px;
+}
+.telemetry-state {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--text-secondary);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+.telemetry-state .is-live {
+  border-color: var(--state-ok);
+  background: var(--state-ok);
+}
+.telemetry-source strong,
+.telemetry-source small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.telemetry-source strong {
+  font-size: 12px;
+}
+.telemetry-source small {
+  color: var(--text-tertiary);
+  font-size: 10px;
+}
+.telemetry-readings {
+  display: flex;
+  justify-content: flex-end;
+  gap: 27px;
+}
+.telemetry-reading {
+  display: grid;
+  min-width: 100px;
+  gap: 4px;
+  font-variant-numeric: tabular-nums;
+}
+.telemetry-reading > span {
+  color: var(--text-tertiary);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.11em;
+}
+.telemetry-reading strong {
+  font:
+    600 15px ui-monospace,
+    SFMono-Regular,
+    monospace;
+}
+.telemetry-reading small {
+  color: var(--text-secondary);
+  font-size: 9px;
+  font-weight: 600;
+}
+.telemetry-open {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+  padding: 7px 0 7px 15px;
+  border: 0;
+  border-left: 1px solid var(--border-subtle);
+  background: transparent;
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 750;
+}
+@media (max-width: 1000px) {
+  .telemetry-reading:last-child {
+    display: none;
+  }
+}
+@media (max-width: 850px) {
+  .telemetry-reading:nth-child(2) {
+    display: none;
+  }
+}
 .topbar {
   height: var(--topbar-height);
   display: flex;

@@ -14,6 +14,7 @@ Local runtime connection, health and telemetry polling, streaming chat, API setu
 
 ## Later milestones
 
+- The persistent telemetry strip and visibility-aware polling are implemented as Unreleased work after 0.1.0; richer charts and field coverage remain under 0.4.0.
 - 0.2.0: profile schema and compiler, supervision, Dive, Logs, Doctor.
 - 0.3.0: richer chat controls. Local saved conversations were brought forward after 0.1.0 and are currently unreleased.
 - 0.4.0: expanded telemetry, silent running, measured performance.

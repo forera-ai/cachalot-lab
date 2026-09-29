@@ -76,11 +76,35 @@ export function useRuntime(): RuntimeConnection {
 
   useEffect(() => {
     if (!isTauri()) return
+    let active = true
+    let timer: number | undefined
+
+    function schedule(delay = document.hidden ? 5000 : 1000) {
+      window.clearTimeout(timer)
+      timer = window.setTimeout(() => void poll(), delay)
+    }
+
+    async function poll() {
+      timer = undefined
+      await refresh()
+      if (active) schedule()
+    }
+
+    function onVisibilityChange() {
+      if (timer !== undefined) schedule(document.hidden ? 5000 : 0)
+    }
+
+    document.addEventListener('visibilitychange', onVisibilityChange)
     void connect(
       localStorage.getItem('cachalot-runtime-endpoint') || DEFAULT_ENDPOINT,
-    )
-    const interval = window.setInterval(() => void refresh(), 3000)
-    return () => window.clearInterval(interval)
+    ).finally(() => {
+      if (active) schedule()
+    })
+    return () => {
+      active = false
+      window.clearTimeout(timer)
+      document.removeEventListener('visibilitychange', onVisibilityChange)
+    }
   }, [connect, refresh])
 
   return { snapshot, connecting, connectError, connect, disconnect, refresh }
