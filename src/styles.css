@@ -831,8 +831,28 @@ textarea:focus-visible {
   max-width: 760px;
   margin-top: 16px;
 }
+.api-example-tabs {
+  display: flex;
+  gap: 5px;
+  margin-top: 22px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.api-example-tabs button {
+  padding: 9px 14px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 650;
+}
+.api-example-tabs button[aria-selected='true'] {
+  border-bottom-color: var(--accent);
+  color: var(--text-primary);
+}
 .api-panel pre {
   overflow-x: auto;
+  margin-top: 0;
   padding: 18px;
   border: 1px solid var(--border-subtle);
   border-radius: 9px;
