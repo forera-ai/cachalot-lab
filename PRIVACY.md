@@ -1,6 +1,6 @@
 # Privacy
 
-Cachalot Studio 0.2.0 makes HTTP requests only to a loopback Cachalot server selected or started by the user. It does not transmit prompts, generated content, telemetry, or model paths to the Studio developer or an analytics service.
+Cachalot Studio 0.2.1 makes HTTP requests only to a loopback Cachalot server selected or started by the user. It does not transmit prompts, generated content, telemetry, or model paths to the Studio developer or an analytics service.
 
 The app saves appearance and screen preferences, plus the last server address, in local WebView storage. It holds an optional server API key in memory during the current app session; closing Studio clears it.
 

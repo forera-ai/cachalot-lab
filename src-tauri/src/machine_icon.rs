@@ -126,6 +126,10 @@ fn icon_for_model(model: &str, root: &Path) -> Option<PathBuf> {
 
 pub fn data_url(model_identifier: Option<&str>) -> Option<String> {
     let icon = icon_for_model(model_identifier?, Path::new(CORE_TYPES))?;
+    icon_data_url(&icon)
+}
+
+fn icon_data_url(icon: &Path) -> Option<String> {
     let unique = SystemTime::now()
         .duration_since(UNIX_EPOCH)
         .ok()?
@@ -136,7 +140,7 @@ pub fn data_url(model_identifier: Option<&str>) -> Option<String> {
     ));
     let result = Command::new("/usr/bin/sips")
         .args(["-s", "format", "png", "-Z", "256"])
-        .arg(&icon)
+        .arg(icon)
         .arg("--out")
         .arg(&png)
         .output();
@@ -158,20 +162,36 @@ mod tests {
     use super::*;
 
     #[test]
-    fn installed_macos_maps_studio_model_to_apple_studio_icon() {
-        let path = icon_for_model("Mac15,14", Path::new(CORE_TYPES)).unwrap();
+    fn model_codes_map_to_distinct_icons() {
+        let root = std::env::temp_dir().join(format!("cachalot-icon-test-{}", std::process::id()));
+        let contents = root.join("Contents");
+        let resources = contents.join("Resources");
+        fs::create_dir_all(&resources).unwrap();
+        fs::write(
+            contents.join("Info.plist"),
+            r#"<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict><key>UTExportedTypeDeclarations</key><array>
+<dict><key>UTTypeIdentifier</key><string>com.apple.macstudio</string><key>UTTypeTagSpecification</key><dict><key>com.apple.device-model-code</key><string>Mac15,14</string></dict><key>UTTypeIcons</key><dict><key>UTTypeIconFile</key><string>com.apple.macstudio.icns</string></dict></dict>
+<dict><key>UTTypeIdentifier</key><string>com.apple.macmini-2024</string><key>UTTypeTagSpecification</key><dict><key>com.apple.device-model-code</key><string>Mac16,10</string></dict><key>UTTypeIcons</key><dict><key>UTTypeIconFile</key><string>com.apple.macmini-2024.icns</string></dict></dict>
+</array></dict></plist>"#,
+        )
+        .unwrap();
+        fs::write(resources.join("com.apple.macstudio.icns"), []).unwrap();
+        fs::write(resources.join("com.apple.macmini-2024.icns"), []).unwrap();
+
+        let path = icon_for_model("Mac15,14", &root).unwrap();
         assert_eq!(path.file_name().unwrap(), "com.apple.macstudio.icns");
-    }
-
-    #[test]
-    fn installed_macos_maps_new_mini_to_its_own_icon() {
-        let path = icon_for_model("Mac16,10", Path::new(CORE_TYPES)).unwrap();
+        let path = icon_for_model("Mac16,10", &root).unwrap();
         assert_eq!(path.file_name().unwrap(), "com.apple.macmini-2024.icns");
+        assert!(icon_for_model("Unknown999,999", &root).is_none());
+        fs::remove_dir_all(root).unwrap();
     }
 
     #[test]
-    fn studio_icon_converts_to_displayable_png() {
-        let data = data_url(Some("Mac15,14")).unwrap();
+    fn bundled_icon_converts_to_displayable_png() {
+        let icon = Path::new(env!("CARGO_MANIFEST_DIR")).join("icons/icon.icns");
+        let data = icon_data_url(&icon).unwrap();
         assert!(data.starts_with("data:image/png;base64,iVBOR"));
     }
 

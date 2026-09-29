@@ -54,9 +54,15 @@ pub fn host_sample() -> Result<HostSample, String> {
                 &mut memory_count,
             )
         };
-        if memory_result != libc::KERN_SUCCESS || memory_count < libc::HOST_VM_INFO64_COUNT {
+        // Older macOS versions return fewer fields than the current libc struct.
+        // The working-set calculation only needs fields through compressor_page_count.
+        let required_memory_count =
+            (std::mem::offset_of!(libc::vm_statistics64, compressor_page_count)
+                + std::mem::size_of::<libc::natural_t>())
+                / std::mem::size_of::<libc::integer_t>();
+        if memory_result != libc::KERN_SUCCESS || memory_count < required_memory_count as u32 {
             return Err(format!(
-                "Could not sample unified memory: Mach error {memory_result}"
+                "Could not sample unified memory: Mach error {memory_result}, fields {memory_count}"
             ));
         }
         let memory = unsafe { memory.assume_init() };

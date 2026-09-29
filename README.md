@@ -14,14 +14,14 @@ Studio makes a local Cachalot server easier to use: launch or connect, inspect l
 
 ## Download
 
-**Current release:** [Cachalot Studio 0.2.0](https://github.com/prooshani/cachalot-studio/releases/tag/v0.2.0) for Apple Silicon, macOS 14 or newer.
+**Current release:** [Cachalot Studio 0.2.1](https://github.com/prooshani/cachalot-studio/releases/tag/v0.2.1) for Apple Silicon, macOS 14 or newer.
 
-1. Download the signed and notarized [DMG](https://github.com/prooshani/cachalot-studio/releases/download/v0.2.0/Cachalot-Studio-0.2.0-macOS-arm64.dmg).
+1. Download the signed and notarized [DMG](https://github.com/prooshani/cachalot-studio/releases/download/v0.2.1/Cachalot-Studio-0.2.1-macOS-arm64.dmg).
 2. Open it and drag **Cachalot Studio** into **Applications**.
 3. Open Studio. It first tries an existing Cachalot server at `http://127.0.0.1:8011`.
 4. Use **Dive** to launch a local runtime, or enter another loopback port and optional API key in **API**.
 
-The release also includes a [ZIP](https://github.com/prooshani/cachalot-studio/releases/download/v0.2.0/Cachalot-Studio-0.2.0-macOS-arm64.zip) and [SHA-256 checksums](https://github.com/prooshani/cachalot-studio/releases/download/v0.2.0/SHA256SUMS). The [release notes](https://github.com/prooshani/cachalot-studio/releases/tag/v0.2.0) state the exact scope and verification.
+The release also includes a [ZIP](https://github.com/prooshani/cachalot-studio/releases/download/v0.2.1/Cachalot-Studio-0.2.1-macOS-arm64.zip) and [SHA-256 checksums](https://github.com/prooshani/cachalot-studio/releases/download/v0.2.1/SHA256SUMS). The [release notes](https://github.com/prooshani/cachalot-studio/releases/tag/v0.2.1) state the exact scope and verification.
 
 Studio does not install Cachalot, Python, or model weights. Prepare a model and environment using the [runtime documentation](https://github.com/prooshani/cachalot). Dive needs the absolute path to a Python interpreter with Cachalot installed, the model directory, and any separate expert bank. You can also start the server yourself:
 
@@ -29,7 +29,9 @@ Studio does not install Cachalot, Python, or model weights. Prepare a model and 
 python -m cachalot.cli serve --model /path/to/your/model --port 8011
 ```
 
-## What 0.2.0 includes
+## What 0.2.1 includes
+
+0.2.1 fixes host memory telemetry on macOS systems whose Mach VM statistics contain fewer fields than the current SDK structure. It also makes CI's Mac icon checks independent of the runner's installed model artwork. The 0.2.0 capabilities below remain available.
 
 - **Cockpit:** a compact dashboard with two-minute decode-speed, expert-hit, SSD-read, and resident-expert traces; whole-Mac CPU, GPU, and memory graphs; and macOS hardware details. Missing metrics remain unavailable.
 - **Chat:** streaming responses, optional reasoning, generation stop, and saved local conversations bound to their original endpoint and model.

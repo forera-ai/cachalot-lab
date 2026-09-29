@@ -6,6 +6,10 @@ Changes are grouped by release. Work on `main` after the latest tag appears unde
 
 No changes yet.
 
+## [0.2.1] - 2026-09-29
+
+This backward-compatible patch fixes host memory sampling on macOS versions that return fewer Mach VM fields than the current SDK declares. The calculation still uses active, wired, and compressed pages. Machine icon tests now use a local fixture and bundled icon so CI does not depend on model artwork installed on the runner.
+
 ## [0.2.0] - 2026-09-29
 
 This backward-compatible minor release adds managed local runtimes, saved conversations, and expanded telemetry. It keeps the 0.1.0 loopback client contract.

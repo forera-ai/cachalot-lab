@@ -53,7 +53,7 @@ This local test installation does not make an uncommitted build a release.
 
 ## Scope
 
-The [0.2.0 release](https://github.com/prooshani/cachalot-studio/releases/tag/v0.2.0) adds managed local runtime control to the 0.1.0 loopback client. The macOS artifact targets Apple Silicon. The installer does not include Python, Cachalot, checkpoints, or an update service.
+The [0.2.1 release](https://github.com/prooshani/cachalot-studio/releases/tag/v0.2.1) fixes host memory telemetry on older macOS versions; it retains 0.2.0's managed local runtime control. The macOS artifact targets Apple Silicon. The installer does not include Python, Cachalot, checkpoints, or an update service.
 
 ## One-time signing setup
 
