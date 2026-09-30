@@ -293,6 +293,11 @@ export function DiveScreen({
                         update({
                           family: event.target.value as LaunchProfile['family'],
                           tuning: newProfile().tuning,
+                          default_temperature:
+                            event.target.value === 'minimax' &&
+                            draft.default_temperature === null
+                              ? 0.7
+                              : draft.default_temperature,
                         })
                       }
                     >
@@ -346,7 +351,11 @@ export function DiveScreen({
                     }
                   />
                   <OptionalNumber
-                    label="Default temperature · runtime default 0.6"
+                    label={
+                      draft.family === 'minimax'
+                        ? 'Default temperature · MiniMax script 0.7; empty uses CLI 0.6'
+                        : 'Default temperature · empty uses CLI 0.6'
+                    }
                     value={draft.default_temperature ?? null}
                     min={0}
                     max={2}
@@ -377,6 +386,15 @@ export function DiveScreen({
                         max={50}
                         onChange={(loop_guard_repeats) =>
                           updateTuning({ loop_guard_repeats })
+                        }
+                      />
+                      <OptionalNumber
+                        label="Incrementing-list guard · Cachalot 0.46+ · default 64; 0 off; 2–4096"
+                        value={draft.tuning.loop_guard_incrementing}
+                        min={0}
+                        max={4096}
+                        onChange={(loop_guard_incrementing) =>
+                          updateTuning({ loop_guard_incrementing })
                         }
                       />
                       {draft.family === 'minimax' && (

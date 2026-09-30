@@ -1,4 +1,5 @@
 import { act, render, screen, waitFor } from '@testing-library/react'
+import { invoke } from '@tauri-apps/api/core'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -80,6 +81,7 @@ beforeEach(() => {
   persistence.list.mockReset().mockResolvedValue([saved])
   persistence.save.mockReset().mockResolvedValue(undefined)
   persistence.remove.mockReset().mockResolvedValue(undefined)
+  vi.mocked(invoke).mockClear()
 })
 
 describe('saved conversations', () => {
@@ -139,6 +141,63 @@ describe('saved conversations', () => {
                 usage: undefined,
               },
             ],
+          }),
+        ),
+      { timeout: 2000 },
+    )
+  })
+
+  it('restores per-chat generation settings and sends temperature explicitly', async () => {
+    const user = userEvent.setup()
+    render(<ChatScreen runtime={runtime()} />)
+    expect(await screen.findByText('Earlier answer')).toBeInTheDocument()
+
+    const thinking = screen.getByRole('checkbox', { name: 'Thinking' })
+    const maxTokens = screen.getByRole('spinbutton', {
+      name: 'Max output tokens',
+    })
+    const temperature = screen.getByRole('spinbutton', {
+      name: 'Temperature · server default when empty',
+    })
+    await user.click(thinking)
+    await user.clear(maxTokens)
+    await user.type(maxTokens, '4096')
+    await user.clear(temperature)
+    await user.type(temperature, '0.7')
+    await user.tab()
+
+    await user.click(screen.getByRole('button', { name: 'New chat' }))
+    expect(thinking).not.toBeChecked()
+    expect(maxTokens).toHaveValue(2048)
+    expect(temperature).toHaveValue(null)
+    await user.click(
+      screen.getByRole('button', { name: 'Open Earlier question' }),
+    )
+    expect(thinking).toBeChecked()
+    expect(maxTokens).toHaveValue(4096)
+    expect(temperature).toHaveValue(0.7)
+
+    await user.type(screen.getByRole('textbox', { name: 'Message' }), 'Again')
+    await user.click(screen.getByRole('button', { name: 'Send' }))
+    await waitFor(() =>
+      expect(invoke).toHaveBeenCalledWith(
+        'start_chat',
+        expect.objectContaining({
+          maxTokens: 4096,
+          thinking: true,
+          temperature: 0.7,
+        }),
+      ),
+    )
+    await waitFor(
+      () =>
+        expect(persistence.save).toHaveBeenCalledWith(
+          expect.objectContaining({
+            settings: {
+              max_tokens: 4096,
+              thinking: true,
+              temperature: 0.7,
+            },
           }),
         ),
       { timeout: 2000 },

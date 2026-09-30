@@ -7,6 +7,12 @@ export type ChatMessage = {
   usage?: Record<string, unknown>
 }
 
+export type GenerationSettings = {
+  thinking: boolean
+  max_tokens: number
+  temperature: number | null
+}
+
 export type Conversation = {
   id: string
   title: string
@@ -14,6 +20,7 @@ export type Conversation = {
   model_id: string
   updated_at: number
   messages: ChatMessage[]
+  settings?: GenerationSettings
 }
 
 export async function listConversations(): Promise<Conversation[]> {

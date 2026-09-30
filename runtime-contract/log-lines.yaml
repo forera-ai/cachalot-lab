@@ -4,6 +4,11 @@ patterns:
     families: [glm-5.3-flash, minimax-m3]
     regex: '^\[loop guard\] reply stopped after (?P<tokens>\d+) tokens: a (?P<block>\d+)-token block repeated (?P<repeats>\d+) times$'
     meaning: The reply looped and was stopped; this precedes its [request] line.
+  - id: loop_guard_incrementing
+    since: 0.46.0
+    families: [glm-5.3-flash, minimax-m3]
+    regex: '^\[loop guard\] reply stopped after (?P<tokens>\d+) tokens: (?P<items>\d+) list items counting up by one, none of them in the prompt$'
+    meaning: An invented counting list was stopped. Logs displays the line raw; a future loop-stop indicator should match the common prefix shared with the repeated-block guard.
   - id: unclosed_tool_block_dropped
     since: 0.43.2
     families: [glm-5.3-flash, minimax-m3]

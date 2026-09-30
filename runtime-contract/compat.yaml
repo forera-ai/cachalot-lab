@@ -1,8 +1,8 @@
-# Checked-out runtime: 0.45.3 at 9147c2d. The HTTP response does not expose
+# Checked-out runtime: 0.47.0 at 77c99a0. The HTTP response does not expose
 # package version or active numerics mode, so external-server mode stays unknown.
 reviewed_runtime:
-  version: 0.45.3
-  commit: 9147c2d30ef25f64be4597bea1b018be16d71608
+  version: 0.47.0
+  commit: 77c99a009cddd85891235e16a4f5154625b35923
 features:
   minimax_miss_substitution: '>=0.39.0'
   loop_guard: '>=0.40.0'
@@ -15,3 +15,10 @@ features:
   host_pressure_watch: '>=0.44.0'
   snapshot_names_include_runtime_identity: '>=0.44.0'
   minimax_adaptive_mirror_share: '>=0.45.0'
+  loop_guard_incrementing: '>=0.46.0'
+  minimax_serve_script_default_temperature_0_7: '>=0.47.0'
+launch_defaults:
+  direct_cli_temperature: 0.6
+  minimax_serve_script_temperature:
+    before_0_47_0: 1.0
+    since_0_47_0: 0.7

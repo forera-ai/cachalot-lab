@@ -6,6 +6,15 @@ Changes are grouped by release. Work on `main` after the latest tag appears unde
 
 No changes yet.
 
+## [0.3.0] - 2026-09-30
+
+This backward-compatible minor release adds per-conversation generation controls and Cachalot 0.46–0.47 launch compatibility.
+
+- Save Thinking, maximum output tokens, and optional temperature with each conversation. Existing conversation files load with previous defaults; an empty temperature leaves the server default in control.
+- Expose Cachalot 0.46's incrementing-list loop guard for managed GLM and MiniMax profiles. Omitted values inherit runtime default 64; 0 disables it. Record the new raw log pattern without inferring per-request warnings from text logs.
+- Start newly selected MiniMax profiles at temperature 0.7, matching the Cachalot 0.47 MiniMax launch script. Existing profiles retain their saved value or the direct CLI default when empty.
+- Review runtime 0.47.0 source and briefs. HTTP routes and stats fields are unchanged.
+
 ## [0.2.1] - 2026-09-29
 
 This backward-compatible patch fixes host memory sampling on macOS versions that return fewer Mach VM fields than the current SDK declares. The calculation still uses active, wired, and compressed pages. Machine icon tests now use a local fixture and bundled icon so CI does not depend on model artwork installed on the runner.

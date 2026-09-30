@@ -12,11 +12,12 @@ const STORE_VERSION: u8 = 1;
 const MAX_STORE_BYTES: usize = 256 * 1024;
 const MAX_PROFILES: usize = 50;
 
-pub(crate) const CONTROLLED_ENV_KEYS: [&str; 14] = [
+pub(crate) const CONTROLLED_ENV_KEYS: [&str; 15] = [
     "CACHALOT_MINIMAX_MISS_DROP",
     "CACHALOT_MINIMAX_MISS_SUB",
     "CACHALOT_MINIMAX_MISS_DROP_ARMED",
     "CACHALOT_LOOP_GUARD_REPEATS",
+    "CACHALOT_LOOP_GUARD_INCREMENTING",
     "CACHALOT_MINIMAX_DECODE_CACHE_GIB",
     "CACHALOT_MINIMAX_SPILL_BLOCKS",
     "CACHALOT_MINIMAX_PREFILL_MISS_DROP",
@@ -52,6 +53,8 @@ pub struct RuntimeTuning {
     minimax_prefill_miss_substitution: Option<bool>,
     #[serde(default)]
     loop_guard_repeats: Option<u8>,
+    #[serde(default)]
+    loop_guard_incrementing: Option<u16>,
     #[serde(default)]
     minimax_decode_cache_gib: Option<f64>,
     #[serde(default)]
@@ -287,13 +290,19 @@ fn validate(profile: &LaunchProfile) -> Result<(), String> {
     {
         return Err("MiniMax tuning requires a MiniMax profile family.".to_owned());
     }
-    if tuning.loop_guard_repeats.is_some()
+    if (tuning.loop_guard_repeats.is_some() || tuning.loop_guard_incrementing.is_some())
         && !matches!(profile.family, ModelFamily::Glm | ModelFamily::Minimax)
     {
         return Err("Loop guard tuning requires a GLM or MiniMax profile family.".to_owned());
     }
     if tuning.loop_guard_repeats.is_some_and(|value| value > 50) {
         return Err("Loop guard repeats must be between 0 and 50.".to_owned());
+    }
+    if tuning
+        .loop_guard_incrementing
+        .is_some_and(|value| value == 1 || value > 4096)
+    {
+        return Err("Incrementing-list guard must be 0 or between 2 and 4096.".to_owned());
     }
     if tuning
         .minimax_decode_cache_gib
@@ -388,6 +397,12 @@ pub(crate) fn compile(profile: &LaunchProfile) -> Result<LaunchCommand, String> 
     }
     if let Some(value) = tuning.loop_guard_repeats {
         environment.insert("CACHALOT_LOOP_GUARD_REPEATS".to_owned(), value.to_string());
+    }
+    if let Some(value) = tuning.loop_guard_incrementing {
+        environment.insert(
+            "CACHALOT_LOOP_GUARD_INCREMENTING".to_owned(),
+            value.to_string(),
+        );
     }
     if let Some(value) = tuning.minimax_decode_cache_gib {
         environment.insert(
@@ -649,19 +664,35 @@ mod tests {
         let mut profile = sample();
         profile.tuning.minimax_decode_miss_substitution = Some(true);
         assert!(validate(&profile).is_err());
+        profile.tuning.minimax_decode_miss_substitution = None;
+        profile.tuning.loop_guard_incrementing = Some(64);
+        assert!(validate(&profile).is_err());
         profile.family = ModelFamily::Minimax;
         profile.tuning.loop_guard_repeats = Some(51);
         assert!(validate(&profile).is_err());
         profile.tuning.loop_guard_repeats = Some(0);
+        profile.tuning.loop_guard_incrementing = Some(1);
+        assert!(validate(&profile).is_err());
+        profile.tuning.loop_guard_incrementing = Some(64);
         profile.tuning.minimax_decode_cache_gib = Some(-1.0);
         profile.tuning.minimax_spill_blocks = Some(false);
         let command = compile(&profile).expect("valid tuning");
         assert_eq!(command.environment["CACHALOT_LOOP_GUARD_REPEATS"], "0");
         assert_eq!(
+            command.environment["CACHALOT_LOOP_GUARD_INCREMENTING"],
+            "64"
+        );
+        assert_eq!(
             command.environment["CACHALOT_MINIMAX_DECODE_CACHE_GIB"],
             "-1"
         );
         assert_eq!(command.environment["CACHALOT_MINIMAX_SPILL_BLOCKS"], "0");
+        profile.tuning.loop_guard_incrementing = Some(0);
+        assert_eq!(
+            compile(&profile).expect("disabled guard").environment
+                ["CACHALOT_LOOP_GUARD_INCREMENTING"],
+            "0"
+        );
     }
 
     #[test]

@@ -1,5 +1,5 @@
-# Verified against Cachalot 0.45.3 (9147c2d). Null overrides in Studio profiles
-# inherit the runtime's version-specific default; explicit zero selects exact output.
+# Verified against Cachalot 0.47.0 (77c99a0). Null overrides in Studio profiles
+# inherit the runtime's version-specific default; zero has each knob's stated effect.
 knobs:
   - key: CACHALOT_MINIMAX_MISS_DROP
     kind: env
@@ -50,6 +50,18 @@ knobs:
     stability: shipped
     since: 0.40.0
     summary: Stop repeated reply blocks; 0 disables the guard.
+  - key: CACHALOT_LOOP_GUARD_INCREMENTING
+    kind: env
+    families: [glm-5.3-flash, minimax-m3]
+    type: int
+    default: { glm-5.3-flash: 64, minimax-m3: 64 }
+    studio_range: [0, 4096]
+    group: decode
+    effect: changes-outputs
+    restart_required: true
+    stability: shipped
+    since: 0.46.0
+    summary: Stop invented list items that differ only by an integer counting up by one; 0 disables the guard. Studio rejects 1 because the runtime requires at least 2 items.
   - key: CACHALOT_MINIMAX_DECODE_CACHE_GIB
     kind: env
     families: [minimax-m3]

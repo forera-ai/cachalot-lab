@@ -26,6 +26,12 @@ struct ActiveChat {
     task: JoinHandle<()>,
 }
 
+struct GenerationOptions {
+    max_tokens: u32,
+    thinking: bool,
+    temperature: Option<f64>,
+}
+
 pub struct RuntimeState {
     connection: Mutex<Option<Connection>>,
     chat: Arc<Mutex<Option<ActiveChat>>>,
@@ -340,11 +346,13 @@ async fn stream_chat(
     connection: Connection,
     chat_id: u64,
     messages: Vec<ChatMessage>,
-    max_tokens: u32,
-    thinking: bool,
+    options: GenerationOptions,
 ) -> Result<(), String> {
     let url = endpoint(&connection.base_url, "v1/chat/completions")?;
-    let request = json!({"model": connection.model_id, "messages": messages, "stream": true, "stream_options": {"include_usage": true}, "max_tokens": max_tokens, "thinking": thinking});
+    let mut request = json!({"model": connection.model_id, "messages": messages, "stream": true, "stream_options": {"include_usage": true}, "max_tokens": options.max_tokens, "thinking": options.thinking});
+    if let Some(value) = options.temperature {
+        request["temperature"] = json!(value);
+    }
     let response = with_auth(client.post(url).json(&request), &connection.api_key)
         .send()
         .await
@@ -397,6 +405,7 @@ pub fn start_chat(
     messages: Vec<ChatMessage>,
     max_tokens: u32,
     thinking: bool,
+    temperature: Option<f64>,
 ) -> Result<u64, String> {
     if messages.is_empty()
         || messages.iter().any(|message| {
@@ -413,6 +422,9 @@ pub fn start_chat(
     }
     if !(1..=32_768).contains(&max_tokens) {
         return Err("Max tokens must be between 1 and 32768.".to_owned());
+    }
+    if temperature.is_some_and(|value| !value.is_finite() || !(0.0..=2.0).contains(&value)) {
+        return Err("Temperature must be between 0 and 2.".to_owned());
     }
     let connection = state
         .connection
@@ -438,8 +450,11 @@ pub fn start_chat(
             connection,
             chat_id,
             messages,
-            max_tokens,
-            thinking,
+            GenerationOptions {
+                max_tokens,
+                thinking,
+                temperature,
+            },
         )
         .await
         {

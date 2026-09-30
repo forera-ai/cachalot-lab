@@ -7,6 +7,7 @@ export type RuntimeTuning = {
   minimax_decode_miss_substitution: boolean | null
   minimax_prefill_miss_substitution: boolean | null
   loop_guard_repeats: number | null
+  loop_guard_incrementing: number | null
   minimax_decode_cache_gib: number | null
   minimax_spill_blocks: boolean | null
   host_grow_quiet_s: number | null
@@ -62,6 +63,7 @@ export function newProfile(): LaunchProfile {
       minimax_decode_miss_substitution: null,
       minimax_prefill_miss_substitution: null,
       loop_guard_repeats: null,
+      loop_guard_incrementing: null,
       minimax_decode_cache_gib: null,
       minimax_spill_blocks: null,
       host_grow_quiet_s: null,

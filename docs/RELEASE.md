@@ -53,7 +53,7 @@ This local test installation does not make an uncommitted build a release.
 
 ## Scope
 
-The [0.2.1 release](https://github.com/prooshani/cachalot-studio/releases/tag/v0.2.1) fixes host memory telemetry on older macOS versions; it retains 0.2.0's managed local runtime control. The macOS artifact targets Apple Silicon. The installer does not include Python, Cachalot, checkpoints, or an update service.
+The [0.3.0 release](https://github.com/prooshani/cachalot-studio/releases/tag/v0.3.0) adds saved per-chat generation settings and Cachalot 0.46–0.47 launch controls. It retains 0.2.x managed local runtime control and host telemetry fixes. The macOS artifact targets Apple Silicon. The installer does not include Python, Cachalot, checkpoints, or an update service.
 
 ## One-time signing setup
 

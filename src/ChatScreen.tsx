@@ -15,6 +15,7 @@ import {
   saveConversation,
   titleFromMessage,
   type Conversation,
+  type GenerationSettings,
 } from './conversations'
 import type { RuntimeConnection } from './runtime'
 import { useStudioStore } from './store'
@@ -29,6 +30,11 @@ type ChatEvent = {
 }
 
 const emptyMessages: Conversation['messages'] = []
+const defaultSettings: GenerationSettings = {
+  thinking: false,
+  max_tokens: 2048,
+  temperature: null,
+}
 
 function updatedConversation(
   conversation: Conversation,
@@ -44,8 +50,10 @@ export function ChatScreen({ runtime }: { runtime: RuntimeConnection }) {
   const [loaded, setLoaded] = useState(false)
   const [storageError, setStorageError] = useState<string | null>(null)
   const [draft, setDraft] = useState('')
-  const [thinking, setThinking] = useState(false)
-  const [maxTokens, setMaxTokens] = useState(2048)
+  const [newChatSettings, setNewChatSettings] =
+    useState<GenerationSettings>(defaultSettings)
+  const [maxTokensDraft, setMaxTokensDraft] = useState<string | null>(null)
+  const [temperatureDraft, setTemperatureDraft] = useState<string | null>(null)
   const [sending, setSending] = useState(false)
   const [chatError, setChatError] = useState<string | null>(null)
 
@@ -205,6 +213,14 @@ export function ChatScreen({ runtime }: { runtime: RuntimeConnection }) {
 
   const selected = conversations.find((item) => item.id === selectedId)
   const messages = selected?.messages ?? emptyMessages
+  const settings = selected
+    ? (selected.settings ?? defaultSettings)
+    : newChatSettings
+
+  useEffect(() => {
+    setMaxTokensDraft(null)
+    setTemperatureDraft(null)
+  }, [selectedId])
   const sameSource =
     !selected ||
     (selected.endpoint === runtime.snapshot.endpoint &&
@@ -218,8 +234,24 @@ export function ChatScreen({ runtime }: { runtime: RuntimeConnection }) {
     if (sending) return
     flushSave()
     setSelectedId(id)
+    if (id === null) setNewChatSettings(defaultSettings)
+    setMaxTokensDraft(null)
+    setTemperatureDraft(null)
     setDraft('')
     setChatError(null)
+  }
+
+  function updateSettings(change: Partial<GenerationSettings>) {
+    if (sending) return
+    if (selected) {
+      updateConversation(selected.id, (current) => ({
+        ...current,
+        settings: { ...(current.settings ?? defaultSettings), ...change },
+        updated_at: Date.now(),
+      }))
+    } else {
+      setNewChatSettings((current) => ({ ...current, ...change }))
+    }
   }
 
   async function removeConversation(id: string) {
@@ -275,6 +307,7 @@ export function ChatScreen({ runtime }: { runtime: RuntimeConnection }) {
         model_id: runtime.snapshot.model_id || '',
         updated_at: Date.now(),
         messages: nextMessages,
+        settings: { ...settings },
       }
       const next = [conversation, ...conversationsRef.current]
       conversationsRef.current = next
@@ -290,8 +323,9 @@ export function ChatScreen({ runtime }: { runtime: RuntimeConnection }) {
     try {
       const requestId = await invoke<number>('start_chat', {
         messages: [...history, { role: 'user', content }],
-        maxTokens,
-        thinking,
+        maxTokens: settings.max_tokens,
+        thinking: settings.thinking,
+        temperature: settings.temperature,
       })
       if (pendingRequest.current) activeRequestId.current = requestId
     } catch (error) {
@@ -457,8 +491,11 @@ export function ChatScreen({ runtime }: { runtime: RuntimeConnection }) {
               <label>
                 <input
                   type="checkbox"
-                  checked={thinking}
-                  onChange={(event) => setThinking(event.target.checked)}
+                  checked={settings.thinking}
+                  disabled={sending}
+                  onChange={(event) =>
+                    updateSettings({ thinking: event.target.checked })
+                  }
                 />{' '}
                 Thinking
               </label>
@@ -468,8 +505,39 @@ export function ChatScreen({ runtime }: { runtime: RuntimeConnection }) {
                   type="number"
                   min="1"
                   max="32768"
-                  value={maxTokens}
-                  onChange={(event) => setMaxTokens(Number(event.target.value))}
+                  value={maxTokensDraft ?? settings.max_tokens}
+                  disabled={sending}
+                  onChange={(event) => {
+                    const raw = event.target.value
+                    setMaxTokensDraft(raw)
+                    const value = Number(raw)
+                    if (Number.isInteger(value) && value >= 1 && value <= 32768)
+                      updateSettings({ max_tokens: value })
+                  }}
+                  onBlur={() => setMaxTokensDraft(null)}
+                />
+              </label>
+              <label>
+                Temperature · server default when empty{' '}
+                <input
+                  type="number"
+                  min="0"
+                  max="2"
+                  step="0.1"
+                  value={temperatureDraft ?? settings.temperature ?? ''}
+                  disabled={sending}
+                  onChange={(event) => {
+                    const value = event.target.value
+                    setTemperatureDraft(value)
+                    if (value === '') updateSettings({ temperature: null })
+                    else if (
+                      Number.isFinite(Number(value)) &&
+                      Number(value) >= 0 &&
+                      Number(value) <= 2
+                    )
+                      updateSettings({ temperature: Number(value) })
+                  }}
+                  onBlur={() => setTemperatureDraft(null)}
                 />
               </label>
             </div>
