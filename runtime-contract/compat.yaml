@@ -1,8 +1,8 @@
-# Checked-out runtime: 0.47.0 at 77c99a0. The HTTP response does not expose
+# Checked-out runtime: 0.60.0 at 62c0f05. The HTTP response does not expose
 # package version or active numerics mode, so external-server mode stays unknown.
 reviewed_runtime:
-  version: 0.47.0
-  commit: 77c99a009cddd85891235e16a4f5154625b35923
+  version: 0.60.0
+  commit: 62c0f053576c191ac56893449932d175abf86537
 features:
   minimax_miss_substitution: '>=0.39.0'
   loop_guard: '>=0.40.0'
@@ -17,8 +17,29 @@ features:
   minimax_adaptive_mirror_share: '>=0.45.0'
   loop_guard_incrementing: '>=0.46.0'
   minimax_serve_script_default_temperature_0_7: '>=0.47.0'
+  minimax_chat_script_default_temperature_0_7: '>=0.48.0'
+  glm_contiguous_expert_bank: '>=0.49.0'
+  glm_next_layer_prefetch: '>=0.50.0'
+  glm_image_input: '>=0.51.0'
+  glm_video_input: '>=0.52.0'
+  deepseek_wired_governor: '>=0.54.0'
+  deepseek_decode_miss_budget: '>=0.57.0'
+  deepseek_disk_chunk_pins: '>=0.59.0'
+  deepseek_system_date_reuse: '>=0.60.0'
 launch_defaults:
   direct_cli_temperature: 0.6
+  deepseek_direct_cli_decode_miss_budget: null
+  deepseek_serve_script_decode_miss_budget_since_0_60_0: 0
+  deepseek_serve_script_expert_budget_gib_since_0_53_0: 48
+  deepseek_system_date_reuse_since_0_60_0: true
+  deepseek_system_date_reuse_days_since_0_60_0: 7
   minimax_serve_script_temperature:
     before_0_47_0: 1.0
     since_0_47_0: 0.7
+  minimax_chat_script_temperature:
+    before_0_48_0: 1.0
+    since_0_48_0: 0.7
+  # Script defaults only. Studio requires explicit absolute model paths and
+  # does not rewrite saved profiles or assume this owner's drive layout.
+  glm_scripts_model_since_0_48_1: '~/GLM-5.3-Flash-MLX-4bit-MTP'
+  deepseek_scripts_bank_since_0_48_1: '/Volumes/X10Pro/Flash4-1/DeepSeek-V4.1-Flash-q2g128'

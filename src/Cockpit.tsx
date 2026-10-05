@@ -10,8 +10,17 @@ import {
   type RuntimePoint,
 } from './runtime'
 import './cockpit.css'
+import { useStudioStore } from './store'
 
 type TrendDatum = { at: number; value: number | null }
+
+function runtimeTotal(runtime: RuntimeConnection, key: string): string {
+  if (!runtime.snapshot.connected || !runtime.snapshot.healthy) return '—'
+  const value = runtimeNumber(runtime.snapshot.stats, key)
+  return value !== null && Number.isSafeInteger(value) && value >= 0
+    ? value.toLocaleString()
+    : '—'
+}
 
 function TrendChart({
   data,
@@ -26,6 +35,18 @@ function TrendChart({
   ceiling?: number
   className?: string
 }) {
+  const silentRunning = useStudioStore((state) => state.silentRunning)
+  const id = useId().replaceAll(':', '')
+  if (silentRunning) {
+    return (
+      <div
+        className={`trend-chart ${className}`}
+        aria-label={`${label} trace paused`}
+      >
+        <span className="trend-empty">Live trace paused</span>
+      </div>
+    )
+  }
   const valid = data.filter((point) => point.value !== null)
   const latest = valid.at(-1)
   const span = 120_000
@@ -64,7 +85,6 @@ function TrendChart({
           )
           .join(' ')} L${x(lastRecent.at).toFixed(1)},128 Z`
       : ''
-  const id = useId().replaceAll(':', '')
 
   return (
     <div className={`trend-chart ${className}`}>
@@ -343,6 +363,16 @@ export function Cockpit({
                 '—'
               }
             />
+            <div
+              role="group"
+              aria-label="Image input total"
+              title="Runtime image inputs across requests, including video steps and resent history. Not unique images, completed replies, or a vision capability signal. — means unreported."
+            >
+              <SmallStat
+                label="IMAGE INPUTS"
+                value={runtimeTotal(runtime, 'images_served')}
+              />
+            </div>
             {!snapshot.healthy && (
               <button
                 className="panel-inline-link"
@@ -470,6 +500,21 @@ export function Cockpit({
                 label="Resident experts"
               />
             </div>
+          </div>
+          <div
+            className="prefetch-totals"
+            role="group"
+            aria-label="Expert prefetch totals"
+          >
+            <SmallStat
+              label="PREFETCH READS"
+              value={runtimeTotal(runtime, 'predicted_loads')}
+            />
+            <SmallStat
+              label="PREFETCH USED"
+              value={runtimeTotal(runtime, 'predicted_used')}
+            />
+            <p>Runtime totals · — means unreported. Not a speedup measure.</p>
           </div>
           <div className="cache-footer">
             <p>

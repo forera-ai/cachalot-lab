@@ -375,6 +375,42 @@ export function DiveScreen({
                     />
                   </label>
                 </div>
+                {draft.family === 'deepseek' && (
+                  <>
+                    <h3>DeepSeek runtime tuning</h3>
+                    <div className="managed-fields">
+                      <TriState
+                        label="Decode drops misses · Cachalot 0.57+ · CLI default Off"
+                        value={draft.tuning.deepseek_decode_drop_misses ?? null}
+                        onChange={(deepseek_decode_drop_misses) =>
+                          updateTuning({ deepseek_decode_drop_misses })
+                        }
+                      />
+                      <TriState
+                        label="System date reuse · Cachalot 0.60+ · default On"
+                        value={draft.tuning.deepseek_system_date_reuse ?? null}
+                        onChange={(deepseek_system_date_reuse) =>
+                          updateTuning({ deepseek_system_date_reuse })
+                        }
+                      />
+                    </div>
+                    <p className="panel-intro">
+                      Decode drops misses is faster but changes outputs and can
+                      lower quality. On drops every non-resident decode expert;
+                      Off selects exact decode. Cachalot 0.60 serve.sh defaults
+                      to On; Studio launches the CLI directly, which defaults to
+                      Off. Runtime default preserves that CLI behavior.
+                    </p>
+                    <p className="panel-intro">
+                      System date reuse can avoid refilling a saved system block
+                      on a new day. The model can see a date up to 7 days old in
+                      the leading system message. Off keeps the true date. A
+                      snapshot directory retains date reuse across restarts.
+                      Older runtimes ignore unsupported controls. Changes apply
+                      on the next launch.
+                    </p>
+                  </>
+                )}
                 {(draft.family === 'glm' || draft.family === 'minimax') && (
                   <>
                     <h3>Runtime tuning</h3>
@@ -397,6 +433,73 @@ export function DiveScreen({
                           updateTuning({ loop_guard_incrementing })
                         }
                       />
+                      {draft.family === 'glm' && (
+                        <>
+                          <label>
+                            GLM expert bank directory · optional · Cachalot
+                            0.49+
+                            <input
+                              value={draft.tuning.glm_bank_path ?? ''}
+                              placeholder="/path/to/glm-bank"
+                              onChange={(event) =>
+                                updateTuning({
+                                  glm_bank_path: event.target.value || null,
+                                })
+                              }
+                            />
+                          </label>
+                          <TriState
+                            label="GLM expert bank · 0.49+ default On when a bank is set"
+                            value={draft.tuning.glm_bank_enabled ?? null}
+                            onChange={(glm_bank_enabled) =>
+                              updateTuning({ glm_bank_enabled })
+                            }
+                          />
+                          <OptionalNumber
+                            label="GLM prefetch experts · 0.50+ default 5; 0 off"
+                            value={draft.tuning.glm_predict_topk ?? null}
+                            min={0}
+                            max={288}
+                            onChange={(glm_predict_topk) =>
+                              updateTuning({ glm_predict_topk })
+                            }
+                          />
+                          <OptionalNumber
+                            label="GLM prefetch read limit · 0.50+ default 0 (all predicted)"
+                            value={draft.tuning.glm_predict_limit ?? null}
+                            min={0}
+                            max={288}
+                            onChange={(glm_predict_limit) =>
+                              updateTuning({ glm_predict_limit })
+                            }
+                          />
+                          <label>
+                            GLM prefetch scheduling · Cachalot 0.50+
+                            <select
+                              value={
+                                draft.tuning.glm_predict_after_demand ??
+                                'inherit'
+                              }
+                              onChange={(event) =>
+                                updateTuning({
+                                  glm_predict_after_demand: optionalNumber(
+                                    event.target.value === 'inherit'
+                                      ? ''
+                                      : event.target.value,
+                                  ),
+                                })
+                              }
+                            >
+                              <option value="inherit">
+                                Runtime default (after demand)
+                              </option>
+                              <option value="1">After demand reads</option>
+                              <option value="0">Alongside demand reads</option>
+                              <option value="-1">Follow store policy</option>
+                            </select>
+                          </label>
+                        </>
+                      )}
                       {draft.family === 'minimax' && (
                         <>
                           <TriState
@@ -499,6 +602,15 @@ export function DiveScreen({
                         </>
                       )}
                     </div>
+                    {draft.family === 'glm' && (
+                      <p className="panel-intro">
+                        Optional GLM overrides apply on the next launch. Empty
+                        fields use runtime defaults; older runtimes ignore these
+                        controls. A bank needs bank.json; Off retains its saved
+                        path but uses checkpoint experts. Bank reads and
+                        prefetch preserve model outputs.
+                      </p>
+                    )}
                     {draft.family === 'minimax' && (
                       <>
                         <p className="panel-intro">

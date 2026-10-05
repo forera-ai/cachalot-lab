@@ -236,6 +236,31 @@ pub fn read_managed_log(app: AppHandle) -> Result<String, String> {
     })
 }
 
+fn check_bank_paths(launch: &profiles::LaunchCommand) -> Result<(), String> {
+    for key in [
+        "CACHALOT_MINIMAX_BANK",
+        "CACHALOT_MINIMAX_BANK_MIRROR",
+        "CACHALOT_GLM_BANK",
+    ] {
+        if key == "CACHALOT_GLM_BANK"
+            && launch
+                .environment
+                .get("CACHALOT_GLM_BANK_ENABLED")
+                .is_some_and(|value| value == "0")
+        {
+            continue;
+        }
+        if let Some(path) = launch.environment.get(key) {
+            if !Path::new(path).join("bank.json").is_file() {
+                return Err(format!(
+                    "{key} must point to an expert bank containing bank.json."
+                ));
+            }
+        }
+    }
+    Ok(())
+}
+
 #[tauri::command]
 pub fn start_managed_runtime(
     app: AppHandle,
@@ -251,15 +276,7 @@ pub fn start_managed_runtime(
     if !Path::new(&profile.model_path).is_dir() {
         return Err("Model directory does not exist.".to_owned());
     }
-    for key in ["CACHALOT_MINIMAX_BANK", "CACHALOT_MINIMAX_BANK_MIRROR"] {
-        if let Some(path) = launch.environment.get(key) {
-            if !Path::new(path).join("bank.json").is_file() {
-                return Err(format!(
-                    "{key} must point to an expert bank containing bank.json."
-                ));
-            }
-        }
-    }
+    check_bank_paths(&launch)?;
     let mut inner = state
         .0
         .lock()
@@ -331,6 +348,41 @@ pub(crate) fn stop_on_exit(app: &AppHandle) {
 mod tests {
     use super::*;
     use std::io::{Read, Write};
+
+    #[test]
+    fn checks_glm_bank_only_when_enabled() {
+        let directory = std::env::temp_dir().join(format!(
+            "studio-glm-bank-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .expect("clock")
+                .as_nanos()
+        ));
+        fs::create_dir_all(&directory).expect("bank directory");
+        let mut launch = profiles::LaunchCommand {
+            executable: String::new(),
+            args: vec![],
+            environment: [(
+                "CACHALOT_GLM_BANK".to_owned(),
+                directory.to_string_lossy().into_owned(),
+            )]
+            .into(),
+            endpoint: String::new(),
+        };
+        assert!(check_bank_paths(&launch).unwrap_err().contains("bank.json"));
+        launch
+            .environment
+            .insert("CACHALOT_GLM_BANK_ENABLED".to_owned(), "0".to_owned());
+        assert!(check_bank_paths(&launch).is_ok());
+        launch
+            .environment
+            .insert("CACHALOT_GLM_BANK_ENABLED".to_owned(), "1".to_owned());
+        assert!(check_bank_paths(&launch).is_err());
+        fs::write(directory.join("bank.json"), b"{}").expect("bank manifest");
+        assert!(check_bank_paths(&launch).is_ok());
+        fs::remove_dir_all(directory).expect("cleanup");
+    }
 
     #[test]
     fn stop_only_reaps_the_child_it_owns() {

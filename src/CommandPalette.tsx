@@ -31,7 +31,9 @@ export default function CommandPalette() {
   const setOpen = useStudioStore((state) => state.setPaletteOpen)
   const setScreen = useStudioStore((state) => state.setScreen)
   const setTheme = useStudioStore((state) => state.setThemePreference)
-  const reduceMotion = useReducedMotion()
+  const systemReducedMotion = useReducedMotion()
+  const silentRunning = useStudioStore((state) => state.silentRunning)
+  const reduceMotion = systemReducedMotion || silentRunning
   const inputRef = useRef<HTMLInputElement>(null)
   const paletteRef = useRef<HTMLDivElement>(null)
   const previousFocus = useRef<HTMLElement | null>(null)

@@ -1,9 +1,44 @@
-import { render, screen } from '@testing-library/react'
-import { expect, it, vi } from 'vitest'
+import { act, render, screen, within } from '@testing-library/react'
+import { beforeEach, expect, it, vi } from 'vitest'
 
 import { Cockpit } from './Cockpit'
 import type { PlatformInfo } from './platform'
 import type { RuntimeConnection, RuntimePoint } from './runtime'
+import { useStudioStore } from './store'
+
+beforeEach(() => useStudioStore.setState({ silentRunning: false }))
+
+it('pauses traces in silent running while keeping readings current', () => {
+  const runtime = connection()
+  const view = () => (
+    <Cockpit
+      platform={platform}
+      platformError={null}
+      host={{ history: [], error: null }}
+      openScreen={vi.fn()}
+      runtime={runtime}
+    />
+  )
+  const { rerender } = render(view())
+  expect(
+    screen.getByRole('img', { name: 'Model decode speed history' }),
+  ).toBeInTheDocument()
+  act(() => useStudioStore.getState().setSilentRunning(true))
+  expect(screen.queryByRole('img', { name: /history/ })).not.toBeInTheDocument()
+  expect(screen.getAllByText('Live trace paused').length).toBeGreaterThan(0)
+  runtime.snapshot.stats = { decode_tps: 37, images_served: 9 }
+  rerender(view())
+  expect(screen.getAllByText('37.0').length).toBeGreaterThan(0)
+  expect(
+    within(screen.getByRole('group', { name: 'Image input total' })).getByText(
+      '9',
+    ),
+  ).toBeInTheDocument()
+  act(() => useStudioStore.getState().setSilentRunning(false))
+  expect(
+    screen.getByRole('img', { name: 'Model decode speed history' }),
+  ).toBeInTheDocument()
+})
 
 const platform: PlatformInfo = {
   architecture: 'arm64',
@@ -150,4 +185,95 @@ it('shows an explicit numerics tag when a future runtime reports one', () => {
   )
   expect(screen.getByText('NUMERICS missdrop0.2-sub4')).toBeInTheDocument()
   expect(screen.queryByText('OUTPUT MODE UNREPORTED')).not.toBeInTheDocument()
+})
+
+it('shows reported prefetch totals, preserves zero, and clears unavailable data', () => {
+  const runtime = connection()
+  const view = () => (
+    <Cockpit
+      platform={platform}
+      platformError={null}
+      host={{ history: [], error: null }}
+      openScreen={vi.fn()}
+      runtime={runtime}
+    />
+  )
+  runtime.snapshot.stats = { predicted_loads: 120, predicted_used: 0 }
+  const { rerender } = render(view())
+  const totals = () =>
+    within(screen.getByRole('group', { name: 'Expert prefetch totals' }))
+  expect(totals().getByText('120')).toBeInTheDocument()
+  expect(totals().getByText('0')).toBeInTheDocument()
+  expect(totals().getByText(/Runtime totals/)).toBeInTheDocument()
+
+  runtime.snapshot.stats = { predicted_loads: 0, predicted_used: 0 }
+  rerender(view())
+  expect(totals().getAllByText('0')).toHaveLength(2)
+
+  runtime.snapshot.stats = { predicted_loads: 12 }
+  rerender(view())
+  expect(totals().getByText('12')).toBeInTheDocument()
+  expect(totals().getByText('—')).toBeInTheDocument()
+
+  for (const stats of [
+    {},
+    { predicted_loads: '120', predicted_used: null },
+    { predicted_loads: -1, predicted_used: 0.5 },
+    { predicted_loads: Infinity, predicted_used: Number.MAX_SAFE_INTEGER + 1 },
+  ]) {
+    runtime.snapshot.stats = stats
+    rerender(view())
+    expect(totals().getAllByText('—')).toHaveLength(2)
+  }
+
+  runtime.snapshot.stats = { predicted_loads: 120, predicted_used: 80 }
+  runtime.snapshot.healthy = false
+  rerender(view())
+  expect(totals().getAllByText('—')).toHaveLength(2)
+  expect(totals().queryByText('120')).not.toBeInTheDocument()
+})
+
+it('shows image input totals without inferring vision support and clears stale values', () => {
+  const runtime = connection()
+  const view = () => (
+    <Cockpit
+      platform={platform}
+      platformError={null}
+      host={{ history: [], error: null }}
+      openScreen={vi.fn()}
+      runtime={runtime}
+    />
+  )
+  runtime.snapshot.stats = { images_served: 7 }
+  const { rerender } = render(view())
+  const total = () =>
+    within(screen.getByRole('group', { name: 'Image input total' }))
+  expect(total().getByText('7')).toBeInTheDocument()
+  expect(total().getByText('IMAGE INPUTS')).toBeInTheDocument()
+  for (const value of [0, 12]) {
+    runtime.snapshot.stats = { images_served: value }
+    rerender(view())
+    expect(total().getByText(String(value))).toBeInTheDocument()
+  }
+  for (const value of [
+    undefined,
+    null,
+    '7',
+    -1,
+    0.5,
+    Infinity,
+    Number.MAX_SAFE_INTEGER + 1,
+  ]) {
+    runtime.snapshot.stats = { images_served: value }
+    rerender(view())
+    expect(total().getByText('—')).toBeInTheDocument()
+  }
+  runtime.snapshot.stats = { images_served: 7 }
+  runtime.snapshot.healthy = false
+  rerender(view())
+  expect(total().getByText('—')).toBeInTheDocument()
+  runtime.snapshot.healthy = true
+  runtime.snapshot.connected = false
+  rerender(view())
+  expect(total().getByText('—')).toBeInTheDocument()
 })

@@ -1,0 +1,50 @@
+# Source-reviewed HTTP fields, not inferred from launch knobs or startup logs.
+reviewed_runtime:
+  version: 0.60.0
+  commit: 62c0f053576c191ac56893449932d175abf86537
+endpoint: /v1/stats
+fields:
+  decode_miss_budget:
+    meaning: DeepSeek per-layer decode miss read cap; null means no miss dropping.
+    type: nullable_nonnegative_integer
+    optional: true
+    studio: Not yet displayed; do not infer exactness of all output paths from this single field.
+  skipped_experts:
+    meaning: Cumulative dropped expert count, not a quality score.
+    type: nonnegative_integer
+    optional: true
+    studio: Not yet displayed.
+  predicted_loads:
+    meaning: Number of predicted expert reads submitted by the resident store.
+    type: nonnegative_integer
+    optional: true
+  predicted_used:
+    meaning: Number of predicted reads consumed by demand loading.
+    type: nonnegative_integer
+    optional: true
+  images_served:
+    meaning: Image spans accepted into requests, including video steps and resent history; incremented before generation.
+    type: nonnegative_integer
+    optional: true
+    since_glm: 0.51.0
+source:
+  counters: src/cachalot/cache/resident_store.py
+  deepseek_export: src/cachalot/model/api.py
+  deepseek_engine: src/cachalot/server/engine.py
+  glm_minimax_engine: src/cachalot/glm/engine.py
+availability:
+  deepseek: Exported by V41Model.stats and forwarded by Engine.stats.
+  glm_minimax: Internal counters exist but GlmEngine.stats omits these HTTP fields.
+studio:
+  display: Independent runtime totals from the current healthy connected snapshot.
+  unavailable: Missing, malformed, negative, unsafe integer, or offline values show —.
+  zero: Displayed as zero; does not imply prefetch is disabled.
+  limits: No speedup, success percentage, or per-request attribution is inferred.
+
+image_input_total:
+  source: GlmEngine.stream_chat increments images_served by len(spans) before model.stream.
+  display: IMAGE INPUTS in Cockpit, with independent current-snapshot validation.
+  limits: Not unique images, completed replies, or proof of vision capability.
+  video_since_glm: 0.52.0
+  video_meaning: Each sampled temporal step contributes a span; this is not a video or frame count.
+  client: Studio image and video attachments remain pending; runtime API image support is separate.

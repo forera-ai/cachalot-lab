@@ -17,10 +17,36 @@ beforeEach(() => {
     screen: 'cockpit',
     themePreference: 'abyss',
     paletteOpen: false,
+    silentRunning: false,
   })
 })
 
 describe('Studio shell', () => {
+  it('saves silent running and restores it from local preferences', async () => {
+    const user = userEvent.setup()
+    useStudioStore.setState({ screen: 'settings' })
+    render(<App />)
+    const toggle = screen.getByRole('switch', { name: 'Silent running' })
+    expect(toggle).not.toBeChecked()
+    await user.click(toggle)
+    expect(toggle).toBeChecked()
+    expect(document.documentElement).toHaveAttribute(
+      'data-silent-running',
+      'true',
+    )
+    const stored = localStorage.getItem('cachalot-studio-ui')
+    expect(JSON.parse(stored!).state.silentRunning).toBe(true)
+    useStudioStore.setState({ silentRunning: false })
+    localStorage.setItem('cachalot-studio-ui', stored!)
+    await useStudioStore.persist.rehydrate()
+    await waitFor(() => expect(toggle).toBeChecked())
+    await user.click(toggle)
+    expect(document.documentElement).toHaveAttribute(
+      'data-silent-running',
+      'false',
+    )
+  })
+
   it('navigates with the sidebar and command palette', async () => {
     const user = userEvent.setup()
     render(<App />)

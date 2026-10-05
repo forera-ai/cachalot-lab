@@ -1506,3 +1506,11 @@ textarea:focus-visible {
     scroll-behavior: auto !important;
   }
 }
+
+html[data-silent-running='true'] *,
+html[data-silent-running='true'] *::before,
+html[data-silent-running='true'] *::after {
+  animation: none !important;
+  transition: none !important;
+  scroll-behavior: auto !important;
+}

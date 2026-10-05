@@ -20,6 +20,8 @@ class Scenario:
     api_key: str = ""
     missing_stats: bool = False
     crash_on_chat: bool = False
+    prefetch_stats: bool = False
+    image_stats: bool = False
 
 
 class MockRuntime(ThreadingHTTPServer):
@@ -93,6 +95,10 @@ class Handler(BaseHTTPRequestHandler):
                 }
             if not self.server.scenario.missing_stats:
                 stats.update({"decode_tps": 0.0, "expert_hit_rate": 0.0, "ssd_gbps": 0.0})
+                if self.server.scenario.prefetch_stats:
+                    stats.update({"predicted_loads": 120, "predicted_used": 80})
+                if self.server.scenario.image_stats:
+                    stats["images_served"] = 7
             self.json_response(200, stats)
             return
         self.json_response(404, {"error": {"message": "Not found"}})
@@ -183,8 +189,10 @@ def main() -> None:
     parser.add_argument("--api-key", default="")
     parser.add_argument("--missing-stats", action="store_true")
     parser.add_argument("--crash-on-chat", action="store_true")
+    parser.add_argument("--prefetch-stats", action="store_true", help="Expose fixed synthetic prefetch totals (120 reads, 80 used)")
+    parser.add_argument("--image-stats", action="store_true", help="Expose a fixed synthetic image input total (7)")
     args = parser.parse_args()
-    scenario = Scenario(args.startup_delay, args.prefill_delay, args.token_delay, args.api_key, args.missing_stats, args.crash_on_chat)
+    scenario = Scenario(args.startup_delay, args.prefill_delay, args.token_delay, args.api_key, args.missing_stats, args.crash_on_chat, args.prefetch_stats, args.image_stats)
     server = MockRuntime(("127.0.0.1", args.port), scenario)
     print("[startup] process up", flush=True)
     print(f"[startup] server listening on 127.0.0.1:{server.server_port}", flush=True)

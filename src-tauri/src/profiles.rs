@@ -12,7 +12,10 @@ const STORE_VERSION: u8 = 1;
 const MAX_STORE_BYTES: usize = 256 * 1024;
 const MAX_PROFILES: usize = 50;
 
-pub(crate) const CONTROLLED_ENV_KEYS: [&str; 15] = [
+pub(crate) const CONTROLLED_ENV_KEYS: [&str; 23] = [
+    "CACHALOT_DECODE_MISS_BUDGET",
+    "CACHALOT_SYSTEM_DATE_REUSE",
+    "CACHALOT_SYSTEM_DATE_REUSE_DAYS",
     "CACHALOT_MINIMAX_MISS_DROP",
     "CACHALOT_MINIMAX_MISS_SUB",
     "CACHALOT_MINIMAX_MISS_DROP_ARMED",
@@ -28,6 +31,11 @@ pub(crate) const CONTROLLED_ENV_KEYS: [&str; 15] = [
     "CACHALOT_MINIMAX_BANK",
     "CACHALOT_MINIMAX_BANK_MIRROR",
     "CACHALOT_MIRROR_FRACTION",
+    "CACHALOT_GLM_BANK",
+    "CACHALOT_GLM_BANK_ENABLED",
+    "CACHALOT_GLM_PREDICT_TOPK",
+    "CACHALOT_GLM_PREDICT_LIMIT",
+    "CACHALOT_GLM_PREDICT_AFTER_DEMAND",
 ];
 
 #[derive(Default)]
@@ -45,6 +53,10 @@ pub enum ModelFamily {
 
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 pub struct RuntimeTuning {
+    #[serde(default)]
+    deepseek_decode_drop_misses: Option<bool>,
+    #[serde(default)]
+    deepseek_system_date_reuse: Option<bool>,
     // None inherits the installed runtime's default. Some(false) explicitly
     // selects the exact path, including on runtime >= 0.43.0.
     #[serde(default)]
@@ -71,6 +83,16 @@ pub struct RuntimeTuning {
     minimax_mirror_path: Option<String>,
     #[serde(default)]
     minimax_mirror_fraction: Option<f64>,
+    #[serde(default)]
+    glm_bank_path: Option<String>,
+    #[serde(default)]
+    glm_bank_enabled: Option<bool>,
+    #[serde(default)]
+    glm_predict_topk: Option<u16>,
+    #[serde(default)]
+    glm_predict_limit: Option<u16>,
+    #[serde(default)]
+    glm_predict_after_demand: Option<i8>,
 }
 
 impl ModelFamily {
@@ -276,6 +298,40 @@ fn validate(profile: &LaunchProfile) -> Result<(), String> {
         return Err("Snapshot directory must be an absolute path.".to_owned());
     }
     let tuning = &profile.tuning;
+    if (tuning.deepseek_decode_drop_misses.is_some() || tuning.deepseek_system_date_reuse.is_some())
+        && profile.family != ModelFamily::Deepseek
+    {
+        return Err("DeepSeek tuning requires a DeepSeek profile family.".to_owned());
+    }
+    if (tuning.glm_bank_path.is_some()
+        || tuning.glm_bank_enabled.is_some()
+        || tuning.glm_predict_topk.is_some()
+        || tuning.glm_predict_limit.is_some()
+        || tuning.glm_predict_after_demand.is_some())
+        && profile.family != ModelFamily::Glm
+    {
+        return Err("GLM tuning requires a GLM profile family.".to_owned());
+    }
+    if tuning.glm_bank_path.as_ref().is_some_and(|path| {
+        path.len() > 1024 || path.chars().any(char::is_control) || !Path::new(path).is_absolute()
+    }) {
+        return Err(
+            "GLM bank directory must be an absolute path without control characters.".to_owned(),
+        );
+    }
+    if [tuning.glm_predict_topk, tuning.glm_predict_limit]
+        .into_iter()
+        .flatten()
+        .any(|value| value > 288)
+    {
+        return Err("GLM prefetch counts must be between 0 and 288.".to_owned());
+    }
+    if tuning
+        .glm_predict_after_demand
+        .is_some_and(|value| !(-1..=1).contains(&value))
+    {
+        return Err("GLM prefetch scheduling must be -1, 0, or 1.".to_owned());
+    }
     if (tuning.minimax_decode_miss_substitution.is_some()
         || tuning.minimax_prefill_miss_substitution.is_some()
         || tuning.minimax_decode_cache_gib.is_some()
@@ -378,6 +434,43 @@ pub(crate) fn compile(profile: &LaunchProfile) -> Result<LaunchCommand, String> 
     }
     let tuning = &profile.tuning;
     let mut environment = BTreeMap::new();
+    if let Some(enabled) = tuning.deepseek_decode_drop_misses {
+        // -1 selects exact decode on 0.57+, including before the off spelling.
+        environment.insert(
+            "CACHALOT_DECODE_MISS_BUDGET".to_owned(),
+            if enabled { "0" } else { "-1" }.to_owned(),
+        );
+    }
+    if let Some(enabled) = tuning.deepseek_system_date_reuse {
+        environment.insert(
+            "CACHALOT_SYSTEM_DATE_REUSE".to_owned(),
+            if enabled { "1" } else { "0" }.to_owned(),
+        );
+    }
+
+    if let Some(path) = &tuning.glm_bank_path {
+        environment.insert("CACHALOT_GLM_BANK".to_owned(), path.clone());
+    }
+    if let Some(enabled) = tuning.glm_bank_enabled {
+        environment.insert(
+            "CACHALOT_GLM_BANK_ENABLED".to_owned(),
+            if enabled { "1" } else { "0" }.to_owned(),
+        );
+    }
+    for (key, value) in [
+        ("CACHALOT_GLM_PREDICT_TOPK", tuning.glm_predict_topk),
+        ("CACHALOT_GLM_PREDICT_LIMIT", tuning.glm_predict_limit),
+    ] {
+        if let Some(value) = value {
+            environment.insert(key.to_owned(), value.to_string());
+        }
+    }
+    if let Some(value) = tuning.glm_predict_after_demand {
+        environment.insert(
+            "CACHALOT_GLM_PREDICT_AFTER_DEMAND".to_owned(),
+            value.to_string(),
+        );
+    }
     if let Some(enabled) = tuning.minimax_decode_miss_substitution {
         environment.insert(
             "CACHALOT_MINIMAX_MISS_DROP".to_owned(),
@@ -741,6 +834,133 @@ mod tests {
     }
 
     #[test]
+    fn compiles_deepseek_choices_and_preserves_legacy_defaults() {
+        let mut profile = sample();
+        profile.family = ModelFamily::Deepseek;
+        assert!(compile(&profile)
+            .expect("inherited CLI defaults")
+            .environment
+            .is_empty());
+        for (drops, dates, budget, reuse) in [(true, false, "0", "0"), (false, true, "-1", "1")] {
+            profile.tuning.deepseek_decode_drop_misses = Some(drops);
+            profile.tuning.deepseek_system_date_reuse = Some(dates);
+            let command = compile(&profile).expect("DeepSeek choices");
+            assert_eq!(command.environment["CACHALOT_DECODE_MISS_BUDGET"], budget);
+            assert_eq!(command.environment["CACHALOT_SYSTEM_DATE_REUSE"], reuse);
+            let loaded: LaunchProfile =
+                serde_json::from_slice(&serde_json::to_vec(&profile).expect("encode"))
+                    .expect("decode");
+            assert_eq!(
+                compile(&loaded).expect("restored choices").environment,
+                command.environment
+            );
+        }
+        for key in [
+            "CACHALOT_DECODE_MISS_BUDGET",
+            "CACHALOT_SYSTEM_DATE_REUSE",
+            "CACHALOT_SYSTEM_DATE_REUSE_DAYS",
+        ] {
+            assert!(CONTROLLED_ENV_KEYS.contains(&key));
+        }
+        let mut old = serde_json::to_value(sample()).expect("legacy JSON");
+        old["family"] = serde_json::json!("deepseek");
+        old["tuning"] = serde_json::json!({});
+        let loaded = serde_json::from_value(old).expect("legacy read");
+        assert!(compile(&loaded)
+            .expect("legacy compile")
+            .environment
+            .is_empty());
+    }
+
+    #[test]
+    fn rejects_deepseek_choices_on_other_families() {
+        for family in [ModelFamily::Auto, ModelFamily::Glm, ModelFamily::Minimax] {
+            for tuning in [
+                RuntimeTuning {
+                    deepseek_decode_drop_misses: Some(false),
+                    ..Default::default()
+                },
+                RuntimeTuning {
+                    deepseek_system_date_reuse: Some(true),
+                    ..Default::default()
+                },
+            ] {
+                let mut profile = sample();
+                profile.family = family;
+                profile.tuning = tuning;
+                assert!(compile(&profile).is_err());
+            }
+        }
+    }
+
+    #[test]
+    fn compiles_glm_bank_and_prefetch_overrides() {
+        let mut value = serde_json::to_value(sample()).expect("profile JSON");
+        value["family"] = serde_json::json!("glm");
+        value["tuning"] = serde_json::json!({
+            "glm_bank_path": "/models/GLM bank",
+            "glm_bank_enabled": false,
+            "glm_predict_topk": 0,
+            "glm_predict_limit": 0,
+            "glm_predict_after_demand": -1
+        });
+        let profile = serde_json::from_value(value).expect("GLM profile");
+        let command = compile(&profile).expect("GLM launch");
+        for (key, expected) in [
+            ("CACHALOT_GLM_BANK", "/models/GLM bank"),
+            ("CACHALOT_GLM_BANK_ENABLED", "0"),
+            ("CACHALOT_GLM_PREDICT_TOPK", "0"),
+            ("CACHALOT_GLM_PREDICT_LIMIT", "0"),
+            ("CACHALOT_GLM_PREDICT_AFTER_DEMAND", "-1"),
+        ] {
+            assert_eq!(
+                command.environment.get(key).map(String::as_str),
+                Some(expected)
+            );
+            assert!(CONTROLLED_ENV_KEYS.contains(&key));
+        }
+    }
+
+    #[test]
+    fn validates_glm_controls_and_preserves_older_tuning() {
+        for tuning in [
+            serde_json::json!({"glm_bank_path": "relative/bank"}),
+            serde_json::json!({"glm_predict_topk": 289}),
+            serde_json::json!({"glm_predict_limit": 289}),
+            serde_json::json!({"glm_predict_after_demand": 2}),
+            serde_json::json!({"glm_predict_after_demand": -2}),
+        ] {
+            let mut value = serde_json::to_value(sample()).expect("profile JSON");
+            value["family"] = serde_json::json!("glm");
+            value["tuning"] = tuning;
+            let profile = serde_json::from_value(value).expect("GLM profile");
+            assert!(compile(&profile).is_err());
+        }
+        for family in ["auto", "deepseek", "minimax"] {
+            for tuning in [
+                serde_json::json!({"glm_bank_path": "/models/bank"}),
+                serde_json::json!({"glm_bank_enabled": false}),
+                serde_json::json!({"glm_predict_topk": 5}),
+                serde_json::json!({"glm_predict_limit": 0}),
+                serde_json::json!({"glm_predict_after_demand": -1}),
+            ] {
+                let mut value = serde_json::to_value(sample()).expect("profile JSON");
+                value["family"] = serde_json::json!(family);
+                value["tuning"] = tuning;
+                let profile = serde_json::from_value(value).expect("profile");
+                assert!(compile(&profile).is_err());
+            }
+        }
+        let mut value = serde_json::to_value(sample()).expect("profile JSON");
+        value["family"] = serde_json::json!("glm");
+        value["tuning"] = serde_json::json!({"loop_guard_repeats": 6});
+        let profile = serde_json::from_value(value).expect("older GLM profile");
+        let command = compile(&profile).expect("older GLM launch");
+        assert_eq!(command.environment.len(), 1);
+        assert_eq!(command.environment["CACHALOT_LOOP_GUARD_REPEATS"], "6");
+    }
+
+    #[test]
     fn round_trips_and_rejects_corrupt_document() {
         let directory = std::env::temp_dir().join(format!(
             "cachalot-profiles-test-{}-{}",
@@ -752,16 +972,30 @@ mod tests {
         ));
         fs::create_dir_all(&directory).expect("create directory");
         let path = directory.join("profiles.json");
+        let mut glm = sample();
+        glm.id = "16bdca45-5cea-4d35-a38d-bfcba49ef097".to_owned();
+        glm.family = ModelFamily::Glm;
+        glm.tuning.glm_bank_path = Some("/models/GLM bank".to_owned());
+        glm.tuning.glm_bank_enabled = Some(true);
+        glm.tuning.glm_predict_topk = Some(5);
+        glm.tuning.glm_predict_limit = Some(3);
+        glm.tuning.glm_predict_after_demand = Some(1);
         write_document(
             &path,
             &Document {
                 version: STORE_VERSION,
-                profiles: vec![sample()],
+                profiles: vec![sample(), glm.clone()],
             },
         )
         .expect("write");
         let loaded = read_document(&path).expect("read");
         assert_eq!(loaded.profiles[0].name, "Local model");
+        assert_eq!(
+            compile(&loaded.profiles[1])
+                .expect("saved GLM compile")
+                .environment,
+            compile(&glm).expect("original GLM compile").environment
+        );
         let mut legacy = serde_json::to_value(&loaded).expect("encode document");
         legacy["profiles"][0]
             .as_object_mut()

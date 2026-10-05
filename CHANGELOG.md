@@ -4,7 +4,17 @@ Changes are grouped by release. Work on `main` after the latest tag appears unde
 
 ## Unreleased
 
-No changes yet.
+## [0.4.0] - 2026-10-05
+
+This backward-compatible minor release adds family-specific launch capabilities, optional runtime totals, and a saved visual quiet preference. Existing profiles, conversations, and preferences retain their defaults.
+
+- Add GLM contiguous expert bank path and enable switch (Cachalot 0.49+), plus prefetch expert count, read limit, and scheduling controls (0.50+). Validate paths, counts, and family; check enabled banks contain `bank.json`. Off retains a saved bank path while using checkpoint experts.
+- Add DeepSeek Decode drops misses (0.57+) and System date reuse (0.60+) switches with output-quality and stale-date warnings. Empty preserves direct CLI defaults: exact decode, date reuse On on 0.60+. Off selects exact decode with budget -1. Distinguish Studio's CLI launch from the 0.60 `serve.sh` default of budget 0. Remove inherited controlled environment keys before applying profile overrides, including the date window so the shown seven-day cost remains accurate.
+- Add Cockpit prefetch read/used and image input totals from reported runtime fields. Preserve zero; show unavailable for missing, malformed, unhealthy, or offline snapshots. Image inputs include video steps and resent history and do not establish vision capability or successful replies. GLM/MiniMax still omit prediction totals in the reviewed HTTP source.
+- Add saved Silent running in Settings: pause Cockpit trace rendering and remove interface transitions while readings, sampling, connection checks, and runtime generation continue. Default Off preserves existing behavior.
+- Review runtime briefs through Cachalot 0.60.0 at `62c0f053576c191ac56893449932d175abf86537`; record video, wired governor, script budget, measurement-only tracing, chunk pins, and date reuse contracts. Update mock fixtures and compatibility tests.
+
+Validation: 35 frontend tests, 27 Rust tests, 5 Python mock tests, TypeScript, production build, lint, formatting, and clippy passed in local preflight. Native profile save/reopen/preview, Cockpit totals, and silent-running behavior were inspected in installed local builds. Live MiniMax 0.50.1 readiness, streamed reply, and clean stop were verified in prior integration work. Live GLM bank/prefetch and DeepSeek 0.60 controls, media attachments, and sustained performance measurements remain unverified or planned. No performance gain or output-quality magnitude is promised.
 
 ## [0.3.0] - 2026-09-30
 

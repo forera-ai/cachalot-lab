@@ -120,6 +120,8 @@ function Doctor({
 }
 
 function Settings() {
+  const silentRunning = useStudioStore((state) => state.silentRunning)
+  const setSilentRunning = useStudioStore((state) => state.setSilentRunning)
   const preference = useStudioStore((state) => state.themePreference)
   const setPreference = useStudioStore((state) => state.setThemePreference)
   const choices: {
@@ -182,9 +184,38 @@ function Settings() {
           ))}
         </div>
       </section>
+      <section className="info-panel settings-panel">
+        <span className="section-kicker">MOTION</span>
+        <h2>Silent running</h2>
+        <p className="panel-intro" id="silent-running-description">
+          Pause live traces and remove interface transitions. Readings and
+          connection checks stay live; runtime generation continues as usual.
+        </p>
+        <button
+          className={`theme-choice ${silentRunning ? 'is-active' : ''}`}
+          role="switch"
+          aria-label="Silent running"
+          aria-describedby="silent-running-description"
+          aria-checked={silentRunning}
+          onClick={() => setSilentRunning(!silentRunning)}
+        >
+          <Moon size={20} aria-hidden="true" />
+          <span>
+            <strong>{silentRunning ? 'On' : 'Off'}</strong>
+            <small>
+              {silentRunning
+                ? 'Quiet interface, live readings'
+                : 'Live traces and transitions'}
+            </small>
+          </span>
+          {silentRunning && (
+            <Check size={18} className="theme-check" aria-hidden="true" />
+          )}
+        </button>
+      </section>
       <p className="settings-note">
-        Theme preference stays on this Mac. API keys remain in memory for the
-        current session.
+        Appearance preferences stay on this Mac. API keys remain in memory for
+        the current session.
       </p>
     </div>
   )
@@ -199,6 +230,13 @@ export default function App() {
   const setPaletteOpen = useStudioStore((state) => state.setPaletteOpen)
   const preference = useStudioStore((state) => state.themePreference)
   const theme = useResolvedTheme(preference)
+  const silentRunning = useStudioStore((state) => state.silentRunning)
+  useEffect(() => {
+    document.documentElement.dataset.silentRunning = String(silentRunning)
+    return () => {
+      delete document.documentElement.dataset.silentRunning
+    }
+  }, [silentRunning])
   const runtime = useRuntime()
   const managed = useManagedRuntime(runtime)
   const host = useHostTelemetry(screen === 'cockpit')

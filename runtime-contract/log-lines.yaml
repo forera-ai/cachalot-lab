@@ -1,4 +1,34 @@
 patterns:
+  - id: deepseek_decode_miss_budget
+    since: 0.57.0
+    families: [deepseek-v4.1-flash]
+    regex: '^decode miss budget (?P<budget>\d+): at most .+$'
+    meaning: Decode drops experts beyond the miss read cap and changes outputs. Raw Logs only; not a runtime version or quality signal.
+  - id: system_date_reuse
+    since: 0.60.0
+    families: [deepseek-v4.1-flash]
+    regex: '^system date reuse: .+$'
+    meaning: Startup announces the date reuse window; raw Logs only.
+  - id: system_date_replaced
+    since: 0.60.0
+    families: [deepseek-v4.1-flash]
+    regex: '^\[request\] system date: showing (?P<shown>.+) for (?P<true>.+)$'
+    meaning: The model sees the saved date while client history retains the true date; raw Logs only.
+  - id: deepseek_wired_fit
+    since: 0.54.0
+    families: [deepseek-v4.1-flash]
+    regex: '^wired fit: expert slots (?P<old>\d+) -> (?P<new>\d+) \(system wired .+, ceiling .+\)$'
+    meaning: Runtime changed resident capacity under whole-system wired pressure. Cockpit reads resident_experts from HTTP rather than parsing this line.
+  - id: routing_trace
+    since: 0.55.0
+    families: [deepseek-v4.1-flash]
+    regex: '^routing trace (on|saved): .+$'
+    meaning: Measurement trace start or save; not normal tuning or a performance result.
+  - id: glm_expert_bank
+    since: 0.49.0
+    families: [glm-5.3-flash]
+    regex: '^GLM expert bank: (?P<path>.+)$'
+    meaning: GLM selected a contiguous bank at startup. Logs displays the raw line; Studio does not infer live telemetry or compatibility from it.
   - id: loop_guard
     since: 0.40.0
     families: [glm-5.3-flash, minimax-m3]

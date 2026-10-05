@@ -4,6 +4,8 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { DEFAULT_RUNTIME_PORT, type RuntimeConnection } from './runtime'
 
 export type RuntimeTuning = {
+  deepseek_decode_drop_misses: boolean | null
+  deepseek_system_date_reuse: boolean | null
   minimax_decode_miss_substitution: boolean | null
   minimax_prefill_miss_substitution: boolean | null
   loop_guard_repeats: number | null
@@ -16,6 +18,11 @@ export type RuntimeTuning = {
   minimax_bank_path: string | null
   minimax_mirror_path: string | null
   minimax_mirror_fraction: number | null
+  glm_bank_path: string | null
+  glm_bank_enabled: boolean | null
+  glm_predict_topk: number | null
+  glm_predict_limit: number | null
+  glm_predict_after_demand: number | null
 }
 
 export type LaunchProfile = {
@@ -60,6 +67,8 @@ export function newProfile(): LaunchProfile {
     default_temperature: null,
     snapshot_dir: null,
     tuning: {
+      deepseek_decode_drop_misses: null,
+      deepseek_system_date_reuse: null,
       minimax_decode_miss_substitution: null,
       minimax_prefill_miss_substitution: null,
       loop_guard_repeats: null,
@@ -72,6 +81,11 @@ export function newProfile(): LaunchProfile {
       minimax_bank_path: null,
       minimax_mirror_path: null,
       minimax_mirror_fraction: null,
+      glm_bank_path: null,
+      glm_bank_enabled: null,
+      glm_predict_topk: null,
+      glm_predict_limit: null,
+      glm_predict_after_demand: null,
     },
   }
 }

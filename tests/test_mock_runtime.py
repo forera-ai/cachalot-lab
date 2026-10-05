@@ -50,6 +50,30 @@ class MockRuntimeTests(unittest.TestCase):
         stats = json.loads(data)
         self.assertIn("requests_served", stats)
         self.assertNotIn("decode_tps", stats)
+        self.assertNotIn("predicted_loads", stats)
+        self.assertNotIn("predicted_used", stats)
+
+    def test_optional_image_fixture_and_partial_response(self):
+        _, data = self.request("/v1/stats")
+        self.assertNotIn("images_served", json.loads(data))
+        self.runtime.scenario = mock_server.Scenario(image_stats=True)
+        _, data = self.request("/v1/stats")
+        self.assertEqual(json.loads(data)["images_served"], 7)
+        self.runtime.scenario = mock_server.Scenario(image_stats=True, missing_stats=True)
+        _, data = self.request("/v1/stats")
+        self.assertNotIn("images_served", json.loads(data))
+
+    def test_optional_prefetch_fixture_and_partial_response(self):
+        self.runtime.scenario = mock_server.Scenario(prefetch_stats=True)
+        _, data = self.request("/v1/stats")
+        stats = json.loads(data)
+        self.assertEqual(stats["predicted_loads"], 120)
+        self.assertEqual(stats["predicted_used"], 80)
+        self.runtime.scenario = mock_server.Scenario(prefetch_stats=True, missing_stats=True)
+        _, data = self.request("/v1/stats")
+        stats = json.loads(data)
+        self.assertNotIn("predicted_loads", stats)
+        self.assertNotIn("predicted_used", stats)
 
     def test_stream_and_counters(self):
         status, stream = self.request(
