@@ -44,6 +44,7 @@ impl Default for RuntimeState {
         let client = Client::builder()
             .connect_timeout(Duration::from_secs(4))
             .no_proxy()
+            .redirect(reqwest::redirect::Policy::none())
             .build()
             .map_err(|error| format!("Could not initialize local HTTP client: {error}"));
         Self {
@@ -109,7 +110,7 @@ fn lock_error() -> String {
     "Studio's runtime state is unavailable. Restart the app.".to_owned()
 }
 
-fn parse_local_endpoint(raw: &str) -> Result<Url, String> {
+pub(crate) fn parse_local_endpoint(raw: &str) -> Result<Url, String> {
     let mut url = Url::parse(raw.trim())
         .map_err(|_| "Enter a complete URL such as http://127.0.0.1:8011".to_owned())?;
     if url.scheme() != "http" {
@@ -120,6 +121,8 @@ fn parse_local_endpoint(raw: &str) -> Result<Url, String> {
         .ok_or("The endpoint needs a hostname.".to_owned())?;
     let loopback = host.eq_ignore_ascii_case("localhost")
         || host
+            .trim_start_matches('[')
+            .trim_end_matches(']')
             .parse::<IpAddr>()
             .is_ok_and(|address| address.is_loopback());
     if !loopback {
@@ -178,6 +181,7 @@ pub async fn connect_runtime(
     state: State<'_, RuntimeState>,
     endpoint_url: String,
     api_key: Option<String>,
+    use_keychain: Option<bool>,
 ) -> Result<ConnectionInfo, String> {
     if state
         .chat
@@ -190,7 +194,16 @@ pub async fn connect_runtime(
     }
     let client = state.client.as_ref().map_err(Clone::clone)?;
     let base_url = parse_local_endpoint(&endpoint_url)?;
-    let key = api_key.filter(|value| !value.trim().is_empty());
+    let key = match api_key.filter(|value| !value.trim().is_empty()) {
+        Some(value) => Some(crate::credentials::validate_key(&value)?),
+        None if use_keychain.unwrap_or(false) => {
+            let address = base_url.as_str().to_owned();
+            tauri::async_runtime::spawn_blocking(move || crate::credentials::load(&address))
+                .await
+                .map_err(|_| "Could not load Keychain key.".to_owned())??
+        }
+        None => None,
+    };
     let health = fetch_json(client, endpoint(&base_url, "health")?, &None).await?;
     if health.get("status").and_then(Value::as_str) != Some("ok") {
         return Err("The server is reachable but is not ready yet.".to_owned());

@@ -214,8 +214,8 @@ function Settings() {
         </button>
       </section>
       <p className="settings-note">
-        Appearance preferences stay on this Mac. API keys remain in memory for
-        the current session.
+        Appearance preferences stay on this Mac. API keys stay in session memory
+        unless explicitly saved in Keychain from API.
       </p>
     </div>
   )

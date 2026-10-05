@@ -1,5 +1,5 @@
 import { ArrowRight, ChevronRight, Monitor, Radio } from 'lucide-react'
-import { useId } from 'react'
+import { useId, useState } from 'react'
 
 import type { HostPoint } from './host'
 import type { Screen } from './navigation'
@@ -187,8 +187,22 @@ export function Cockpit({
   openScreen: (screen: Screen) => void
   runtime: RuntimeConnection
 }) {
+  const [storageView, setStorageView] = useState<'drives' | 'runtime'>('drives')
+  const [diskId, setDiskId] = useState('')
   const { snapshot, history } = runtime
   const latestHost = host.history.at(-1)
+  const disks = host.error ? [] : (latestHost?.disks ?? [])
+  const selectedDisk = diskId
+    ? disks.find((disk) => disk.id === diskId)
+    : disks[0]
+  const selectedId = selectedDisk?.id
+  const diskTrace = (key: 'read_mbps' | 'write_mbps') =>
+    host.history.map((point) => ({
+      at: point.at,
+      value: selectedId
+        ? (point.disks?.find((disk) => disk.id === selectedId)?.[key] ?? null)
+        : null,
+    }))
   const decode = runtimeNumber(snapshot.stats, 'decode_tps')
   const hitRate = runtimeNumber(snapshot.stats, 'expert_hit_rate')
   const ssdRate = runtimeNumber(snapshot.stats, 'ssd_gbps')
@@ -293,7 +307,7 @@ export function Cockpit({
           ceiling={100}
         />
         <Readout
-          label="SSD READ"
+          label="RUNTIME SSD READ"
           value={storage.value}
           unit={storage.unit}
           detail="Runtime storage stream"
@@ -449,77 +463,153 @@ export function Cockpit({
             detail="Expert reuse and SSD activity"
             id="cache-title"
           />
-          <div className="cache-traces">
-            <div className="cache-trace">
-              <div className="trace-head">
-                <span>EXPERT HIT RATE</span>
-                <strong>
-                  {hitRate === null ? '—' : `${(hitRate * 100).toFixed(1)}%`}
-                </strong>
-              </div>
-              <TrendChart
-                data={history.map((point) => ({
-                  at: point.at,
-                  value:
-                    point.expert_hit_rate === null
-                      ? null
-                      : point.expert_hit_rate * 100,
-                }))}
-                color="var(--cockpit-violet)"
-                label="Expert hit rate"
-                ceiling={100}
-              />
+          <div className="storage-controls">
+            <div role="group" aria-label="Storage view">
+              <button
+                aria-pressed={storageView === 'drives'}
+                onClick={() => setStorageView('drives')}
+              >
+                Drives
+              </button>
+              <button
+                aria-pressed={storageView === 'runtime'}
+                onClick={() => setStorageView('runtime')}
+              >
+                Runtime
+              </button>
             </div>
-            <div className="cache-trace">
-              <div className="trace-head">
-                <span>RUNTIME SSD READ</span>
-                <strong>
-                  {ssdRate === null ? '—' : `${storage.value} ${storage.unit}`}
-                </strong>
-              </div>
-              <TrendChart
-                data={history.map((point) => ({
-                  at: point.at,
-                  value: point.ssd_gbps,
-                }))}
-                color="var(--cockpit-amber)"
-                label="Runtime SSD read rate"
-              />
-            </div>
-            <div className="cache-trace">
-              <div className="trace-head">
-                <span>RESIDENT EXPERTS</span>
-                <strong>{residents?.toLocaleString() ?? '—'}</strong>
-              </div>
-              <TrendChart
-                data={history.map((point) => ({
-                  at: point.at,
-                  value: point.resident_experts,
-                }))}
-                color="var(--cockpit-mint)"
-                label="Resident experts"
-              />
-            </div>
+            {storageView === 'drives' && (
+              <select
+                aria-label="Storage drive"
+                value={selectedId ?? ''}
+                onChange={(event) => setDiskId(event.target.value)}
+              >
+                <option value="" disabled>
+                  {diskId
+                    ? 'Selected drive unavailable'
+                    : 'No drive counters available'}
+                </option>
+                {disks.map((disk) => (
+                  <option key={disk.id} value={disk.id}>
+                    {disk.name} · {disk.bsd_name}
+                  </option>
+                ))}
+              </select>
+            )}
           </div>
-          <div
-            className="prefetch-totals"
-            role="group"
-            aria-label="Expert prefetch totals"
-          >
-            <SmallStat
-              label="PREFETCH READS"
-              value={runtimeTotal(runtime, 'predicted_loads')}
-            />
-            <SmallStat
-              label="PREFETCH USED"
-              value={runtimeTotal(runtime, 'predicted_used')}
-            />
-            <p>Runtime totals · — means unreported. Not a speedup measure.</p>
-          </div>
+          {storageView === 'drives' ? (
+            <div
+              className="cache-traces disk-traces"
+              role="group"
+              aria-label="Drive throughput"
+            >
+              {(['read_mbps', 'write_mbps'] as const).map((key) => (
+                <div className="cache-trace" key={key}>
+                  <div className="trace-head">
+                    <span>
+                      {key === 'read_mbps' ? 'DRIVE READ' : 'DRIVE WRITE'}
+                    </span>
+                    <strong>
+                      {selectedDisk?.[key] == null
+                        ? '—'
+                        : selectedDisk[key].toFixed(1)}{' '}
+                      MB/s
+                    </strong>
+                  </div>
+                  <TrendChart
+                    data={diskTrace(key)}
+                    color={
+                      key === 'read_mbps'
+                        ? 'var(--cockpit-amber)'
+                        : 'var(--cockpit-mint)'
+                    }
+                    label={
+                      key === 'read_mbps'
+                        ? 'Drive read throughput'
+                        : 'Drive write throughput'
+                    }
+                  />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="cache-traces">
+              <div className="cache-trace">
+                <div className="trace-head">
+                  <span>EXPERT HIT RATE</span>
+                  <strong>
+                    {hitRate === null ? '—' : `${(hitRate * 100).toFixed(1)}%`}
+                  </strong>
+                </div>
+                <TrendChart
+                  data={history.map((point) => ({
+                    at: point.at,
+                    value:
+                      point.expert_hit_rate === null
+                        ? null
+                        : point.expert_hit_rate * 100,
+                  }))}
+                  color="var(--cockpit-violet)"
+                  label="Expert hit rate"
+                  ceiling={100}
+                />
+              </div>
+              <div className="cache-trace">
+                <div className="trace-head">
+                  <span>RUNTIME SSD READ</span>
+                  <strong>
+                    {ssdRate === null
+                      ? '—'
+                      : `${storage.value} ${storage.unit}`}
+                  </strong>
+                </div>
+                <TrendChart
+                  data={history.map((point) => ({
+                    at: point.at,
+                    value: point.ssd_gbps,
+                  }))}
+                  color="var(--cockpit-amber)"
+                  label="Runtime SSD read rate"
+                />
+              </div>
+              <div className="cache-trace">
+                <div className="trace-head">
+                  <span>RESIDENT EXPERTS</span>
+                  <strong>{residents?.toLocaleString() ?? '—'}</strong>
+                </div>
+                <TrendChart
+                  data={history.map((point) => ({
+                    at: point.at,
+                    value: point.resident_experts,
+                  }))}
+                  color="var(--cockpit-mint)"
+                  label="Resident experts"
+                />
+              </div>
+            </div>
+          )}
+          {storageView === 'runtime' && (
+            <div
+              className="prefetch-totals"
+              role="group"
+              aria-label="Expert prefetch totals"
+            >
+              <SmallStat
+                label="PREFETCH READS"
+                value={runtimeTotal(runtime, 'predicted_loads')}
+              />
+              <SmallStat
+                label="PREFETCH USED"
+                value={runtimeTotal(runtime, 'predicted_used')}
+              />
+              <p>Runtime totals · — means unreported. Not a speedup measure.</p>
+            </div>
+          )}
           <div className="cache-footer">
             <p>
-              Surface · Twilight · Midnight · Abyss are memory tiers. Per-tier
-              occupancy and SSD pressure are not reported by this runtime.
+              {storageView === 'drives'
+                ? 'Whole-drive activity from all apps · decimal MB/s · — means unavailable or awaiting samples. Not a speed benchmark or Cachalot-only I/O.'
+                : 'Surface · Twilight · Midnight · Abyss are memory tiers. Per-tier occupancy and SSD pressure are not reported by this runtime.'}
             </p>
           </div>
         </section>

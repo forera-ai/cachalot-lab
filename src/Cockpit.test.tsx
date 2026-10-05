@@ -1,4 +1,4 @@
-import { act, render, screen, within } from '@testing-library/react'
+import { act, fireEvent, render, screen, within } from '@testing-library/react'
 import { beforeEach, expect, it, vi } from 'vitest'
 
 import { Cockpit } from './Cockpit'
@@ -92,6 +92,7 @@ it('shows measured Mac details and labels unsupported tier data', () => {
   expect(screen.getByText('28 cores')).toBeInTheDocument()
   expect(screen.getByText('60 cores')).toBeInTheDocument()
   expect(screen.getByText('OUTPUT MODE UNREPORTED')).toBeInTheDocument()
+  fireEvent.click(screen.getByRole('button', { name: 'Runtime' }))
   expect(
     screen.getByText(/Per-tier occupancy and SSD pressure are not reported/),
   ).toBeInTheDocument()
@@ -200,6 +201,7 @@ it('shows reported prefetch totals, preserves zero, and clears unavailable data'
   )
   runtime.snapshot.stats = { predicted_loads: 120, predicted_used: 0 }
   const { rerender } = render(view())
+  fireEvent.click(screen.getByRole('button', { name: 'Runtime' }))
   const totals = () =>
     within(screen.getByRole('group', { name: 'Expert prefetch totals' }))
   expect(totals().getByText('120')).toBeInTheDocument()
@@ -276,4 +278,64 @@ it('shows image input totals without inferring vision support and clears stale v
   runtime.snapshot.connected = false
   rerender(view())
   expect(total().getByText('—')).toBeInTheDocument()
+})
+
+it('shows drive rates offline, changes drive, and clears disconnected or failed samples', () => {
+  const runtime = connection()
+  runtime.snapshot.healthy = false
+  const host = {
+    history: [
+      {
+        at: Date.now(),
+        cpu_percent: null,
+        gpu_percent: null,
+        memory_working_gib: 12,
+        disks: [
+          {
+            id: '1',
+            name: 'Internal SSD',
+            bsd_name: 'disk0',
+            read_mbps: 12.5,
+            write_mbps: 0,
+          },
+          {
+            id: '2',
+            name: 'External SSD',
+            bsd_name: 'disk6',
+            read_mbps: 25,
+            write_mbps: 1,
+          },
+        ],
+      },
+    ],
+    error: null as string | null,
+  }
+  const view = () => (
+    <Cockpit
+      platform={platform}
+      platformError={null}
+      host={host}
+      openScreen={vi.fn()}
+      runtime={runtime}
+    />
+  )
+  const { rerender } = render(view())
+  const rates = () =>
+    within(screen.getByRole('group', { name: 'Drive throughput' }))
+  expect(rates().getByText('12.5 MB/s')).toBeInTheDocument()
+  expect(rates().getByText('0.0 MB/s')).toBeInTheDocument()
+  fireEvent.change(screen.getByRole('combobox', { name: 'Storage drive' }), {
+    target: { value: '2' },
+  })
+  expect(rates().getByText('25.0 MB/s')).toBeInTheDocument()
+  host.history[0]!.disks = host.history[0]!.disks.slice(0, 1)
+  rerender(view())
+  expect(rates().getAllByText('— MB/s')).toHaveLength(2)
+  expect(rates().queryByText('12.5 MB/s')).not.toBeInTheDocument()
+  fireEvent.change(screen.getByRole('combobox', { name: 'Storage drive' }), {
+    target: { value: '1' },
+  })
+  host.error = 'sampling failed'
+  rerender(view())
+  expect(rates().getAllByText('— MB/s')).toHaveLength(2)
 })

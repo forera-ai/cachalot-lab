@@ -155,3 +155,155 @@ it('keeps older DeepSeek profiles on inherited CLI defaults', async () => {
   expect(screen.getByLabelText(/Decode drops misses/)).toHaveValue('inherit')
   expect(screen.getByLabelText(/System date reuse/)).toHaveValue('inherit')
 })
+
+it('discovers a model into an unsaved draft without launching it', async () => {
+  const original = invoke.getMockImplementation()!
+  invoke.mockImplementation(async (command, args) =>
+    command === 'discover_models'
+      ? {
+          root: '/models',
+          models: [
+            {
+              name: 'GLM local',
+              path: '/models/glm',
+              family: 'glm',
+              model_type: 'glm5_next',
+              weights_present: false,
+              tokenizer_present: true,
+            },
+          ],
+          scanned_dirs: 2,
+          skipped_dirs: 0,
+          invalid_configs: 0,
+          truncated: false,
+        }
+      : original(command, args),
+  )
+  const user = userEvent.setup()
+  render(<DiveScreen managed={managed} runtime={runtime} />)
+  await user.type(screen.getByLabelText('Search folder'), '/models')
+  await user.click(screen.getByRole('button', { name: 'Scan folder' }))
+  expect(
+    await screen.findByText('No weight file found', { exact: false }),
+  ).toBeInTheDocument()
+  await user.click(
+    screen.getByRole('button', { name: 'Create profile for GLM local' }),
+  )
+  expect(screen.getByLabelText('Model directory')).toHaveValue('/models/glm')
+  expect(screen.getByLabelText('Model family')).toHaveValue('glm')
+  expect(screen.getByLabelText('Python executable')).toHaveValue('')
+  expect(
+    invoke.mock.calls.some(
+      ([command]) =>
+        command === 'save_profile' || command === 'start_managed_runtime',
+    ),
+  ).toBe(false)
+})
+
+it('separates deletion from launch actions and requires explicit confirmation', async () => {
+  profiles = [{ ...newProfile(), name: 'Disposable test profile' }]
+  const user = userEvent.setup()
+  render(<DiveScreen managed={managed} runtime={runtime} />)
+  await user.click(
+    await screen.findByRole('button', { name: 'Delete profile' }),
+  )
+  expect(
+    screen.getByRole('group', { name: 'Delete profile confirmation' }),
+  ).toBeInTheDocument()
+  expect(
+    invoke.mock.calls.some(([command]) => command === 'delete_profile'),
+  ).toBe(false)
+  await user.click(screen.getByRole('button', { name: 'Keep profile' }))
+  expect(
+    screen.queryByRole('group', { name: 'Delete profile confirmation' }),
+  ).not.toBeInTheDocument()
+  await user.click(screen.getByRole('button', { name: 'Delete profile' }))
+  await user.click(screen.getByRole('button', { name: 'Confirm delete' }))
+  await waitFor(() =>
+    expect(invoke).toHaveBeenCalledWith('delete_profile', {
+      id: profiles[0]?.id,
+    }),
+  )
+})
+
+it('shows a labeled launch preview and can dismiss it', async () => {
+  profiles = [{ ...newProfile(), name: 'Preview test' }]
+  const original = invoke.getMockImplementation()!
+  invoke.mockImplementation(async (command, args) =>
+    command === 'preview_profile'
+      ? {
+          executable: '/python',
+          args: ['-m', 'cachalot.cli', '--model', '/models/a b'],
+          environment: { CACHALOT_TEST: '0' },
+          endpoint: 'http://127.0.0.1:8011',
+        }
+      : original(command, args),
+  )
+  const user = userEvent.setup()
+  render(<DiveScreen managed={managed} runtime={runtime} />)
+  await user.click(await screen.findByRole('button', { name: 'Preview' }))
+  const preview = await screen.findByRole('region', { name: 'Launch preview' })
+  expect(preview).toHaveTextContent('Executable')
+  expect(preview).toHaveTextContent('Environment overrides')
+  expect(preview).toHaveTextContent('CACHALOT_TEST=0')
+  expect(preview).toHaveTextContent('"/models/a b"')
+  await user.click(screen.getByRole('button', { name: 'Hide preview' }))
+  expect(
+    screen.queryByRole('region', { name: 'Launch preview' }),
+  ).not.toBeInTheDocument()
+})
+
+it('does not offer to stop another selected profile runtime', async () => {
+  profiles = [{ ...newProfile(), name: 'Inactive profile' }]
+  const active = {
+    ...managed,
+    status: {
+      running: true,
+      ready: true,
+      profile_id: 'another-profile',
+      endpoint: 'http://127.0.0.1:8012',
+      pid: 42,
+      last_exit_code: null,
+    },
+  }
+  render(<DiveScreen managed={active} runtime={runtime} />)
+  expect(
+    await screen.findByRole('button', { name: 'Start runtime' }),
+  ).toBeDisabled()
+  expect(
+    screen.queryByRole('button', { name: 'Stop runtime' }),
+  ).not.toBeInTheDocument()
+  expect(screen.getByText(/Another profile is running/)).toBeInTheDocument()
+})
+
+it('discards a late preview after selecting another profile', async () => {
+  profiles = [
+    { ...newProfile(), name: 'First' },
+    { ...newProfile(), name: 'Second' },
+  ]
+  let resolvePreview!: (value: unknown) => void
+  const original = invoke.getMockImplementation()!
+  invoke.mockImplementation(async (command, args) =>
+    command === 'preview_profile'
+      ? new Promise((resolve) => {
+          resolvePreview = resolve
+        })
+      : original(command, args),
+  )
+  const user = userEvent.setup()
+  render(<DiveScreen managed={managed} runtime={runtime} />)
+  await user.click(await screen.findByRole('button', { name: 'Preview' }))
+  await user.click(screen.getByRole('button', { name: /Second.*auto/ }))
+  resolvePreview({
+    executable: '/old-python',
+    args: [],
+    environment: {},
+    endpoint: 'http://127.0.0.1:8011',
+  })
+  await waitFor(() =>
+    expect(screen.getByRole('heading', { name: 'Second' })).toBeInTheDocument(),
+  )
+  expect(
+    screen.queryByRole('region', { name: 'Launch preview' }),
+  ).not.toBeInTheDocument()
+})

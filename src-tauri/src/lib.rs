@@ -4,6 +4,8 @@ use serde::Serialize;
 use serde_json::Value;
 
 mod conversations;
+mod credentials;
+mod discovery;
 mod host;
 #[cfg(target_os = "macos")]
 mod machine_icon;
@@ -125,6 +127,10 @@ pub fn run() {
         .manage(supervisor::Supervisor::default())
         .invoke_handler(tauri::generate_handler![
             platform_info,
+            discovery::discover_models,
+            credentials::has_runtime_key,
+            credentials::save_runtime_key,
+            credentials::delete_runtime_key,
             host::host_sample,
             profiles::list_profiles,
             profiles::save_profile,

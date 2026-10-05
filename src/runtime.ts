@@ -23,6 +23,7 @@ export type RuntimeConnection = {
     endpoint: string,
     apiKey?: string,
     remember?: boolean,
+    useKeychain?: boolean,
   ) => Promise<boolean>
   disconnect: () => Promise<void>
   refresh: () => Promise<void>
@@ -89,7 +90,12 @@ export function useRuntime(): RuntimeConnection {
   }, [])
 
   const connect = useCallback(
-    async (endpoint: string, apiKey?: string, remember = true) => {
+    async (
+      endpoint: string,
+      apiKey?: string,
+      remember = true,
+      useKeychain = false,
+    ) => {
       if (!isTauri()) {
         setConnectError('Open the macOS app to connect to a local runtime.')
         return false
@@ -100,6 +106,7 @@ export function useRuntime(): RuntimeConnection {
         await invoke('connect_runtime', {
           endpointUrl: endpoint,
           apiKey: apiKey || null,
+          useKeychain,
         })
         if (remember)
           localStorage.setItem('cachalot-runtime-endpoint', endpoint)
@@ -148,6 +155,9 @@ export function useRuntime(): RuntimeConnection {
     document.addEventListener('visibilitychange', onVisibilityChange)
     void connect(
       localStorage.getItem('cachalot-runtime-endpoint') || DEFAULT_ENDPOINT,
+      undefined,
+      true,
+      true,
     ).finally(() => {
       if (active) schedule()
     })

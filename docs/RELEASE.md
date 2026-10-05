@@ -53,7 +53,7 @@ This local test installation does not make an uncommitted build a release.
 
 ## Scope
 
-The [0.4.0 release](https://github.com/prooshani/cachalot-studio/releases/tag/v0.4.0) adds GLM and DeepSeek launch controls, optional runtime totals, and saved visual quiet mode. It retains earlier chat settings, managed process ownership, and host telemetry fixes. Live GLM/DeepSeek model validation and performance measurements remain outstanding. The macOS artifact targets Apple Silicon. The installer does not include Python, Cachalot, checkpoints, or an update service.
+The [0.5.0 release](https://github.com/prooshani/cachalot-studio/releases/tag/v0.5.0) adds physical-drive telemetry, bounded local model discovery, optional macOS Keychain credentials, and a refined Dive interface. It retains GLM/DeepSeek controls, optional runtime totals, and saved visual quiet mode. It retains earlier chat settings, managed process ownership, and host telemetry fixes. Live GLM/DeepSeek model validation and performance measurements remain outstanding. The macOS artifact targets Apple Silicon. The installer does not include Python, Cachalot, checkpoints, or an update service.
 
 ## One-time signing setup
 

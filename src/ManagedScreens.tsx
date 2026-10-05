@@ -1,5 +1,5 @@
 import { invoke, isTauri } from '@tauri-apps/api/core'
-import { useCallback, useEffect, useState, type FormEvent } from 'react'
+import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react'
 
 import {
   newProfile,
@@ -7,6 +7,9 @@ import {
   type ManagedRuntime,
   type RuntimeTuning,
 } from './managed'
+import { Eye, Pencil, Play, Plus, Square, Trash2 } from 'lucide-react'
+
+import { ModelDiscovery } from './ModelDiscovery'
 import { DEFAULT_RUNTIME_PORT, type RuntimeConnection } from './runtime'
 
 type LaunchCommand = {
@@ -93,8 +96,19 @@ export function DiveScreen({
   const [preview, setPreview] = useState<LaunchCommand | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
+  const [deleteId, setDeleteId] = useState<string | null>(null)
+  const [previewBusy, setPreviewBusy] = useState(false)
+  const previewRequest = useRef(0)
   const selected = profiles.find((profile) => profile.id === selectedId) ?? null
   const status = managed.status
+  const ownsSelected = status?.running && status.profile_id === selected?.id
+  const otherRunning = status?.running && !ownsSelected
+  function clearPreview() {
+    ++previewRequest.current
+    setPreview(null)
+    setPreviewBusy(false)
+    setDeleteId(null)
+  }
 
   const reload = useCallback(async () => {
     if (!isTauri()) return
@@ -142,13 +156,18 @@ export function DiveScreen({
   }
 
   async function remove() {
-    if (!selected || status?.profile_id === selected.id) return
+    if (
+      !selected ||
+      deleteId !== selected.id ||
+      status?.profile_id === selected.id
+    )
+      return
     setBusy(true)
     setError(null)
     try {
       await invoke('delete_profile', { id: selected.id })
       setSelectedId(null)
-      setPreview(null)
+      clearPreview()
       await reload()
     } catch (reason) {
       setError(String(reason))
@@ -159,13 +178,22 @@ export function DiveScreen({
 
   async function showPreview() {
     if (!selected) return
+    if (preview) {
+      clearPreview()
+      return
+    }
+    const request = ++previewRequest.current
+    setPreviewBusy(true)
     setError(null)
     try {
-      setPreview(
-        await invoke<LaunchCommand>('preview_profile', { profile: selected }),
-      )
+      const command = await invoke<LaunchCommand>('preview_profile', {
+        profile: selected,
+      })
+      if (request === previewRequest.current) setPreview(command)
     } catch (reason) {
-      setError(String(reason))
+      if (request === previewRequest.current) setError(String(reason))
+    } finally {
+      if (request === previewRequest.current) setPreviewBusy(false)
     }
   }
 
@@ -185,13 +213,13 @@ export function DiveScreen({
         <button
           className="secondary-button"
           type="button"
-          disabled={!isTauri()}
+          disabled={busy || !isTauri()}
           onClick={() => {
             setDraft(newProfile())
-            setPreview(null)
+            clearPreview()
           }}
         >
-          New profile
+          <Plus size={15} aria-hidden="true" /> New profile
         </button>
       </div>
       {!isTauri() && (
@@ -206,6 +234,7 @@ export function DiveScreen({
         <section className="info-panel managed-profiles">
           <span className="section-kicker">01 / SAVED PROFILES</span>
           <h2>Your launch setups</h2>
+          <p className="panel-intro">Saved configurations for this Mac.</p>
           {profiles.length === 0 && (
             <p className="panel-intro">
               No profiles yet. Create one to launch a local model.
@@ -217,10 +246,12 @@ export function DiveScreen({
                 key={profile.id}
                 type="button"
                 className={`managed-profile ${selectedId === profile.id ? 'is-selected' : ''}`}
+                aria-pressed={selectedId === profile.id}
+                disabled={busy}
                 onClick={() => {
                   setSelectedId(profile.id)
                   setDraft(null)
-                  setPreview(null)
+                  clearPreview()
                 }}
               >
                 <strong>{profile.name}</strong>
@@ -231,7 +262,10 @@ export function DiveScreen({
             ))}
           </div>
         </section>
-        <section className="info-panel managed-details">
+        <section
+          className="info-panel managed-details"
+          aria-label="Profile details"
+        >
           <span className="section-kicker">02 / SELECTED PROFILE</span>
           {draft ? (
             <>
@@ -240,8 +274,12 @@ export function DiveScreen({
                   ? 'Edit profile'
                   : 'New profile'}
               </h2>
+              <p className="panel-intro">
+                Set the model and Python environment, then review launch
+                settings. Changes apply on the next launch.
+              </p>
               <form
-                className="managed-form"
+                className="managed-form profile-editor"
                 onSubmit={(event) => void save(event)}
               >
                 <label>
@@ -275,6 +313,7 @@ export function DiveScreen({
                     }
                   />
                 </label>
+                <h3 className="managed-form-heading">Launch settings</h3>
                 <div className="managed-fields">
                   <OptionalNumber
                     label="Local port"
@@ -642,6 +681,7 @@ export function DiveScreen({
                   <button
                     className="secondary-button"
                     type="button"
+                    disabled={busy}
                     onClick={() => setDraft(null)}
                   >
                     Cancel
@@ -651,22 +691,23 @@ export function DiveScreen({
             </>
           ) : selected ? (
             <>
-              <h2>{selected.name}</h2>
+              <div className="managed-detail-heading">
+                <h2>{selected.name}</h2>
+                <span
+                  className={`managed-state ${ownsSelected ? 'is-active' : ''}`}
+                >
+                  {ownsSelected
+                    ? status?.ready
+                      ? 'Ready'
+                      : 'Starting'
+                    : 'Not running'}
+                </span>
+              </div>
               <p className="panel-intro">
                 Studio manages only processes started here. Startup can take
                 several minutes while model loads.
               </p>
               <div className="managed-facts">
-                <div>
-                  <span>State</span>
-                  <strong>
-                    {status?.profile_id === selected.id
-                      ? status.ready
-                        ? 'Ready'
-                        : 'Starting'
-                      : 'Not running'}
-                  </strong>
-                </div>
                 <div>
                   <span>Python</span>
                   <strong>{selected.python_executable}</strong>
@@ -687,62 +728,143 @@ export function DiveScreen({
                 )}
               </div>
               <div className="managed-actions">
-                {status?.running ? (
+                {ownsSelected ? (
                   <button
                     className="primary-button"
                     type="button"
-                    disabled={managed.working}
+                    disabled={managed.working || busy}
                     onClick={() => void managed.stop()}
                   >
-                    Stop runtime
+                    <Square size={14} aria-hidden="true" /> Stop runtime
                   </button>
                 ) : (
                   <button
                     className="primary-button"
                     type="button"
-                    disabled={managed.working || !isTauri()}
+                    disabled={
+                      managed.working || busy || !!otherRunning || !isTauri()
+                    }
                     onClick={() => void managed.start(selected.id)}
                   >
-                    Start runtime
+                    <Play size={14} aria-hidden="true" /> Start runtime
                   </button>
                 )}
                 <button
                   className="secondary-button"
                   type="button"
-                  onClick={() => setDraft(structuredClone(selected))}
+                  disabled={busy}
+                  onClick={() => {
+                    clearPreview()
+                    setDraft(structuredClone(selected))
+                  }}
                 >
-                  Edit
+                  <Pencil size={14} aria-hidden="true" /> Edit
                 </button>
                 <button
                   className="secondary-button"
                   type="button"
+                  aria-expanded={!!preview}
+                  aria-controls="launch-preview"
+                  disabled={previewBusy || busy}
                   onClick={() => void showPreview()}
                 >
-                  Preview
+                  <Eye size={14} aria-hidden="true" />{' '}
+                  {previewBusy
+                    ? 'Loading…'
+                    : preview
+                      ? 'Hide preview'
+                      : 'Preview'}
                 </button>
                 <button
-                  className="text-button"
+                  className="secondary-button managed-delete"
                   type="button"
                   disabled={busy || status?.profile_id === selected.id}
-                  onClick={() => void remove()}
+                  aria-expanded={deleteId === selected.id}
+                  aria-controls="delete-profile-confirmation"
+                  onClick={() => setDeleteId(selected.id)}
                 >
-                  Delete
+                  <Trash2 size={14} aria-hidden="true" /> Delete profile
                 </button>
               </div>
+              {otherRunning && (
+                <p className="managed-notice">
+                  Another profile is running. Select it to stop the runtime
+                  before starting this profile.
+                </p>
+              )}
+              {deleteId === selected.id && (
+                <div
+                  id="delete-profile-confirmation"
+                  className="managed-delete-confirmation"
+                  role="group"
+                  aria-label="Delete profile confirmation"
+                >
+                  <div>
+                    <strong>Delete “{selected.name}”?</strong>
+                    <p>
+                      Only the saved launch profile is removed. Model files and
+                      conversations stay on your Mac.
+                    </p>
+                  </div>
+                  <div className="managed-actions">
+                    <button
+                      type="button"
+                      className="secondary-button"
+                      disabled={busy}
+                      onClick={() => setDeleteId(null)}
+                    >
+                      Keep profile
+                    </button>
+                    <button
+                      type="button"
+                      className="secondary-button managed-delete"
+                      disabled={busy}
+                      onClick={() => void remove()}
+                    >
+                      {busy ? 'Deleting…' : 'Confirm delete'}
+                    </button>
+                  </div>
+                </div>
+              )}
               {preview && (
-                <pre className="managed-preview">
-                  <code>
-                    {JSON.stringify(
-                      [preview.executable, ...preview.args],
-                      null,
-                      2,
-                    )}
-                    \n
-                    {Object.entries(preview.environment)
-                      .map(([key, value]) => `${key}=${value}`)
-                      .join('\n')}
-                  </code>
-                </pre>
+                <section
+                  id="launch-preview"
+                  className="managed-preview-panel"
+                  aria-label="Launch preview"
+                >
+                  <div className="managed-preview-heading">
+                    <h3>Launch preview</h3>
+                    <span>{preview.endpoint}</span>
+                  </div>
+                  <p className="panel-intro">
+                    Review the exact executable, arguments, and environment
+                    before starting.
+                  </p>
+                  <h4>Executable</h4>
+                  <pre className="managed-preview">
+                    <code>{preview.executable}</code>
+                  </pre>
+                  <h4>Arguments</h4>
+                  <pre className="managed-preview">
+                    <code>
+                      {preview.args
+                        .map((arg) => JSON.stringify(arg))
+                        .join('\n')}
+                    </code>
+                  </pre>
+                  <h4>Environment overrides</h4>
+                  {Object.keys(preview.environment).length ? (
+                    <pre className="managed-preview">
+                      <code>
+                        {Object.entries(preview.environment)
+                          .map(([key, value]) => `${key}=${value}`)
+                          .join('\n')}
+                      </code>
+                    </pre>
+                  ) : (
+                    <p className="panel-intro">No explicit overrides.</p>
+                  )}
+                </section>
               )}
               {runtime.snapshot.endpoint === status?.endpoint &&
                 status?.ready && (
@@ -756,7 +878,20 @@ export function DiveScreen({
           )}
         </section>
       </div>
-      <ManagedLog compact />
+      {!draft && (
+        <ModelDiscovery
+          onDraft={(profile) => {
+            clearPreview()
+            setDraft(profile)
+          }}
+        />
+      )}
+      <details className="managed-log-disclosure">
+        <summary>
+          Runtime output <span>Recent output from Studio-owned launches</span>
+        </summary>
+        <ManagedLog compact />
+      </details>
     </div>
   )
 }

@@ -1,8 +1,20 @@
 # Changelog
 
-Changes are grouped by release. Work on `main` after the latest tag appears under **Unreleased**.
+## [Unreleased]
 
-## Unreleased
+Changes are grouped by release. Work after the latest tag appears here.
+
+## [0.5.0] - 2026-10-05
+
+This backward-compatible minor release adds physical-drive telemetry, local model discovery, optional macOS Keychain credentials, and a refined Dive interface. Existing profiles and conversations keep their format and defaults.
+
+- Add Cockpit Drives/Runtime storage views, physical-drive selection, decimal read/write MB/s, and two-minute histories. Rates cover all applications on the selected drive and work while Cachalot is offline. First samples, unavailable/reset counters, sampling failures, and long gaps show unavailable; disconnected selected drives do not silently switch.
+- Add bounded metadata discovery for DeepSeek V4.1, GLM 5 Next, and MiniMax M3. A chosen folder is scanned within explicit depth/count/size limits; results create editable unsaved drafts, without downloads, runtime launches, or complete-checkpoint claims.
+- Add explicit optional Keychain save/replace/forget for API credentials, bound to the normalized loopback origin and port. Typed session keys override saved keys; startup can use saved credentials, while managed auto-connect does not. Stored secrets never return to JavaScript or copied examples. Disable runtime HTTP redirects. Settings accurately describes optional persistence.
+- Refine Dive action alignment, destructive-action confirmation, state display, forms, discovery rows, theme contrast, and collapsible output. Add labeled, dismissible, bounded launch previews. Discard stale preview responses and prevent one profile's controls from stopping another profile's runtime.
+- Review runtime briefs through 0.60.0 against clean Cachalot 0.60.1 commit `9d11bc061dcb434c40494be3d507521194d376dc`; the follow-up changes measurement tooling/docs/version only.
+
+Validation: 45 frontend tests, 31 normal Rust tests, isolated real macOS Keychain CRUD, native SSD/discovery/Dive inspection, types/lint/format/clippy, and signed local builds passed before release preparation. The release verification report records fresh exact-source checks and artifact verification. Live GLM/DeepSeek launch/generation/stop validation, authenticated saved-key reconnect across restart, physical unplug testing, and sustained performance remain unverified. SSD counters are not a speed benchmark or per-model I/O measurement.
 
 ## [0.4.0] - 2026-10-05
 

@@ -1,5 +1,6 @@
 import { Copy, PlugZap } from 'lucide-react'
-import { useState, type FormEvent } from 'react'
+import { invoke, isTauri } from '@tauri-apps/api/core'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
 
 import { apiExamples, type ApiExampleLanguage } from './apiExamples'
 import {
@@ -13,11 +14,64 @@ export function ConnectionPanel({ runtime }: { runtime: RuntimeConnection }) {
     () => localStorage.getItem('cachalot-runtime-endpoint') || DEFAULT_ENDPOINT,
   )
   const [apiKey, setApiKey] = useState('')
+  const [savedEndpoint, setSavedEndpoint] = useState<string | null>(null)
+  const [useSaved, setUseSaved] = useState(true)
+  const [keyBusy, setKeyBusy] = useState(false)
+  const [keyError, setKeyError] = useState<string | null>(null)
+  const keyRevision = useRef(0)
+  const hasSaved = savedEndpoint === endpoint
+  useEffect(() => {
+    if (!isTauri()) return
+    let active = true
+    const revision = ++keyRevision.current
+    const timer = window.setTimeout(() => {
+      void invoke<boolean>('has_runtime_key', { endpointUrl: endpoint })
+        .then((found) => {
+          if (active && revision === keyRevision.current) {
+            setSavedEndpoint(found ? endpoint : null)
+            setKeyError(null)
+          }
+        })
+        .catch(() => {
+          if (active && revision === keyRevision.current) setSavedEndpoint(null)
+        })
+    }, 300)
+    return () => {
+      active = false
+      window.clearTimeout(timer)
+    }
+  }, [endpoint])
+  async function changeSavedKey(remove: boolean) {
+    const address = endpoint
+    ++keyRevision.current
+    setKeyBusy(true)
+    setKeyError(null)
+    try {
+      await invoke(remove ? 'delete_runtime_key' : 'save_runtime_key', {
+        endpointUrl: address,
+        ...(remove ? {} : { apiKey }),
+      })
+      setSavedEndpoint(remove ? null : address)
+      if (!remove) {
+        setApiKey('')
+        setUseSaved(true)
+      }
+    } catch (reason) {
+      setKeyError(String(reason))
+    } finally {
+      setKeyBusy(false)
+    }
+  }
   const { snapshot } = runtime
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    await runtime.connect(endpoint, apiKey)
+    await runtime.connect(
+      endpoint,
+      apiKey,
+      true,
+      useSaved && hasSaved && !apiKey.trim(),
+    )
     setApiKey('')
   }
 
@@ -26,8 +80,8 @@ export function ConnectionPanel({ runtime }: { runtime: RuntimeConnection }) {
       <span className="section-kicker">LOCAL CONNECTION</span>
       <h2>{snapshot.healthy ? 'Runtime connected' : 'Connect to Cachalot'}</h2>
       <p className="panel-intro">
-        Use a Cachalot server running on this Mac. The API key stays in app
-        memory for this session.
+        Use a Cachalot server running on this Mac. Keys stay in session memory
+        unless you explicitly save one in macOS Keychain for this address.
       </p>
       <form
         onSubmit={(event) => void submit(event)}
@@ -37,6 +91,7 @@ export function ConnectionPanel({ runtime }: { runtime: RuntimeConnection }) {
         <input
           id="runtime-endpoint"
           value={endpoint}
+          disabled={keyBusy}
           onChange={(event) => setEndpoint(event.target.value)}
           spellCheck={false}
           placeholder={DEFAULT_ENDPOINT}
@@ -47,6 +102,7 @@ export function ConnectionPanel({ runtime }: { runtime: RuntimeConnection }) {
             <button
               type="button"
               className="text-button"
+              disabled={keyBusy}
               onClick={() => setEndpoint(DEFAULT_ENDPOINT)}
             >
               Use default address
@@ -62,12 +118,55 @@ export function ConnectionPanel({ runtime }: { runtime: RuntimeConnection }) {
           value={apiKey}
           onChange={(event) => setApiKey(event.target.value)}
           autoComplete="off"
+          disabled={keyBusy}
         />
+        {isTauri() && (
+          <div className="keychain-controls">
+            {hasSaved && (
+              <label>
+                <input
+                  type="checkbox"
+                  checked={useSaved}
+                  onChange={(event) => setUseSaved(event.target.checked)}
+                />{' '}
+                Use saved Keychain key for this address
+              </label>
+            )}
+            <button
+              className="text-button"
+              type="button"
+              disabled={keyBusy || !apiKey.trim()}
+              onClick={() => void changeSavedKey(false)}
+            >
+              Save key in Keychain
+            </button>
+            {hasSaved && (
+              <button
+                className="text-button"
+                type="button"
+                disabled={keyBusy}
+                onClick={() => void changeSavedKey(true)}
+              >
+                Forget saved key
+              </button>
+            )}
+            <p className="panel-intro">
+              A typed key overrides the saved key. Saved keys can reconnect
+              after restart. Forgetting a key leaves the active connection
+              unchanged.
+            </p>
+            {keyError && (
+              <p className="inline-error" role="alert">
+                {keyError}
+              </p>
+            )}
+          </div>
+        )}
         <div className="connection-actions">
           <button
             className="primary-button"
             type="submit"
-            disabled={runtime.connecting}
+            disabled={runtime.connecting || keyBusy}
           >
             {runtime.connecting ? 'Connecting…' : 'Connect'}{' '}
             <PlugZap size={16} />

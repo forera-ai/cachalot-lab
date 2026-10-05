@@ -925,14 +925,19 @@ textarea:focus-visible {
   margin-top: 24px;
   border-top: 1px solid var(--border-subtle);
 }
+/* Dive: consistent controls, contained paths, and explicit task hierarchy. */
 .managed-page {
   max-width: 1120px;
 }
 .managed-grid {
   display: grid;
-  grid-template-columns: minmax(210px, 0.7fr) minmax(420px, 1.5fr);
-  gap: 16px;
+  grid-template-columns: minmax(210px, 0.65fr) minmax(0, 1.5fr);
+  gap: 20px;
   align-items: start;
+}
+.managed-page .info-panel {
+  padding: 24px;
+  min-width: 0;
 }
 .managed-profile-list {
   display: grid;
@@ -941,44 +946,80 @@ textarea:focus-visible {
 }
 .managed-profile {
   display: grid;
-  gap: 5px;
+  gap: 6px;
   text-align: left;
-  padding: 14px;
+  padding: 16px;
   border: 1px solid var(--border-subtle);
   border-radius: 9px;
   background: var(--bg-inset);
   color: var(--text-primary);
+  min-width: 0;
+}
+.managed-profile strong {
+  overflow-wrap: anywhere;
+  font-size: 13px;
 }
 .managed-profile.is-selected {
   border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 6%, var(--bg-inset));
 }
 .managed-profile span,
 .managed-facts span {
   color: var(--text-secondary);
   font-size: 11px;
 }
+.managed-detail-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 12px 0 10px;
+}
+.managed-detail-heading h2 {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.managed-state {
+  flex-shrink: 0;
+  padding: 5px 9px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  font-size: 10px;
+  color: var(--text-secondary);
+  background: var(--bg-inset);
+}
+.managed-state.is-active {
+  color: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border-subtle));
+}
 .managed-form,
 .managed-fields {
   display: grid;
-  gap: 12px;
+  gap: 16px;
   margin-top: 20px;
 }
 .managed-fields {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   margin: 0;
+  align-items: stretch;
+}
+.managed-fields > label {
+  grid-template-rows: 1fr auto;
 }
 .managed-form label {
   display: grid;
-  gap: 6px;
+  gap: 8px;
   color: var(--text-secondary);
   font-size: 11px;
   font-weight: 650;
+  min-width: 0;
 }
 .managed-form input,
 .managed-form select {
   width: 100%;
-  height: 39px;
-  padding: 0 10px;
+  min-width: 0;
+  height: 40px;
+  padding: 0 12px;
   border: 1px solid var(--border-strong);
   border-radius: 8px;
   background: var(--bg-inset);
@@ -986,51 +1027,151 @@ textarea:focus-visible {
   font-size: 12px;
 }
 .managed-form .panel-intro {
-  margin-top: 6px;
+  margin-top: 0;
+}
+.profile-editor h3 {
+  padding-top: 20px;
+  border-top: 1px solid var(--border-subtle);
+  margin: 8px 0 0;
+  font-size: 14px;
 }
 .managed-facts {
   display: grid;
-  gap: 10px;
-  margin: 22px 0;
+  gap: 14px;
+  margin: 24px 0;
 }
 .managed-facts > div {
   display: grid;
-  grid-template-columns: 90px minmax(0, 1fr);
-  gap: 12px;
+  grid-template-columns: 76px minmax(0, 1fr);
+  gap: 16px;
+  align-items: baseline;
 }
 .managed-facts strong {
   min-width: 0;
   overflow-wrap: anywhere;
   font-size: 12px;
+  line-height: 1.6;
+  font-weight: 550;
 }
 .managed-actions {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 9px;
-  margin-top: 20px;
+  gap: 10px;
+  margin-top: 24px;
 }
-.managed-actions button:disabled {
+.managed-page .primary-button,
+.managed-page .secondary-button {
+  min-height: 40px;
+  height: auto;
+  padding: 10px 14px;
+  line-height: 1.4;
+}
+.managed-actions .text-button {
+  margin: 0;
+  min-height: 40px;
+  padding: 10px 14px;
+}
+.managed-actions > .managed-delete {
+  margin-left: auto;
+}
+.managed-page button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  transform: none;
+}
+.managed-page button:focus-visible,
+.managed-page summary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+.managed-page .managed-delete {
+  color: var(--state-error);
+  border-color: color-mix(
+    in srgb,
+    var(--state-error) 35%,
+    var(--border-subtle)
+  );
+}
+.managed-page .managed-delete:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--state-error) 8%, var(--bg-raised));
+}
+.managed-delete-confirmation {
+  margin-top: 20px;
+  padding: 18px;
+  border: 1px solid
+    color-mix(in srgb, var(--state-error) 35%, var(--border-subtle));
+  border-radius: 10px;
+  background: var(--bg-inset);
+}
+.managed-delete-confirmation strong {
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+.managed-delete-confirmation p,
+.managed-notice {
+  margin: 8px 0 0;
+  color: var(--text-secondary);
+  font-size: 11px;
+  line-height: 1.6;
+}
+.managed-delete-confirmation .managed-actions {
+  margin-top: 16px;
+  justify-content: flex-end;
+}
+.managed-delete-confirmation .managed-delete {
+  margin-left: 0;
+}
+.managed-preview-panel {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border-subtle);
+}
+.managed-preview-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.managed-preview-heading h3 {
+  margin: 0;
+  font-size: 15px;
+}
+.managed-preview-heading span {
+  color: var(--text-secondary);
+  font-size: 10px;
+  overflow-wrap: anywhere;
+}
+.managed-preview-panel h4 {
+  margin: 20px 0 8px;
+  font-size: 11px;
+  font-weight: 650;
+  color: var(--text-secondary);
 }
 .managed-preview,
 .managed-log {
   overflow: auto;
-  padding: 14px;
+  padding: 14px 16px;
   border: 1px solid var(--border-subtle);
   border-radius: 8px;
   background: var(--bg-inset);
   color: var(--text-secondary);
   font:
-    11px/1.6 ui-monospace,
+    11px/1.7 ui-monospace,
     SFMono-Regular,
     monospace;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
+.managed-preview {
+  margin: 0;
+  max-height: 280px;
+  scrollbar-gutter: stable;
+}
 .managed-log-panel {
-  margin-top: 16px;
+  margin-top: 20px;
 }
 .managed-log {
   min-height: 260px;
@@ -1041,10 +1182,89 @@ textarea:focus-visible {
   min-height: 90px;
   max-height: 155px;
 }
-@media (max-width: 780px) {
-  .managed-grid,
-  .managed-fields {
+.managed-log-disclosure {
+  margin-top: 20px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  background: var(--bg-raised);
+}
+.managed-log-disclosure > summary {
+  padding: 18px 24px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 650;
+  color: var(--text-primary);
+}
+.managed-log-disclosure > summary span {
+  margin-left: 12px;
+  color: var(--text-secondary);
+  font-weight: 400;
+  font-size: 11px;
+}
+.managed-log-disclosure .managed-log-panel {
+  margin: 0;
+  border: 0;
+  border-top: 1px solid var(--border-subtle);
+  border-radius: 0 0 12px 12px;
+}
+.managed-page .model-discovery {
+  margin-top: 20px;
+}
+.discovery-form {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+}
+.discovered-model {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 20px 0;
+  border-top: 1px solid var(--border-subtle);
+}
+.discovered-model-info {
+  flex: 1;
+  min-width: 0;
+}
+.discovered-model-info strong {
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+.discovered-model-info p {
+  margin: 6px 0 0;
+  overflow-wrap: anywhere;
+  color: var(--text-secondary);
+  font-size: 11px;
+  line-height: 1.6;
+}
+.discovered-model > button {
+  flex-shrink: 0;
+}
+@media (max-width: 1000px) {
+  .managed-grid {
     grid-template-columns: 1fr;
+  }
+  .managed-profile-list {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+}
+@media (max-width: 780px) {
+  .managed-fields,
+  .discovery-form {
+    grid-template-columns: 1fr;
+  }
+  .managed-actions > .managed-delete {
+    margin-left: 0;
+  }
+  .discovered-model {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .managed-detail-heading {
+    flex-wrap: wrap;
+  }
+  .managed-log-disclosure > summary span {
+    display: block;
+    margin: 8px 0 0 16px;
   }
 }
 .connection-facts > div {
@@ -1513,4 +1733,15 @@ html[data-silent-running='true'] *::after {
   animation: none !important;
   transition: none !important;
   scroll-behavior: auto !important;
+}
+
+.model-discovery form + .panel-intro {
+  margin: 20px 0 12px;
+}
+.model-discovery .discovered-model + .panel-intro {
+  margin-top: 12px;
+}
+
+:root[data-theme='surface'] .managed-page .primary-button {
+  color: #fff;
 }
