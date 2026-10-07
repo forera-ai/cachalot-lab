@@ -10,12 +10,44 @@ run-manifest design; token tracing requires authoritative Cachalot instrumentati
 The former fixed 0.6/0.7/1.0 roadmap assignments are superseded, with useful work retained
 as backlog. No research capability is claimed as shipped by these document changes.
 
-Release 0.6.0 is prepared for publication at
-[GitHub Release](https://github.com/prooshani/cachalot-lab/releases/tag/v0.6.0).
-The minor version reflects the additive runtime read/wait evidence capability
-and compatible Lab rename. Package and native versions are 0.6.0. The exact
-release source commit will be recorded in `SOURCE_COMMIT` and `RELEASE-REPORT.md`.
-Publication and post-publication installation must be verified before completion.
+Release **0.6.0 is published** at
+[GitHub Release](https://github.com/prooshani/cachalot-lab/releases/tag/v0.6.0),
+from implementation commit `769a6c652867a9b838d3112597b34556d4662f08`
+and matching annotated tag `v0.6.0`. The minor version reflects the additive
+runtime read/wait evidence capability and compatible Lab rename. Package and
+native versions are 0.6.0. All seven public assets were downloaded and hash-compared
+with local files and GitHub digests. The source record, signed/notarized DMG and ZIP,
+checksums, notarization receipts, and
+[verification report](https://github.com/prooshani/cachalot-lab/releases/download/v0.6.0/RELEASE-REPORT.md)
+are published.
+
+Release evidence: app notarization `d4d9564b-572f-4c55-90a5-5904ae5829eb`;
+DMG notarization `13c39d71-d4f4-479c-a86b-3838cf6574e3`, both Accepted.
+Strict signatures, staple validation, Gatekeeper and DMG internal checksum checks
+passed. ZIP SHA-256 `6c455d6487975b17aeee59c76113566ba358186fba5a84c8901806f4afe9817c`;
+DMG `7bc194fe2a303a938bca00ab79e4631cf327a674fceffa3de6a66ad18ea71b3d`.
+Fresh exact-source checks passed: 46 frontend tests, six Python mock tests, 31
+normal Rust tests, explicit isolated native Keychain CRUD, formatting, lint,
+TypeScript, clippy and the signed production build. The initial explicit PATH
+selected unsupported Node 26; repeating preflight with Node 22.23.1 passed.
+Optional debug-info stripping retains the known nonfatal missing-libLLVM warning.
+
+The downloaded public DMG is installed at `/Applications/Cachalot Lab.app`.
+Every installed bundle file matches the public DMG and release app; executable
+SHA-256 `aad6521617667b4a8d638244fc78a78e1af55f776ae1be4a48a630ddde7a7d20`.
+Native sidebar and About show Cachalot Lab 0.6.0. Offline fallback and the nine
+synthetic read/wait totals were inspected, with charts restored on collapse.
+Application-support files remained byte-identical across installation and native
+smoke. No real model launch, generation, profile or user credential change.
+Mocks were disconnected and stopped; app left on Cockpit/Drives. The prior local
+app is recoverable under `.release/local-before-v0.6.0/previous-Cachalot Lab.app`;
+local installation and public verification records are under `.release/0.6.0/`.
+
+Both exact-source [main CI](https://github.com/prooshani/cachalot-lab/actions/runs/37599719902)
+and [tag CI](https://github.com/prooshani/cachalot-lab/actions/runs/37599719511)
+passed, including native app builds. Runner annotations note action-runtime Node
+20 deprecation/forced Node 24 and possible arm64 queue delays; checks succeeded.
+The app's test/build Node version remains 22.
 
 Last committed runtime source reviewed on **2026-10-07**: **0.61.2**, commit
 `954dff83c54071e10aef649ae725dd0afd141528`, with briefs through **0.61.1**.
@@ -27,13 +59,13 @@ the emulation knob without changing launch policy. Busy-rate and wait-percentage
 calculations remain deferred pending aligned evidence; see `docs/RUNTIME_SYNC.md`.
 Live GLM/DeepSeek and authenticated saved-key restart validation remain outstanding.
 
-The Developer ID signed local app is installed at `/Applications/Cachalot Lab.app`.
-The 2026-10-07 compatibility pass passed 46 frontend tests, six Python mock tests,
+Historical pre-release local verification (superseded by the published app above):
+the 2026-10-07 compatibility pass passed 46 frontend tests, six Python mock tests,
 TypeScript, ESLint, Prettier, production build, and signed native build. No Rust
 source changed in this pass; the prior rename's 31 Rust tests and format/clippy
 checks remain historical evidence, not a new run. Those local artifacts carried development version
-0.5.0 and were not notarized or published. The current release workflow supersedes
-them with fresh exact-source 0.6.0 artifacts before any implementation push.
+0.5.0 and were not notarized or published. The completed release workflow superseded
+them with fresh exact-source 0.6.0 artifacts before the implementation push.
 Final installed executable SHA-256:
 `b395edcc2150b04336710796c2726b4927088da087c2cdf4f2d473fa0891b9ee`.
 Strict signature verification and all four bundle-file hash comparisons passed.

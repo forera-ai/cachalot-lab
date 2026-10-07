@@ -63,7 +63,10 @@ as another 0.5.0 artifact.
 Before any implementation push, choose the appropriate new version and complete the
 exact-source signed/notarized [release gate](RELEASE.md).
 
-### Completed verification
+### Historical local rename verification
+
+The following records the earlier development pass; the published 0.6.0 checks
+and installation below supersede its development artifact and test counts.
 
 - GitHub repository renamed to `prooshani/cachalot-lab`; description and local
   origin updated and verified. The previous repository URL redirects correctly.
@@ -117,7 +120,13 @@ tool is read-only, no rename tool is exposed, and UI automation of Codex was den
 by the tool's safety policy. This label requires a manual product-level rename.
 The old path alias keeps the existing chat usable. No private Codex database was edited.
 
-The authorized 0.6.0 release round packages the rename and read/wait telemetry
-from exact committed source. Publication verification is recorded in that
-release's `RELEASE-REPORT.md` and `HANDOFF.md`, including notarization, public asset
-hashes, CI, and post-publication installation.
+The [published 0.6.0 release](https://github.com/prooshani/cachalot-lab/releases/tag/v0.6.0)
+ships the rename and read/wait telemetry from exact committed source
+`769a6c652867a9b838d3112597b34556d4662f08`. Both app and DMG were signed,
+notarized, stapled and verified. All seven public assets were downloaded and
+hash-compared, and the verified public DMG is installed at the canonical app path.
+Native sidebar and About show 0.6.0; saved application-support files remained
+byte-identical. Fresh checks include 46 frontend, six Python and 31 normal Rust
+tests, plus isolated native Keychain CRUD. Real saved-key restart remains unverified.
+See the release's `RELEASE-REPORT.md` and `HANDOFF.md` for exact hashes, receipts,
+CI results and installation evidence.
