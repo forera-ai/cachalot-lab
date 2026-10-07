@@ -40,7 +40,7 @@ textarea:focus-visible {
   background: var(--accent-strong);
   color: white;
 }
-.studio-shell {
+.lab-shell {
   display: flex;
   min-height: 100vh;
 }

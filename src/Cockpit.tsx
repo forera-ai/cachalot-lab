@@ -10,7 +10,7 @@ import {
   type RuntimePoint,
 } from './runtime'
 import './cockpit.css'
-import { useStudioStore } from './store'
+import { useLabStore } from './store'
 
 type TrendDatum = { at: number; value: number | null }
 
@@ -20,6 +20,77 @@ function runtimeTotal(runtime: RuntimeConnection, key: string): string {
   return value !== null && Number.isSafeInteger(value) && value >= 0
     ? value.toLocaleString()
     : '—'
+}
+
+const readEvidenceFields = [
+  ['expert_hits', 'Expert hits', ''],
+  ['expert_misses', 'Expert misses', ''],
+  ['ssd_bytes_read', 'Accounted read bytes', 'B'],
+  ['expert_reads', 'Expert reads', ''],
+  ['expert_fast_reads', 'Fast reads (cache heuristic)', ''],
+  ['expert_read_seconds', 'Summed read time', 's'],
+  ['expert_read_busy_seconds', 'Read busy time', 's'],
+  ['decode_wait_seconds', 'Decode wait time', 's'],
+  ['decode_waited_misses', 'Decode waited misses', ''],
+] as const
+
+function ReadEvidence({ runtime }: { runtime: RuntimeConnection }) {
+  return (
+    <details className="read-evidence">
+      <summary>Read and wait evidence</summary>
+      <div className="read-evidence-body">
+        <p>
+          Measured runtime counters · /v1/stats · cumulative since server start.
+          Lookups and reads include prefill and decode. — means unreported,
+          invalid, or offline.
+        </p>
+        <table aria-label="Runtime read and wait totals">
+          <tbody>
+            {readEvidenceFields.map(([key, label, unit]) => {
+              const value =
+                runtime.snapshot.connected && runtime.snapshot.healthy
+                  ? runtimeNumber(runtime.snapshot.stats, key)
+                  : null
+              const formatted =
+                unit === 's'
+                  ? value !== null &&
+                    value >= 0 &&
+                    value <= Number.MAX_SAFE_INTEGER
+                    ? value.toFixed(3)
+                    : '—'
+                  : runtimeTotal(runtime, key)
+              return (
+                <tr key={key}>
+                  <th scope="row" title={key}>
+                    {label}
+                  </th>
+                  <td>
+                    {formatted}
+                    {formatted !== '—' && unit ? ` ${unit}` : ''}
+                  </td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
+        <p>
+          Read durations overlap; summed time is not elapsed time. Busy time
+          means at least one read in flight. Decode wait is caller waiting, not
+          a latency percentage or a critical path.
+        </p>
+        <p>
+          Fast reads use a timing heuristic for page-cache hits. Accounted bytes
+          are runtime store counters, not physical-drive traffic. Emulated drive
+          bandwidth is not reported; these counters cannot identify a throttled
+          run.
+        </p>
+        <p>
+          Surface · Twilight · Midnight · Abyss are memory tiers. Per-tier
+          occupancy and SSD pressure are not reported by this runtime.
+        </p>
+      </div>
+    </details>
+  )
 }
 
 function TrendChart({
@@ -35,7 +106,7 @@ function TrendChart({
   ceiling?: number
   className?: string
 }) {
-  const silentRunning = useStudioStore((state) => state.silentRunning)
+  const silentRunning = useLabStore((state) => state.silentRunning)
   const id = useId().replaceAll(':', '')
   if (silentRunning) {
     return (
@@ -233,7 +304,7 @@ export function Cockpit({
       <header className="cockpit-header">
         <div className="cockpit-heading">
           <div className="cockpit-overline">
-            <span className="signal-line" /> STUDIO / SYSTEM TELEMETRY
+            <span className="signal-line" /> LAB / SYSTEM TELEMETRY
           </div>
           <div className="cockpit-title-row">
             <h1>Cockpit</h1>
@@ -605,13 +676,16 @@ export function Cockpit({
               <p>Runtime totals · — means unreported. Not a speedup measure.</p>
             </div>
           )}
-          <div className="cache-footer">
-            <p>
-              {storageView === 'drives'
-                ? 'Whole-drive activity from all apps · decimal MB/s · — means unavailable or awaiting samples. Not a speed benchmark or Cachalot-only I/O.'
-                : 'Surface · Twilight · Midnight · Abyss are memory tiers. Per-tier occupancy and SSD pressure are not reported by this runtime.'}
-            </p>
-          </div>
+          {storageView === 'runtime' && <ReadEvidence runtime={runtime} />}
+          {storageView === 'drives' && (
+            <div className="cache-footer">
+              <p>
+                Whole-drive activity from all apps · decimal MB/s · — means
+                unavailable or awaiting samples. Not a speed benchmark or
+                Cachalot-only I/O.
+              </p>
+            </div>
+          )}
         </section>
 
         <section

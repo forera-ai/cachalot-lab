@@ -7,7 +7,7 @@ import './styles.css'
 const root = document.getElementById('root')
 
 if (!root) {
-  throw new Error('Cachalot Studio root element is missing')
+  throw new Error('Cachalot Lab root element is missing')
 }
 
 ReactDOM.createRoot(root).render(

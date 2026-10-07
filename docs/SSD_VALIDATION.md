@@ -1,6 +1,6 @@
 # SSD telemetry and model integration validation
 
-This describes the SSD capability shipping in Studio 0.5.0 and its outstanding model-validation work. The initial scope excluded discovery and Keychain; the owner subsequently requested both, tracked in [Discovery and Keychain](DISCOVERY_KEYCHAIN.md). SSD speed benchmarking remains excluded.
+This describes the SSD capability shipping in Lab 0.5.0 and its outstanding model-validation work. The initial scope excluded discovery and Keychain; the owner subsequently requested both, tracked in [Discovery and Keychain](DISCOVERY_KEYCHAIN.md). SSD speed benchmarking remains excluded.
 
 ## SSD measurements
 
@@ -18,7 +18,7 @@ Runtime reviewed: Cachalot 0.60.1, `9d11bc061dcb434c40494be3d507521194d376dc`. N
 
 Live validation is pending. A separate runtime-project session is running `benchmarks/quality_blind_ab.py run --budget 0 --n 48` (observed PID 33189, about 56 GiB resident memory). It must finish before a second model starts. No test server has been started, no existing runtime stopped, and no user profile changed. The initial memory level was 18 with about 5.7 GiB swap, so an idle/pressure check is also required. A narrow process-name check initially missed this Python executable; all Python command lines must be checked before testing, not only the virtualenv spelling.
 
-Once the other job finishes, verify normal memory pressure, stable swap, available memory, no runtime/GPU workload, and no screensaver. Run each row sequentially through the installed Studio-owned runtime with a temporary profile, isolated loopback port and snapshot directory, and a short synthetic streaming prompt capped at 16 output tokens. Record launch preview, actual startup knobs, readiness/model ID, streaming completion, optional telemetry availability, owned stop, PID exit, and free port. Preserve and restore original profile and conversation files.
+Once the other job finishes, verify normal memory pressure, stable swap, available memory, no runtime/GPU workload, and no screensaver. Run each row sequentially through the installed Lab-owned runtime with a temporary profile, isolated loopback port and snapshot directory, and a short synthetic streaming prompt capped at 16 output tokens. Record launch preview, actual startup knobs, readiness/model ID, streaming completion, optional telemetry availability, owned stop, PID exit, and free port. Preserve and restore original profile and conversation files.
 
 | Model    | Launch choices                                                          | Required observations                                                                                                                     |
 | -------- | ----------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
@@ -29,4 +29,4 @@ Once the other job finishes, verify normal memory pressure, stable swap, availab
 
 A short streaming smoke validates integration and lifecycle only. It does not validate general output quality, long-context behavior, speed gains, or seven-day reuse across real calendar days. The runtime's quality benchmark is separate evidence. Date normalization can receive a bounded two-request test with a synthetic system date once its persisted mapping is isolated.
 
-Release note: the development-build hashes and version descriptions above are historical pre-release evidence. Studio 0.5.0 ships the combined changes; its exact source, signed/notarized artifacts, and final verification are recorded in the GitHub Release verification report. Outstanding validation limits above still apply.
+Release note: the development-build hashes and version descriptions above are historical pre-release evidence. Lab 0.5.0 ships the combined changes; its exact source, signed/notarized artifacts, and final verification are recorded in the GitHub Release verification report. Outstanding validation limits above still apply.

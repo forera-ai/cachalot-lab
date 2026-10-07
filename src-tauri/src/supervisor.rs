@@ -121,19 +121,19 @@ fn log_path(app: &AppHandle) -> Result<std::path::PathBuf, String> {
     app.path()
         .app_data_dir()
         .map(|directory| directory.join("managed-runtime.log"))
-        .map_err(|error| format!("Could not locate Studio data directory: {error}"))
+        .map_err(|error| format!("Could not locate Lab data directory: {error}"))
 }
 
 fn runtime_log(app: &AppHandle) -> Result<File, String> {
     let path = log_path(app)?;
     let directory = path.parent().ok_or("Managed log path has no parent.")?;
     fs::create_dir_all(directory)
-        .map_err(|error| format!("Could not create Studio data directory: {error}"))?;
+        .map_err(|error| format!("Could not create Lab data directory: {error}"))?;
     #[cfg(unix)]
     {
         use std::os::unix::fs::PermissionsExt;
         fs::set_permissions(directory, fs::Permissions::from_mode(0o700))
-            .map_err(|error| format!("Could not protect Studio data directory: {error}"))?;
+            .map_err(|error| format!("Could not protect Lab data directory: {error}"))?;
     }
     let mut options = OpenOptions::new();
     options.write(true).create(true).truncate(true);
@@ -283,12 +283,12 @@ pub fn start_managed_runtime(
         .map_err(|_| "Managed runtime is unavailable.".to_owned())?;
     inner.refresh()?;
     if inner.active.is_some() {
-        return Err("Studio already has a managed runtime running.".to_owned());
+        return Err("Lab already has a managed runtime running.".to_owned());
     }
     let address = SocketAddrV4::new(Ipv4Addr::LOCALHOST, profile.port);
     let reservation = TcpListener::bind(address).map_err(|_| {
         format!(
-            "Port {} is in use. Stop the previous Cachalot server in Activity Monitor or choose another port. Studio will not attach to or stop a process it does not own.",
+            "Port {} is in use. Stop the previous Cachalot server in Activity Monitor or choose another port. Lab will not attach to or stop a process it does not own.",
             profile.port
         )
     })?;
@@ -352,7 +352,7 @@ mod tests {
     #[test]
     fn checks_glm_bank_only_when_enabled() {
         let directory = std::env::temp_dir().join(format!(
-            "studio-glm-bank-{}-{}",
+            "lab-glm-bank-{}-{}",
             std::process::id(),
             std::time::SystemTime::now()
                 .duration_since(std::time::UNIX_EPOCH)

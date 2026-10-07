@@ -1,4 +1,4 @@
-"""Small local Cachalot stand-in for Studio development and tests."""
+"""Small local Cachalot stand-in for Lab development and tests."""
 
 from __future__ import annotations
 
@@ -22,6 +22,7 @@ class Scenario:
     crash_on_chat: bool = False
     prefetch_stats: bool = False
     image_stats: bool = False
+    read_stats: bool = False
 
 
 class MockRuntime(ThreadingHTTPServer):
@@ -99,6 +100,12 @@ class Handler(BaseHTTPRequestHandler):
                     stats.update({"predicted_loads": 120, "predicted_used": 80})
                 if self.server.scenario.image_stats:
                     stats["images_served"] = 7
+                if self.server.scenario.read_stats:
+                    stats.update({"expert_hits": 240, "expert_misses": 60,
+                                  "ssd_bytes_read": 1000000000, "expert_reads": 80,
+                                  "expert_fast_reads": 20, "expert_read_seconds": 12.5,
+                                  "expert_read_busy_seconds": 4.25,
+                                  "decode_wait_seconds": 2.125, "decode_waited_misses": 30})
             self.json_response(200, stats)
             return
         self.json_response(404, {"error": {"message": "Not found"}})
@@ -191,8 +198,9 @@ def main() -> None:
     parser.add_argument("--crash-on-chat", action="store_true")
     parser.add_argument("--prefetch-stats", action="store_true", help="Expose fixed synthetic prefetch totals (120 reads, 80 used)")
     parser.add_argument("--image-stats", action="store_true", help="Expose a fixed synthetic image input total (7)")
+    parser.add_argument("--read-stats", action="store_true", help="Expose fixed synthetic runtime read/wait counters")
     args = parser.parse_args()
-    scenario = Scenario(args.startup_delay, args.prefill_delay, args.token_delay, args.api_key, args.missing_stats, args.crash_on_chat, args.prefetch_stats, args.image_stats)
+    scenario = Scenario(args.startup_delay, args.prefill_delay, args.token_delay, args.api_key, args.missing_stats, args.crash_on_chat, args.prefetch_stats, args.image_stats, args.read_stats)
     server = MockRuntime(("127.0.0.1", args.port), scenario)
     print("[startup] process up", flush=True)
     print(f"[startup] server listening on 127.0.0.1:{server.server_port}", flush=True)

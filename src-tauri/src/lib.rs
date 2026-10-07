@@ -115,7 +115,7 @@ fn platform_info() -> Result<PlatformInfo, String> {
 
     #[cfg(not(target_os = "macos"))]
     {
-        Err("Cachalot Studio requires macOS.".to_owned())
+        Err("Cachalot Lab requires macOS.".to_owned())
     }
 }
 
@@ -158,7 +158,7 @@ pub fn run() {
             }
         }),
         Err(error) => {
-            eprintln!("Cachalot Studio failed to start: {error}");
+            eprintln!("Cachalot Lab failed to start: {error}");
             std::process::exit(1);
         }
     }

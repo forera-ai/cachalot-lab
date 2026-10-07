@@ -13,7 +13,7 @@ import { navigation, type Screen } from './navigation'
 import { loadPlatformInfo, type PlatformInfo } from './platform'
 import { ApiScreen } from './RuntimeScreens'
 import { useRuntime, type RuntimeConnection } from './runtime'
-import { useStudioStore, type ThemePreference } from './store'
+import { useLabStore, type ThemePreference } from './store'
 import { TelemetryStrip } from './TelemetryStrip'
 
 function useResolvedTheme(preference: ThemePreference) {
@@ -120,10 +120,10 @@ function Doctor({
 }
 
 function Settings() {
-  const silentRunning = useStudioStore((state) => state.silentRunning)
-  const setSilentRunning = useStudioStore((state) => state.setSilentRunning)
-  const preference = useStudioStore((state) => state.themePreference)
-  const setPreference = useStudioStore((state) => state.setThemePreference)
+  const silentRunning = useLabStore((state) => state.silentRunning)
+  const setSilentRunning = useLabStore((state) => state.setSilentRunning)
+  const preference = useLabStore((state) => state.themePreference)
+  const setPreference = useLabStore((state) => state.setThemePreference)
   const choices: {
     id: ThemePreference
     label: string
@@ -152,12 +152,12 @@ function Settings() {
   return (
     <div className="page detail-page">
       <div className="eyebrow">
-        <span className="eyebrow-line" /> STUDIO / PREFERENCES
+        <span className="eyebrow-line" /> LAB / PREFERENCES
       </div>
       <div className="page-heading">
         <div>
           <h1>Settings</h1>
-          <p>Shape the Studio around the way you work.</p>
+          <p>Shape the Lab around the way you work.</p>
         </div>
       </div>
       <section className="info-panel settings-panel">
@@ -222,15 +222,15 @@ function Settings() {
 }
 
 export default function App() {
-  const storedScreen = useStudioStore((state) => state.screen)
+  const storedScreen = useLabStore((state) => state.screen)
   const screen = navigation.some((item) => item.id === storedScreen)
     ? storedScreen
     : 'cockpit'
-  const setScreen = useStudioStore((state) => state.setScreen)
-  const setPaletteOpen = useStudioStore((state) => state.setPaletteOpen)
-  const preference = useStudioStore((state) => state.themePreference)
+  const setScreen = useLabStore((state) => state.setScreen)
+  const setPaletteOpen = useLabStore((state) => state.setPaletteOpen)
+  const preference = useLabStore((state) => state.themePreference)
   const theme = useResolvedTheme(preference)
-  const silentRunning = useStudioStore((state) => state.silentRunning)
+  const silentRunning = useLabStore((state) => state.silentRunning)
   useEffect(() => {
     document.documentElement.dataset.silentRunning = String(silentRunning)
     return () => {
@@ -278,7 +278,7 @@ export default function App() {
   }, [setPaletteOpen])
 
   return (
-    <div className="studio-shell">
+    <div className="lab-shell">
       <aside
         className="sidebar"
         aria-label="Main navigation"
@@ -289,7 +289,7 @@ export default function App() {
             <img src={theme === 'abyss' ? markDark : markLight} alt="" />
           </span>
           <span className="brand-name">
-            CACHALOT <b>STUDIO</b>
+            CACHALOT <b>LAB</b>
           </span>
         </div>
         <div className="sidebar-section-label">WORKSPACE</div>
@@ -327,7 +327,7 @@ export default function App() {
                 ? 'RUNTIME STARTING'
                 : 'NO RUNTIME ACTIVE'}
           </span>
-          <span className="side-version">STUDIO {studioVersion}</span>
+          <span className="side-version">LAB {labVersion}</span>
         </div>
       </aside>
       <div
@@ -335,7 +335,7 @@ export default function App() {
       >
         <header className="topbar" data-tauri-drag-region>
           <div className="breadcrumbs">
-            <span>STUDIO</span>
+            <span>LAB</span>
             <ChevronRight size={14} />
             <strong>
               {navigation.find((item) => item.id === screen)?.label}
@@ -414,4 +414,4 @@ function NavButton({
     </button>
   )
 }
-import { version as studioVersion } from '../package.json'
+import { version as labVersion } from '../package.json'

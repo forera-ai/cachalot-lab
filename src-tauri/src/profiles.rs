@@ -151,7 +151,7 @@ fn store_path(app: &AppHandle) -> Result<PathBuf, String> {
     app.path()
         .app_data_dir()
         .map(|directory| directory.join("profiles.json"))
-        .map_err(|error| format!("Could not locate Studio data directory: {error}"))
+        .map_err(|error| format!("Could not locate Lab data directory: {error}"))
 }
 
 fn lock_store(path: &Path) -> Result<File, String> {
@@ -159,12 +159,12 @@ fn lock_store(path: &Path) -> Result<File, String> {
         .parent()
         .ok_or_else(|| "Profile path has no parent directory.".to_owned())?;
     fs::create_dir_all(directory)
-        .map_err(|error| format!("Could not create Studio data directory: {error}"))?;
+        .map_err(|error| format!("Could not create Lab data directory: {error}"))?;
     #[cfg(unix)]
     {
         use std::os::unix::fs::PermissionsExt;
         fs::set_permissions(directory, fs::Permissions::from_mode(0o700))
-            .map_err(|error| format!("Could not protect Studio data directory: {error}"))?;
+            .map_err(|error| format!("Could not protect Lab data directory: {error}"))?;
     }
     let mut options = OpenOptions::new();
     options.read(true).write(true).create(true);

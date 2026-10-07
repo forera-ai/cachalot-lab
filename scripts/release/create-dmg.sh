@@ -3,13 +3,13 @@ set -euo pipefail
 
 APP_PATH="${1:-}"
 OUTPUT_PATH="${2:-}"
-VOLUME_NAME="${3:-Cachalot Studio}"
+VOLUME_NAME="${3:-Cachalot Lab}"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 BACKGROUND="$ROOT/assets/dmg/background.png"
 
 if [[ ! -d "$APP_PATH" || "$APP_PATH" != *.app || -z "$OUTPUT_PATH" || -e "$OUTPUT_PATH" ]]; then
-  echo "Usage: $0 /path/to/Cachalot\ Studio.app /new/path/Cachalot\ Studio.dmg [volume-name]" >&2
+  echo "Usage: $0 /path/to/Cachalot\ Lab.app /new/path/Cachalot\ Lab.dmg [volume-name]" >&2
   exit 64
 fi
 [[ -f "$BACKGROUND" ]] || { echo "DMG background is missing" >&2; exit 1; }
@@ -26,7 +26,7 @@ cleanup() {
 trap cleanup EXIT
 
 mkdir -p "$MOUNT" "$STAGING" "$(dirname "$OUTPUT_PATH")"
-ditto "$APP_PATH" "$STAGING/Cachalot Studio.app"
+ditto "$APP_PATH" "$STAGING/Cachalot Lab.app"
 ln -s /Applications "$STAGING/Applications"
 ditto "$BACKGROUND" "$STAGING/.background.png"
 chflags hidden "$STAGING/.background.png"
@@ -55,7 +55,7 @@ on run argv
     set label position of viewOptions to bottom
     set background picture of viewOptions to backgroundFile
     set position of item ".background.png" of volumeFolder to {605, 105}
-    set position of item "Cachalot Studio.app" of volumeFolder to {188, 262}
+    set position of item "Cachalot Lab.app" of volumeFolder to {188, 262}
     set position of item "Applications" of volumeFolder to {530, 262}
     update volumeFolder without registering applications
     delay 2

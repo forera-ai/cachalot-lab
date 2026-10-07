@@ -2,7 +2,22 @@
 
 ## [Unreleased]
 
-Changes are grouped by release. Work after the latest tag appears here.
+No pending changes.
+
+## [0.6.0] - 2026-10-07
+
+This backward-compatible minor release adds runtime read/wait evidence and ships the Cachalot Lab rename. The new telemetry view is an additive capability; existing data formats, bundle identity, credentials, inference workflows, and launch defaults are preserved.
+
+- Review runtime 0.61.0/0.61.1 briefs against `eef2bc5`. Record optional emulated-drive bandwidth and GLM/MiniMax telemetry parity without changing launch settings. Review the 0.61.2 follow-up (`954dff8`), which changes measurements/docs/version only.
+- Add a collapsed Cockpit Runtime read/wait evidence table with independently validated counts, bytes, and seconds; preserve missing values and label overlapping durations, heuristic fast reads, and unknown throttle state. No derived latency percentage, busy rate, or critical path is claimed.
+- Extend synthetic mock telemetry and compatibility tests for the new fields, older/partial responses, invalid values, zero, and disconnects.
+
+- Rename the product to **Cachalot Lab** across the local app, packages, installer tooling, active documentation, and development guidance. Preserve established data/credential identifiers and historical release records; see `docs/RENAME.md`.
+- Adopt the owner's inference observability, profiling, and experimentation mission. Replace speculative version-based milestones with evidence-led phases, explicit runtime dependencies, preservation requirements, and acceptance criteria. These planning changes do not implement the proposed research features.
+
+Validation: release preparation passed 46 frontend tests and six mock-runtime tests, TypeScript/lint/format checks, a signed local build, and native telemetry/disclosure/partial-response inspection. The exact-source release report records fresh Rust checks, signed/notarized packaging, and installed-app verification. Live GLM/DeepSeek inference, saved-key restart, and sustained performance/overhead remain unverified.
+
+Versions below were published under the **Cachalot Studio** name. Their artifact names, hashes, and historical claims remain unchanged.
 
 ## [0.5.0] - 2026-10-05
 

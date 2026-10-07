@@ -28,7 +28,7 @@ patterns:
     since: 0.49.0
     families: [glm-5.3-flash]
     regex: '^GLM expert bank: (?P<path>.+)$'
-    meaning: GLM selected a contiguous bank at startup. Logs displays the raw line; Studio does not infer live telemetry or compatibility from it.
+    meaning: GLM selected a contiguous bank at startup. Logs displays the raw line; Lab does not infer live telemetry or compatibility from it.
   - id: loop_guard
     since: 0.40.0
     families: [glm-5.3-flash, minimax-m3]

@@ -9,11 +9,11 @@ import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it } from 'vitest'
 
 import App from './App'
-import { useStudioStore } from './store'
+import { useLabStore } from './store'
 
 beforeEach(() => {
   localStorage.clear()
-  useStudioStore.setState({
+  useLabStore.setState({
     screen: 'cockpit',
     themePreference: 'abyss',
     paletteOpen: false,
@@ -21,10 +21,10 @@ beforeEach(() => {
   })
 })
 
-describe('Studio shell', () => {
+describe('Lab shell', () => {
   it('saves silent running and restores it from local preferences', async () => {
     const user = userEvent.setup()
-    useStudioStore.setState({ screen: 'settings' })
+    useLabStore.setState({ screen: 'settings' })
     render(<App />)
     const toggle = screen.getByRole('switch', { name: 'Silent running' })
     expect(toggle).not.toBeChecked()
@@ -36,9 +36,9 @@ describe('Studio shell', () => {
     )
     const stored = localStorage.getItem('cachalot-studio-ui')
     expect(JSON.parse(stored!).state.silentRunning).toBe(true)
-    useStudioStore.setState({ silentRunning: false })
+    useLabStore.setState({ silentRunning: false })
     localStorage.setItem('cachalot-studio-ui', stored!)
-    await useStudioStore.persist.rehydrate()
+    await useLabStore.persist.rehydrate()
     await waitFor(() => expect(toggle).toBeChecked())
     await user.click(toggle)
     expect(document.documentElement).toHaveAttribute(
@@ -71,13 +71,13 @@ describe('Studio shell', () => {
 
   it('applies theme choices to the document', async () => {
     const user = userEvent.setup()
-    useStudioStore.setState({ screen: 'settings' })
+    useLabStore.setState({ screen: 'settings' })
     render(<App />)
 
     await user.click(screen.getByRole('button', { name: /Surface/ }))
     await waitFor(() =>
       expect(document.documentElement).toHaveAttribute('data-theme', 'surface'),
     )
-    expect(useStudioStore.getState().themePreference).toBe('surface')
+    expect(useLabStore.getState().themePreference).toBe('surface')
   })
 })

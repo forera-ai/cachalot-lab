@@ -1,19 +1,19 @@
 # Source-reviewed HTTP fields, not inferred from launch knobs or startup logs.
 reviewed_runtime:
-  version: 0.60.0
-  commit: 62c0f053576c191ac56893449932d175abf86537
+  version: 0.61.2
+  commit: 954dff83c54071e10aef649ae725dd0afd141528
 endpoint: /v1/stats
 fields:
   decode_miss_budget:
     meaning: DeepSeek per-layer decode miss read cap; null means no miss dropping.
     type: nullable_nonnegative_integer
     optional: true
-    studio: Not yet displayed; do not infer exactness of all output paths from this single field.
+    lab: Not yet displayed; do not infer exactness of all output paths from this single field.
   skipped_experts:
     meaning: Cumulative dropped expert count, not a quality score.
     type: nonnegative_integer
     optional: true
-    studio: Not yet displayed.
+    lab: Not yet displayed.
   predicted_loads:
     meaning: Number of predicted expert reads submitted by the resident store.
     type: nonnegative_integer
@@ -22,6 +22,52 @@ fields:
     meaning: Number of predicted reads consumed by demand loading.
     type: nonnegative_integer
     optional: true
+  expert_hits:
+    meaning: Cumulative expert-store lookup hits, including prefill and decode.
+    type: nonnegative_integer
+    optional: true
+  expert_misses:
+    meaning: Cumulative expert-store lookup misses, including prefill and decode.
+    type: nonnegative_integer
+    optional: true
+  ssd_bytes_read:
+    meaning: Bytes accounted by the expert store; not physical-drive traffic. Not the separate internal read_bytes tally.
+    type: nonnegative_integer
+    unit: bytes
+    optional: true
+  expert_reads:
+    meaning: Cumulative instrumented expert reads, including demand and speculative reads.
+    type: nonnegative_integer
+    optional: true
+  expert_fast_reads:
+    meaning: Reads faster than the runtime threshold (default 1 ms), a page-cache heuristic rather than measured cache residency.
+    type: nonnegative_integer
+    optional: true
+  expert_read_seconds:
+    meaning: Sum of instrumented read wall times; overlapping reads can exceed elapsed wall time.
+    type: nonnegative_finite_number
+    unit: seconds
+    optional: true
+  expert_read_busy_seconds:
+    meaning: Wall time with at least one instrumented read in flight, including the current busy interval.
+    type: nonnegative_finite_number
+    unit: seconds
+    optional: true
+    families: [glm, minimax]
+    since: 0.61.1
+  decode_wait_seconds:
+    meaning: Cumulative time the decode caller waited for misses; not request duration or critical-path attribution.
+    type: nonnegative_finite_number
+    unit: seconds
+    optional: true
+    families: [glm, minimax]
+    since: 0.61.1
+  decode_waited_misses:
+    meaning: Cumulative decode misses counted by the caller's wait accounting.
+    type: nonnegative_integer
+    optional: true
+    families: [glm, minimax]
+    since: 0.61.1
   images_served:
     meaning: Image spans accepted into requests, including video steps and resent history; incremented before generation.
     type: nonnegative_integer
@@ -34,12 +80,12 @@ source:
   glm_minimax_engine: src/cachalot/glm/engine.py
 availability:
   deepseek: Exported by V41Model.stats and forwarded by Engine.stats.
-  glm_minimax: Internal counters exist but GlmEngine.stats omits these HTTP fields.
-studio:
+  glm_minimax: Since 0.61.1, GlmEngine.stats exports expert hit/miss, prediction, bytes, reads, fast reads, summed read time, busy time, and decode wait counters. Older versions omit them.
+lab:
   display: Independent runtime totals from the current healthy connected snapshot.
-  unavailable: Missing, malformed, negative, unsafe integer, or offline values show —.
+  unavailable: Missing, malformed, negative, unsafe integer, nonfinite duration, out-of-range duration, unhealthy, or offline values show —.
   zero: Displayed as zero; does not imply prefetch is disabled.
-  limits: No speedup, success percentage, or per-request attribution is inferred.
+  limits: No speedup, success percentage, wait percentage, busy rate, critical path, or per-request attribution is inferred.
 
 image_input_total:
   source: GlmEngine.stream_chat increments images_served by len(spans) before model.stream.
@@ -47,4 +93,16 @@ image_input_total:
   limits: Not unique images, completed replies, or proof of vision capability.
   video_since_glm: 0.52.0
   video_meaning: Each sampled temporal step contributes a span; this is not a video or frame count.
-  client: Studio image and video attachments remain pending; runtime API image support is separate.
+  client: Lab image and video attachments remain pending; runtime API image support is separate.
+
+read_wait_evidence:
+  question: How many expert lookups and reads has this server accounted, and how much read activity and decode waiting has it recorded?
+  lifetime: Cumulative since server/store creation; server restart resets counters. No stable session identifier is reported.
+  display: Cockpit Runtime offers a collapsed Read and wait evidence table. Counts and bytes retain integer values; seconds use three decimal places.
+  evidence: Runtime-reported measurements, except fast-read cache classification which is explicitly heuristic. No new derived rate or delta is calculated.
+  scope: Expert-store totals; reads and lookups include prefill and decode. Wait counters cover decode only. No request or token attribution.
+  fallback: Validate each field independently. Integers must be nonnegative safe integers; durations must be finite, nonnegative, and at most Number.MAX_SAFE_INTEGER. Missing is not zero.
+  collection: Existing visible 1 Hz / hidden 0.2 Hz stats polling; no extra requests, history, persistence, exports, or runtime instrumentation. Raw fields remain in the current snapshot only.
+  overhead: No inference-overhead measurement was performed; no overhead or performance claim is made.
+  throttle: CACHALOT_READ_THROTTLE_GBPS is not reported over HTTP. Emulated drive bandwidth is unknown from stats and must not be inferred from a low rate.
+  deferred: Per-token deltas need aligned windows and reset handling; decode wait share needs matching request decode durations. Busy-rate derivation needs confirmed byte/timing population alignment.

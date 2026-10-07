@@ -7,10 +7,10 @@ TEAM_ID="${CACHALOT_TEAM_ID:-ZKC68BDK5F}"
 IDENTITY="${CACHALOT_SIGNING_IDENTITY:-Developer ID Application: Hamed Prooshani ($TEAM_ID)}"
 PROFILE="${CACHALOT_NOTARY_PROFILE:-stagebeacon-notary}"
 RELEASE="$ROOT/.release/$VERSION"
-SOURCE_APP="$ROOT/src-tauri/target/release/bundle/macos/Cachalot Studio.app"
-APP="$RELEASE/Cachalot Studio.app"
-ZIP="$RELEASE/Cachalot-Studio-$VERSION-macOS-arm64.zip"
-DMG="$RELEASE/Cachalot-Studio-$VERSION-macOS-arm64.dmg"
+SOURCE_APP="$ROOT/src-tauri/target/release/bundle/macos/Cachalot Lab.app"
+APP="$RELEASE/Cachalot Lab.app"
+ZIP="$RELEASE/Cachalot-Lab-$VERSION-macOS-arm64.zip"
+DMG="$RELEASE/Cachalot-Lab-$VERSION-macOS-arm64.dmg"
 
 fail() { echo "Release blocked: $*" >&2; exit 1; }
 [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || fail "pass a semantic version, such as 0.1.0"
@@ -26,7 +26,7 @@ for file in (root / 'package.json', root / 'src-tauri/tauri.conf.json'):
     assert json.loads(file.read_text())['version'] == version, file
 assert tomllib.loads((root / 'src-tauri/Cargo.toml').read_text())['package']['version'] == version
 lock = tomllib.loads((root / 'src-tauri/Cargo.lock').read_text())
-assert any(p['name'] == 'cachalot-studio' and p['version'] == version for p in lock['package'])
+assert any(p['name'] == 'cachalot-lab' and p['version'] == version for p in lock['package'])
 assert f'## [{version}]' in (root / 'CHANGELOG.md').read_text()
 assert f'/releases/tag/v{version}' in (root / 'README.md').read_text()
 PY
@@ -62,7 +62,7 @@ xcrun stapler validate "$APP"
 spctl --assess --type execute --verbose=2 "$APP"
 ditto -c -k --sequesterRsrc --keepParent "$APP" "$ZIP"
 
-"$ROOT/scripts/release/create-dmg.sh" "$APP" "$DMG" "Cachalot Studio $VERSION"
+"$ROOT/scripts/release/create-dmg.sh" "$APP" "$DMG" "Cachalot Lab $VERSION"
 codesign --force --sign "$IDENTITY" --timestamp "$DMG"
 codesign --verify --verbose=2 "$DMG"
 xcrun notarytool submit "$DMG" --keychain-profile "$PROFILE" --wait --output-format json > "$RELEASE/dmg-notary.json"

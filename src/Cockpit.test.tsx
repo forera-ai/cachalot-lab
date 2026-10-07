@@ -4,9 +4,9 @@ import { beforeEach, expect, it, vi } from 'vitest'
 import { Cockpit } from './Cockpit'
 import type { PlatformInfo } from './platform'
 import type { RuntimeConnection, RuntimePoint } from './runtime'
-import { useStudioStore } from './store'
+import { useLabStore } from './store'
 
-beforeEach(() => useStudioStore.setState({ silentRunning: false }))
+beforeEach(() => useLabStore.setState({ silentRunning: false }))
 
 it('pauses traces in silent running while keeping readings current', () => {
   const runtime = connection()
@@ -23,7 +23,7 @@ it('pauses traces in silent running while keeping readings current', () => {
   expect(
     screen.getByRole('img', { name: 'Model decode speed history' }),
   ).toBeInTheDocument()
-  act(() => useStudioStore.getState().setSilentRunning(true))
+  act(() => useLabStore.getState().setSilentRunning(true))
   expect(screen.queryByRole('img', { name: /history/ })).not.toBeInTheDocument()
   expect(screen.getAllByText('Live trace paused').length).toBeGreaterThan(0)
   runtime.snapshot.stats = { decode_tps: 37, images_served: 9 }
@@ -34,7 +34,7 @@ it('pauses traces in silent running while keeping readings current', () => {
       '9',
     ),
   ).toBeInTheDocument()
-  act(() => useStudioStore.getState().setSilentRunning(false))
+  act(() => useLabStore.getState().setSilentRunning(false))
   expect(
     screen.getByRole('img', { name: 'Model decode speed history' }),
   ).toBeInTheDocument()
@@ -278,6 +278,97 @@ it('shows image input totals without inferring vision support and clears stale v
   runtime.snapshot.connected = false
   rerender(view())
   expect(total().getByText('—')).toBeInTheDocument()
+})
+
+it('shows independent runtime read and wait totals without inventing latency attribution', () => {
+  const runtime = connection()
+  const stats = {
+    expert_hits: 240,
+    expert_misses: 60,
+    ssd_bytes_read: 1000000000,
+    expert_reads: 80,
+    expert_fast_reads: 20,
+    expert_read_seconds: 12.5,
+    expert_read_busy_seconds: 4.25,
+    decode_wait_seconds: 2.125,
+    decode_waited_misses: 30,
+  }
+  runtime.snapshot.stats = stats
+  const view = () => (
+    <Cockpit
+      platform={platform}
+      platformError={null}
+      host={{ history: [], error: null }}
+      openScreen={vi.fn()}
+      runtime={runtime}
+    />
+  )
+  const { rerender } = render(view())
+  expect(screen.queryByText('Read and wait evidence')).not.toBeInTheDocument()
+  fireEvent.click(screen.getByRole('button', { name: 'Runtime' }))
+  const disclosure = screen
+    .getByText('Read and wait evidence')
+    .closest('details')!
+  expect(disclosure).not.toHaveAttribute('open')
+  fireEvent.click(screen.getByText('Read and wait evidence'))
+  const table = () =>
+    within(screen.getByRole('table', { name: 'Runtime read and wait totals' }))
+  const reading = (label: string) =>
+    within(table().getByRole('row', { name: new RegExp(label) })).getByRole(
+      'cell',
+    )
+  expect(reading('Expert hits')).toHaveTextContent('240')
+  expect(reading('Expert misses')).toHaveTextContent('60')
+  expect(reading('Accounted read bytes')).toHaveTextContent('1,000,000,000 B')
+  expect(reading('Expert reads')).toHaveTextContent('80')
+  expect(reading('Fast reads')).toHaveTextContent('20')
+  expect(reading('Summed read time')).toHaveTextContent('12.500 s')
+  expect(reading('Read busy time')).toHaveTextContent('4.250 s')
+  expect(reading('Decode wait time')).toHaveTextContent('2.125 s')
+  expect(reading('Decode waited misses')).toHaveTextContent('30')
+  expect(screen.getByText(/Read durations overlap/)).toBeInTheDocument()
+  expect(
+    screen.getByText(/Emulated drive bandwidth is not reported/),
+  ).toBeInTheDocument()
+
+  runtime.snapshot.stats = {
+    ...stats,
+    expert_misses: 0,
+    decode_wait_seconds: 0,
+  }
+  rerender(view())
+  expect(reading('Expert misses')).toHaveTextContent(/^0$/)
+  expect(reading('Decode wait time')).toHaveTextContent('0.000 s')
+  for (const invalid of [
+    undefined,
+    null,
+    '2',
+    -1,
+    Infinity,
+    NaN,
+    Number.MAX_SAFE_INTEGER + 1,
+  ]) {
+    runtime.snapshot.stats = {
+      ...stats,
+      expert_misses: invalid,
+      decode_wait_seconds: invalid,
+    }
+    rerender(view())
+    expect(reading('Expert misses')).toHaveTextContent('—')
+    expect(reading('Decode wait time')).toHaveTextContent('—')
+    expect(reading('Expert hits')).toHaveTextContent('240')
+  }
+  runtime.snapshot.stats = { expert_hits: 0.5 }
+  rerender(view())
+  expect(table().getAllByText('—')).toHaveLength(9)
+  for (const [connected, healthy] of [
+    [true, false],
+    [false, true],
+  ] as const) {
+    runtime.snapshot = { ...runtime.snapshot, stats, connected, healthy }
+    rerender(view())
+    expect(table().getAllByText('—')).toHaveLength(9)
+  }
 })
 
 it('shows drive rates offline, changes drive, and clears disconnected or failed samples', () => {

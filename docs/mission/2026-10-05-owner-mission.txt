@@ -1,0 +1,715 @@
+Cachalot Studio — Long-Term Engineering and Product Direction
+
+Mission
+
+Cachalot Studio is evolving from primarily being a graphical interface for interacting with Cachalot into an AI inference observability, profiling and experimentation environment.
+
+Cachalot is the experimental inference engine.
+
+Cachalot Studio is the instrument panel through which a human can understand what that engine is doing.
+
+The primary question Studio should answer is no longer only:
+
+Is the model running, and how many tokens per second is it producing?
+
+It should increasingly answer:
+
+What is happening inside the inference system right now, where is time being spent, which resources are active or waiting, where is data moving, what forms the critical path, what is limiting performance, and how did an experimental change alter system behavior?
+
+Studio should make invisible inference behavior visible.
+
+Its long-term role is comparable to a combination of:
+
+* profiler;
+* observability console;
+* experiment dashboard;
+* hardware monitor;
+* performance-analysis workstation;
+* benchmark comparison environment.
+
+It should remain usable and visually coherent rather than becoming a collection of raw diagnostic counters.
+
+⸻
+
+1. Preserve Existing Functionality
+
+Do not rewrite Studio merely to satisfy this new direction.
+
+First understand:
+
+* existing application architecture;
+* communication with Cachalot;
+* telemetry mechanisms;
+* model controls;
+* chat/inference workflows;
+* hardware monitoring;
+* storage monitoring;
+* cache/expert metrics;
+* performance visualization;
+* existing Cockpit functionality;
+* existing historical data and benchmark functionality.
+
+Existing user-facing inference functionality remains useful.
+
+Studio should evolve around it.
+
+⸻
+
+2. Maintain a Strict Responsibility Boundary
+
+Cachalot owns:
+
+* inference execution;
+* model behavior;
+* runtime policy;
+* cache policy;
+* prefetch policy;
+* scheduling;
+* instrumentation generation;
+* authoritative runtime metrics.
+
+Studio owns:
+
+* visualization;
+* aggregation;
+* comparison;
+* exploration;
+* experiment management;
+* interpretation surfaces;
+* historical analysis.
+
+Studio must not silently become responsible for inference policy.
+
+The guiding relationship is:
+
+Cachalot
+   │
+   │ structured telemetry/events
+   ▼
+Cachalot Studio
+   │
+   ▼
+human understanding
+
+Where additional telemetry is required, define the required data contract and implement authoritative measurement in Cachalot rather than reconstructing unreliable approximations in the UI.
+
+⸻
+
+3. Primary Visualization: Anatomy of a Token
+
+A major future objective is a token-level timeline.
+
+Conceptually:
+
+Token N
+──────────────────────────────────────────────────>
+Router       ███
+Expert lookup   ██
+Storage I/O       ███████████████
+                       └── hidden ──┘
+                                  └ exposed ┘
+Attention     █████
+Expert compute       █████████████
+Synchronization                    ███
+Sampling                              ██
+
+The exact phases must come from measured Cachalot instrumentation rather than this conceptual example.
+
+The timeline should eventually make concurrency obvious.
+
+A user should be able to see:
+
+* what happened;
+* when it started;
+* how long it lasted;
+* what overlapped;
+* what blocked progress;
+* what formed the critical path.
+
+This is fundamentally more useful than presenting a table of durations.
+
+⸻
+
+4. Distinguish Resource Activity From Exposed Cost
+
+Studio must avoid misleading visualizations.
+
+If storage is active for 100 ms while 70 ms overlaps useful GPU computation, do not visually imply that storage added 100 ms to token latency.
+
+Where telemetry permits, distinguish:
+
+* total activity;
+* overlapped activity;
+* exposed stall;
+* idle/wait time.
+
+The UI should help teach the difference between:
+
+resource busy time
+
+and:
+
+contribution to end-to-end latency.
+
+This principle should apply to:
+
+* storage;
+* CPU;
+* GPU;
+* memory;
+* synchronization;
+* prefetch.
+
+⸻
+
+5. Develop a Memory-Hierarchy View
+
+Studio should eventually visualize where model state resides.
+
+Conceptually:
+
+┌────────────────────────────┐
+│ Persistent Storage        │
+│ Model: 280 GB             │
+└──────────────┬─────────────┘
+               │
+          420 MB/token
+               │
+               ▼
+┌────────────────────────────┐
+│ Unified Memory            │
+│ Resident: 76 GB           │
+│ Expert cache: 52 GB       │
+│ KV: 2.1 GB                │
+│ Runtime: 4.2 GB           │
+└──────────────┬─────────────┘
+               │
+               ▼
+            Compute
+
+Over time this should expose:
+
+* capacity;
+* occupancy;
+* movement;
+* cache hits;
+* cache misses;
+* evictions;
+* prefetch;
+* paging;
+* memory pressure.
+
+The visualization should help answer:
+
+What is resident?
+
+What had to move?
+
+Why?
+
+What did that movement cost?
+
+⸻
+
+6. Storage Must Be Shown as More Than MB/s
+
+Existing physical-drive monitoring is valuable and should remain.
+
+Expand the conceptual storage model over time to include, where Cachalot can expose reliable measurements:
+
+* bytes/token;
+* read requests/token;
+* request-size distribution;
+* queue depth;
+* effective bandwidth;
+* latency;
+* p50/p95/p99 request latency;
+* useful reads;
+* speculative/prefetched reads;
+* wasted prefetch;
+* exposed storage stall;
+* hidden storage latency;
+* cache miss traffic.
+
+A drive reaching 5 GB/s is not automatically performing well.
+
+Studio should make this distinction understandable.
+
+⸻
+
+7. Expert Behavior Should Become Visible
+
+For MoE models, Studio should eventually expose:
+
+* selected experts;
+* resident experts;
+* cache hits;
+* misses;
+* evictions;
+* prefetched experts;
+* unused prefetched experts;
+* expert reuse;
+* expert popularity;
+* residency duration;
+* expert load latency.
+
+Useful future visualizations may include:
+
+* expert heat maps;
+* residency timelines;
+* cache hit/miss timelines;
+* expert popularity distributions;
+* expert transition/reuse patterns.
+
+These visualizations should exist because they answer performance questions, not merely because they look interesting.
+
+⸻
+
+8. Add Experimental Comparison as a Core Workflow
+
+Studio should eventually make controlled experiments easy to compare.
+
+A user should be able to compare:
+
+Baseline
+vs
+Experiment A
+vs
+Experiment B
+
+across metrics such as:
+
+* tok/s;
+* ms/token;
+* TTFT;
+* prefill speed;
+* memory;
+* storage traffic;
+* cache hit rate;
+* exposed I/O;
+* energy/token.
+
+For example:
+
+Resident cache     20 GB   40 GB   60 GB
+Decode             4.2     7.1     8.0 tok/s
+Hit rate            31%     68%     84%
+SSD/token          820MB   410MB   210MB
+Memory pressure     Low     Low     High
+
+Studio should make the tradeoff visible rather than automatically declaring a winner.
+
+⸻
+
+9. Parameter-Sweep Visualization
+
+Cachalot’s research direction requires moving from individual benchmark results to curves.
+
+Studio should support visualizing relationships such as:
+
+tok/s vs resident memory
+latency vs storage bandwidth
+hit rate vs cache size
+exposed I/O vs prefetch depth
+energy/token vs throughput
+latency vs context length
+
+Highlight:
+
+* saturation;
+* knees;
+* regressions;
+* nonlinearities;
+* thresholds;
+* bottleneck transitions.
+
+The purpose is to reveal system behavior.
+
+⸻
+
+10. Bottleneck Visualization
+
+Eventually Studio should help identify probable limiting resources.
+
+However, it must distinguish measured evidence from inference.
+
+Do not present:
+
+SSD is the bottleneck.
+
+unless instrumentation genuinely establishes that.
+
+Prefer evidence such as:
+
+Storage exposed stall: 47 ms/token
+GPU idle during stall: 39 ms
+Storage utilization: 93%
+
+and then perhaps:
+
+Evidence suggests storage is currently on the critical path.
+
+If the conclusion is heuristic, label it accordingly.
+
+The UI must preserve scientific honesty.
+
+⸻
+
+11. Bottleneck Migration
+
+Experiment comparison should eventually show when optimization moves the bottleneck.
+
+For example:
+
+BEFORE
+Storage        ███████████████  limiting
+Compute        ███████
+Sync           ██
+AFTER PREFETCH
+Storage        █████
+Compute        ██████████████  limiting
+Sync           ███
+
+This is a major research result.
+
+Studio should make it obvious.
+
+⸻
+
+12. Energy Visualization
+
+Where reliable platform telemetry becomes available, add:
+
+* current power;
+* average power;
+* inference energy;
+* joules/token;
+* tokens/joule.
+
+Eventually comparisons might show:
+
+Configuration A
+8.4 tok/s
+118 W
+14.0 J/token
+Configuration B
+8.0 tok/s
+ 82 W
+10.3 J/token
+
+Do not automatically label A or B as better.
+
+The objective is to expose the tradeoff.
+
+Clearly identify estimated versus measured power data.
+
+⸻
+
+13. Cost Modeling
+
+In a later phase, Studio may provide an optional economic simulation layer.
+
+This must remain separate from measured hardware telemetry.
+
+Potential derived/estimated metrics include:
+
+energy cost / 1M tokens
+amortized hardware cost / 1M tokens
+estimated total cost / 1M tokens
+
+Such calculations require explicit assumptions including:
+
+* hardware acquisition cost;
+* expected useful lifetime;
+* electricity price;
+* utilization;
+* maintenance assumptions.
+
+Never present modeled economic results as measured facts.
+
+The long-term objective is to connect:
+
+architecture
+   ↓
+resource behavior
+   ↓
+performance
+   ↓
+energy
+   ↓
+economics
+
+⸻
+
+14. Counterfactual Simulation
+
+Once Cachalot develops validated performance models, Studio should provide a surface for exploring counterfactuals.
+
+Examples:
+
+Storage bandwidth:
+[ 1 GB/s ───────────── 100 GB/s ]
+Resident memory:
+[ 20 GB ─────────────── 96 GB ]
+Prefetch accuracy:
+[ 0% ───────────────── 100% ]
+
+and display predicted:
+
+* tok/s;
+* token latency;
+* exposed I/O;
+* utilization.
+
+These values must be explicitly labeled as:
+
+Predicted / simulated
+
+and must never be visually confused with measured results.
+
+Where possible show prediction confidence or validation range.
+
+⸻
+
+15. Measured vs Derived vs Predicted
+
+Studio should establish a consistent visual language for:
+
+MEASURED
+
+Directly observed telemetry.
+
+DERIVED
+
+Calculated from measured telemetry.
+
+PREDICTED
+
+Produced by a validated performance model.
+
+HYPOTHETICAL
+
+User-supplied scenario outside validated observations.
+
+This distinction is essential if Studio is to function as an engineering/research instrument.
+
+⸻
+
+16. Experiment Reproducibility
+
+Each benchmark/experiment record should eventually contain sufficient metadata to reproduce it.
+
+Potential metadata:
+
+* Cachalot commit;
+* Studio commit;
+* model;
+* quantization;
+* model configuration;
+* machine;
+* OS;
+* storage topology;
+* memory configuration;
+* cache budget;
+* context;
+* prompt/workload;
+* generation parameters;
+* runtime settings;
+* environment variables;
+* warm/cold state;
+* date/time.
+
+A result without configuration context has limited scientific value.
+
+⸻
+
+17. Historical Performance
+
+Studio should eventually allow the evolution of Cachalot itself to be studied.
+
+For example:
+
+commit A    6.4 tok/s
+commit B    7.1
+commit C    7.0
+commit D    8.2
+
+but also:
+
+storage bytes/token
+cache hit rate
+energy/token
+memory usage
+
+This allows regressions to be detected even when headline tok/s remains similar.
+
+⸻
+
+18. Keep the Interface Layered
+
+Do not overwhelm ordinary use with every research metric.
+
+Use progressive disclosure.
+
+A possible conceptual hierarchy:
+
+Level 1 — Runtime
+
+* model;
+* state;
+* tok/s;
+* TTFT;
+* memory;
+* storage;
+* CPU/GPU.
+
+Level 2 — Performance
+
+* token latency;
+* cache behavior;
+* I/O;
+* compute;
+* utilization.
+
+Level 3 — Profiler
+
+* token timeline;
+* expert behavior;
+* request latency;
+* overlap;
+* critical path.
+
+Level 4 — Research
+
+* experiment comparison;
+* parameter sweeps;
+* predictive models;
+* counterfactual hardware simulation;
+* energy/economic analysis.
+
+The product should remain approachable while supporting deep investigation.
+
+⸻
+
+19. Avoid Dashboard Inflation
+
+Do not add a chart merely because a metric exists.
+
+Every visualization should answer an engineering question.
+
+Before adding one ask:
+
+What decision can a user make from this?
+
+What hypothesis can this confirm or reject?
+
+What behavior does this reveal that is otherwise difficult to see?
+
+Prefer a smaller number of highly explanatory visualizations over dozens of gauges.
+
+⸻
+
+20. Performance of the Profiler Matters
+
+Instrumentation and visualization must not materially distort the workload being measured.
+
+Monitor:
+
+* telemetry frequency;
+* event volume;
+* serialization;
+* IPC/network overhead;
+* storage overhead;
+* UI rendering overhead.
+
+Where instrumentation has measurable cost, quantify it.
+
+Support lower-overhead measurement modes when appropriate.
+
+A profiler that significantly changes inference behavior undermines its own results.
+
+⸻
+
+21. Preserve Raw Evidence
+
+Where practical, retain or export sufficiently detailed raw experiment data so future analysis does not depend solely on UI summaries.
+
+Consider structured experiment artifacts suitable for:
+
+* Python analysis;
+* statistical analysis;
+* plotting;
+* regression detection;
+* external research.
+
+The UI is a view over evidence, not the evidence itself.
+
+⸻
+
+22. Long-Term Questions Studio Should Answer
+
+A mature Cachalot Studio should make it possible to answer visually:
+
+* Why did this token take 130 ms?
+* Which operations overlapped?
+* What was actually on the critical path?
+* Was the GPU computing or waiting?
+* How much model data moved for this token?
+* How much storage latency was hidden?
+* Which experts caused misses?
+* Which prefetched experts were wasted?
+* Is more resident memory still useful?
+* At what cache size does improvement saturate?
+* Did faster storage actually improve inference?
+* Where did the bottleneck move afterward?
+* Did an optimization improve throughput but increase energy/token?
+* Which configuration provides the desired performance/efficiency tradeoff?
+* Does our performance model correctly predict the measured result?
+
+⸻
+
+23. Relationship With Cachalot’s Research Cycle
+
+Studio should make Cachalot’s governing research process visible:
+
+OBSERVE
+   ↓
+MEASURE
+   ↓
+IDENTIFY BOTTLENECK
+   ↓
+FORM HYPOTHESIS
+   ↓
+MODIFY CACHALOT
+   ↓
+RUN CONTROLLED EXPERIMENT
+   ↓
+COMPARE
+   ↓
+VALIDATE / REJECT
+   ↓
+UPDATE PERFORMANCE MODEL
+
+Studio exists to make this loop faster, clearer and more rigorous.
+
+⸻
+
+24. Long-Term Vision
+
+Cachalot Studio should become:
+
+A professional inference observability and experimentation environment that exposes the relationship among model behavior, compute, memory, storage, data movement, concurrency, energy and end-to-end performance.
+
+It should transform a statement such as:
+
+The model runs at 8.2 tokens/second.
+
+into an explanation such as:
+
+The model requires 122 ms per decode token. Approximately this portion is unavoidable compute, this portion results from cache misses, this amount of I/O occurs concurrently with computation, this amount remains exposed on the critical path, memory residency is approaching this saturation point, and the measurements predict that increasing storage bandwidth beyond approximately this range will provide diminishing returns.
+
+And then, after Cachalot implements an architectural change, Studio should provide the evidence required to say:
+
+We predicted this change would remove this bottleneck. The measured result confirms or rejects that prediction.
+
+That is the governing principle for future Cachalot Studio development.

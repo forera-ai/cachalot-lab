@@ -1,13 +1,13 @@
 [package]
-name = "cachalot-studio"
-version = "0.5.0"
+name = "cachalot-lab"
+version = "0.6.0"
 description = "Mac desktop instrument panel for Cachalot"
 authors = ["Hamed Prooshani"]
 edition = "2021"
 rust-version = "1.77.2"
 
 [lib]
-name = "cachalot_studio_lib"
+name = "cachalot_lab_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]

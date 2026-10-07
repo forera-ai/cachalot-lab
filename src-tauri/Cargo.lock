@@ -206,8 +206,8 @@ dependencies = [
 ]
 
 [[package]]
-name = "cachalot-studio"
-version = "0.5.0"
+name = "cachalot-lab"
+version = "0.6.0"
 dependencies = [
  "base64 0.23.1",
  "futures-util",

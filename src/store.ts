@@ -5,7 +5,7 @@ import type { Screen } from './navigation'
 
 export type ThemePreference = 'system' | 'abyss' | 'surface'
 
-type StudioState = {
+type LabState = {
   screen: Screen
   themePreference: ThemePreference
   silentRunning: boolean
@@ -16,7 +16,7 @@ type StudioState = {
   setPaletteOpen: (open: boolean) => void
 }
 
-export const useStudioStore = create<StudioState>()(
+export const useLabStore = create<LabState>()(
   persist(
     (set) => ({
       screen: 'cockpit',
@@ -29,6 +29,7 @@ export const useStudioStore = create<StudioState>()(
       setPaletteOpen: (paletteOpen) => set({ paletteOpen }),
     }),
     {
+      // Stable on-disk key: the Lab rename preserves existing preferences.
       name: 'cachalot-studio-ui',
       storage: createJSONStorage(() => localStorage),
       partialize: ({ screen, themePreference, silentRunning }) => ({

@@ -1,11 +1,62 @@
 # Handoff
 
+## Start here — Cachalot Lab 0.6.0 release, 2026-10-07
+
+The owner renamed this product **Cachalot Lab** and adopted the full long-term
+observability/profiling/experimentation mission. Read `docs/PRODUCT_DIRECTION.md`,
+`docs/PLAN.md`, and `docs/RENAME.md` before continuing. Preserve the 0.5.0 inference
+workflows and data. The next slice is the metric/provenance inventory and reproducible
+run-manifest design; token tracing requires authoritative Cachalot instrumentation.
+The former fixed 0.6/0.7/1.0 roadmap assignments are superseded, with useful work retained
+as backlog. No research capability is claimed as shipped by these document changes.
+
+Release 0.6.0 is prepared for publication at
+[GitHub Release](https://github.com/prooshani/cachalot-lab/releases/tag/v0.6.0).
+The minor version reflects the additive runtime read/wait evidence capability
+and compatible Lab rename. Package and native versions are 0.6.0. The exact
+release source commit will be recorded in `SOURCE_COMMIT` and `RELEASE-REPORT.md`.
+Publication and post-publication installation must be verified before completion.
+
+Last committed runtime source reviewed on **2026-10-07**: **0.61.2**, commit
+`954dff83c54071e10aef649ae725dd0afd141528`, with briefs through **0.61.1**.
+The 0.61.2 follow-up changes measurements, documentation, and the package version only.
+The reviewed runtime adds optional expert-read bandwidth emulation (0.61.0)
+and GLM/MiniMax expert-store stats parity (0.61.1). Lab now has a collapsed Runtime
+read/wait evidence table, preserves independent unknowns and zero, and documents
+the emulation knob without changing launch policy. Busy-rate and wait-percentage
+calculations remain deferred pending aligned evidence; see `docs/RUNTIME_SYNC.md`.
+Live GLM/DeepSeek and authenticated saved-key restart validation remain outstanding.
+
+The Developer ID signed local app is installed at `/Applications/Cachalot Lab.app`.
+The 2026-10-07 compatibility pass passed 46 frontend tests, six Python mock tests,
+TypeScript, ESLint, Prettier, production build, and signed native build. No Rust
+source changed in this pass; the prior rename's 31 Rust tests and format/clippy
+checks remain historical evidence, not a new run. Those local artifacts carried development version
+0.5.0 and were not notarized or published. The current release workflow supersedes
+them with fresh exact-source 0.6.0 artifacts before any implementation push.
+Final installed executable SHA-256:
+`b395edcc2150b04336710796c2726b4927088da087c2cdf4f2d473fa0891b9ee`.
+Strict signature verification and all four bundle-file hash comparisons passed.
+Previous installation and `installation.json` are in
+`.release/local-runtime-0.61.1-2026-10-07/`. Native inspection of the final build
+verified reported totals, healthy partial-response fallback, bounded disclosure
+scrolling, and restored chart space when collapsed. Synthetic mocks were stopped;
+no real model launch, generation, profile edit, or credential change was performed.
+The initial build needed the installed Rust toolchain added to PATH; the known
+optional `rust-objcopy`/`libLLVM.dylib` stripping warning remains nonfatal.
+See `docs/RENAME.md` for the earlier rename's data-preservation and UI evidence.
+
+## Historical release and development record
+
+Entries below retain the name and paths used when their evidence was recorded.
+They are historical evidence, not the current product name or current roadmap.
+
 - Studio version: **0.5.0**, published on 2026-10-05 from implementation commit `a3078658251d1ec66f5092c54038583d30630b47`. [GitHub Release](https://github.com/prooshani/cachalot-studio/releases/tag/v0.5.0) ships SSD telemetry, bounded local model discovery, optional macOS Keychain credentials, and Dive refinement. This is a backward-compatible minor capability release. Signed/notarized DMG and ZIP, checksums, source record, notarization receipts and [verification report](https://github.com/prooshani/cachalot-studio/releases/download/v0.5.0/RELEASE-REPORT.md) are published. All seven public assets were downloaded and hash-compared; the public DMG is installed at `/Applications/Cachalot Studio.app`, every bundle file matches, and native version/Dive/credentials copy inspection passed. Prior app retained under `.release/local-before-v0.5.0/previous-Cachalot Studio.app`. Historical development entries below describe pre-release states; live GLM/DeepSeek validation and authenticated saved-key restart remain unverified.
 - 0.5.0 release evidence: app notarization `91d301b5-751c-4311-b447-5bcb80d203cb`; DMG notarization `8bd6fd64-d04b-40b5-a4f9-b7211dc41912`, both Accepted. Strict signature, staple and Gatekeeper checks pass. ZIP SHA-256 `30f40a74a9cd3d9ac731bfe10916074116f27978d8666c0a3532302941e9fe6b`; DMG `f8e5b80e91a00a65beee36cb3b7912faff788082f54ceb5c77382ea0426b3407`; installed executable `f6bc0fd52fec209c61df3bcb4aaab3887c9b6e767382b294c4f78648d011f615`. Fresh checks: 45 UI tests, 31 normal Rust tests, explicit isolated native Keychain CRUD, five Python mock tests, formatting/lint/types/clippy and production signed build. Both exact-source [main CI](https://github.com/prooshani/cachalot-studio/actions/runs/37345572827) and [tag CI](https://github.com/prooshani/cachalot-studio/actions/runs/37345573004) passed, including their native app builds.
 - Prior Studio version: 0.4.0 remains available at its [release](https://github.com/prooshani/cachalot-studio/releases/tag/v0.4.0), source `aa8d1a2a36ba19eb774d32ebd78d7419b01f74ca`.
 - Standing release rule: every implementation commit pushed to GitHub must include current `CHANGELOG.md`, `README.md`, `HANDOFF.md`, and other affected docs, a major/minor/patch Studio version bump chosen for the depth of the shipped changes, fresh signed/notarized artifacts, and a created or updated GitHub Release with those artifacts. Never reuse a published version for a different source commit. Verify release assets and hashes before reporting completion. The full gate is in `AGENTS.md` and `docs/RELEASE.md`; documentation-only edits do not require a binary release.
 - Runtime contract reference: Cachalot HTTP routes verified against `src/cachalot/server/app.py` and the live MiniMax server on 2026-09-28.
-- Runtime brief watch: before every Studio development pass, check `/Users/hamedprooshani/Projects/deepseek-v41-mac/docs/studio/briefs`, then verify new claims against the runtime checkout. Last reviewed on 2026-10-05: briefs 0.39.0 through 0.60.0, Cachalot 0.60.1 commit `9d11bc061dcb434c40494be3d507521194d376dc` (`main`; clean checkout; follow-up measurement tools/docs/version only). The 0.48 script defaults, 0.49 GLM bank, and 0.50 GLM prefetch controls were checked against source and changelog. The 0.50.1 follow-up changes only measurements, documentation, and version strings. Studio does not infer compatibility from startup logs. See `docs/RUNTIME_SYNC.md`.
+- Runtime brief watch: before every Studio development pass, check `/Users/hamedprooshani/Projects/deepseek-v41-mac/docs/lab/briefs`, then verify new claims against the runtime checkout. Last reviewed on 2026-10-05: briefs 0.39.0 through 0.60.0, Cachalot 0.60.1 commit `9d11bc061dcb434c40494be3d507521194d376dc` (`main`; clean checkout; follow-up measurement tools/docs/version only). The 0.48 script defaults, 0.49 GLM bank, and 0.50 GLM prefetch controls were checked against source and changelog. The 0.50.1 follow-up changes only measurements, documentation, and version strings. Studio does not infer compatibility from startup logs. See `docs/RUNTIME_SYNC.md`.
 - Done: repository initialized locally, `main` and `origin` configured, baseline documentation, three exploratory concepts, and a traced owner-selected graphic mark in `assets/logo/` with dark/light variants and 16–1024 px exports. Design tokens generate CSS and TypeScript. Tauri 2 + React 19 app includes Cockpit, Chat, API, Doctor, Settings, system/Abyss/Surface themes, and a ⌘K command palette. Vitest UI checks and macOS CI are present.
 - Current state: native app connects to an existing local Cachalot server, reads health and real metrics, streams chat with cancellation and per-conversation generation controls, and shows API setup. Dive manages one Studio-owned runtime process with profile editing, launch preview, readiness, logs, and automatic connection. A native MiniMax 0.50.1 launch, streamed reply, and clean stop passed on 2026-09-30; the current runtime contract source review is 0.60.1. A controllable Python mock covers startup delay, keep-alives, partial stats, authentication, queueing, and a scripted crash.
 - v0.1.0 release verification: Prettier, ESLint, TypeScript, Vitest, mock runtime unittest, `cargo fmt`, `cargo clippy -D warnings`, `cargo test`, and a Developer ID signed Tauri `.app` build. The native window connected to the mock runtime, streamed a reply, updated telemetry, and retained chat across navigation. App and DMG notarization were accepted; the mounted DMG and Gatekeeper checks passed. See the [release report](https://github.com/prooshani/cachalot-studio/releases/download/v0.1.0/RELEASE-REPORT.md).

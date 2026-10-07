@@ -3,7 +3,7 @@ import { Command, Search } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { navigation } from './navigation'
-import { useStudioStore } from './store'
+import { useLabStore } from './store'
 
 type PaletteCommand = {
   id: string
@@ -27,12 +27,12 @@ function fuzzyMatch(value: string, query: string): boolean {
 }
 
 export default function CommandPalette() {
-  const open = useStudioStore((state) => state.paletteOpen)
-  const setOpen = useStudioStore((state) => state.setPaletteOpen)
-  const setScreen = useStudioStore((state) => state.setScreen)
-  const setTheme = useStudioStore((state) => state.setThemePreference)
+  const open = useLabStore((state) => state.paletteOpen)
+  const setOpen = useLabStore((state) => state.setPaletteOpen)
+  const setScreen = useLabStore((state) => state.setScreen)
+  const setTheme = useLabStore((state) => state.setThemePreference)
   const systemReducedMotion = useReducedMotion()
-  const silentRunning = useStudioStore((state) => state.silentRunning)
+  const silentRunning = useLabStore((state) => state.silentRunning)
   const reduceMotion = systemReducedMotion || silentRunning
   const inputRef = useRef<HTMLInputElement>(null)
   const paletteRef = useRef<HTMLDivElement>(null)

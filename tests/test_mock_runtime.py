@@ -75,6 +75,23 @@ class MockRuntimeTests(unittest.TestCase):
         self.assertNotIn("predicted_loads", stats)
         self.assertNotIn("predicted_used", stats)
 
+    def test_optional_read_fixture_and_partial_response(self):
+        expected = {"expert_hits": 240, "expert_misses": 60,
+                    "ssd_bytes_read": 1000000000, "expert_reads": 80,
+                    "expert_fast_reads": 20, "expert_read_seconds": 12.5,
+                    "expert_read_busy_seconds": 4.25,
+                    "decode_wait_seconds": 2.125, "decode_waited_misses": 30}
+        for scenario in (mock_server.Scenario(), mock_server.Scenario(read_stats=True),
+                         mock_server.Scenario(read_stats=True, missing_stats=True)):
+            self.runtime.scenario = scenario
+            _, data = self.request("/v1/stats")
+            actual = json.loads(data)
+            for key, value in expected.items():
+                if scenario.read_stats and not scenario.missing_stats:
+                    self.assertEqual(actual[key], value)
+                else:
+                    self.assertNotIn(key, actual)
+
     def test_stream_and_counters(self):
         status, stream = self.request(
             "/v1/chat/completions", {"model": "cachalot-mock", "messages": [], "stream": True}

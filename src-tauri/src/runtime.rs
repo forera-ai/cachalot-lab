@@ -107,7 +107,7 @@ impl ChatEvent {
 }
 
 fn lock_error() -> String {
-    "Studio's runtime state is unavailable. Restart the app.".to_owned()
+    "Lab's runtime state is unavailable. Restart the app.".to_owned()
 }
 
 pub(crate) fn parse_local_endpoint(raw: &str) -> Result<Url, String> {

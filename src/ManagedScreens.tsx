@@ -437,7 +437,7 @@ export function DiveScreen({
                       Decode drops misses is faster but changes outputs and can
                       lower quality. On drops every non-resident decode expert;
                       Off selects exact decode. Cachalot 0.60 serve.sh defaults
-                      to On; Studio launches the CLI directly, which defaults to
+                      to On; Lab launches the CLI directly, which defaults to
                       Off. Runtime default preserves that CLI behavior.
                     </p>
                     <p className="panel-intro">
@@ -704,7 +704,7 @@ export function DiveScreen({
                 </span>
               </div>
               <p className="panel-intro">
-                Studio manages only processes started here. Startup can take
+                Lab manages only processes started here. Startup can take
                 several minutes while model loads.
               </p>
               <div className="managed-facts">
@@ -869,7 +869,7 @@ export function DiveScreen({
               {runtime.snapshot.endpoint === status?.endpoint &&
                 status?.ready && (
                   <p className="panel-intro">
-                    Studio connected to this managed runtime.
+                    Lab connected to this managed runtime.
                   </p>
                 )}
             </>
@@ -888,7 +888,7 @@ export function DiveScreen({
       )}
       <details className="managed-log-disclosure">
         <summary>
-          Runtime output <span>Recent output from Studio-owned launches</span>
+          Runtime output <span>Recent output from Lab-owned launches</span>
         </summary>
         <ManagedLog compact />
       </details>
@@ -940,7 +940,7 @@ export function LogsScreen() {
       <div className="page-heading">
         <div>
           <h1>Logs</h1>
-          <p>Inspect output from the runtime Studio started.</p>
+          <p>Inspect output from the runtime Lab started.</p>
         </div>
       </div>
       <ManagedLog />

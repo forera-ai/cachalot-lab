@@ -2,7 +2,7 @@
 
 ## Required for every pushed implementation
 
-An implementation commit pushed to the Studio GitHub repository is a release
+An implementation commit pushed to the Lab GitHub repository is a release
 event. Complete the following in one workflow; do not leave pushed code ahead of
 its versioned GitHub Release.
 
@@ -11,7 +11,7 @@ its versioned GitHub Release.
    contract, requirements, architecture, plan, or limitations. Move the
    unreleased notes into a dated version section. Update the download and feature
    descriptions in the README for the new release.
-2. Compare with the latest published Studio release and choose the next version
+2. Compare with the latest published Lab release and choose the next version
    for the depth of the changes: **major** for a breaking public contract or
    major product milestone, **minor** for a new backward-compatible capability,
    or **patch** for a backward-compatible fix or polish. Use the highest level
@@ -47,13 +47,20 @@ implementation local and report the blocker before pushing an implementation
 commit. A documentation-only edit does not itself require a new binary release.
 
 For local implementation testing before publication, build the current checkout,
-install it at `/Applications/Cachalot Studio.app`, preserve the prior installed
+install it at `/Applications/Cachalot Lab.app`, preserve the prior installed
 bundle for rollback, and verify the installed executable matches the fresh build.
 This local test installation does not make an uncommitted build a release.
 
 ## Scope
 
-The [0.5.0 release](https://github.com/prooshani/cachalot-studio/releases/tag/v0.5.0) adds physical-drive telemetry, bounded local model discovery, optional macOS Keychain credentials, and a refined Dive interface. It retains GLM/DeepSeek controls, optional runtime totals, and saved visual quiet mode. It retains earlier chat settings, managed process ownership, and host telemetry fixes. Live GLM/DeepSeek model validation and performance measurements remain outstanding. The macOS artifact targets Apple Silicon. The installer does not include Python, Cachalot, checkpoints, or an update service.
+The [0.6.0 release](https://github.com/prooshani/cachalot-lab/releases/tag/v0.6.0)
+adds runtime read/wait evidence and ships the compatible Cachalot Lab rename.
+It retains physical-drive telemetry, bounded local model discovery, optional
+Keychain credentials, Dive controls, chat settings, managed process ownership,
+and host telemetry. Live GLM/DeepSeek inference, saved-key restart, and performance
+measurements remain outstanding. The macOS artifact targets Apple Silicon on
+macOS 14 or newer. Python, Cachalot, checkpoints, and an update service are not
+included.
 
 ## One-time signing setup
 
@@ -73,8 +80,8 @@ and the matching version in `CHANGELOG.md` and the README release link:
 
 The script runs frontend and Rust checks, builds a Developer ID signed app with Hardened Runtime and secure timestamp, submits it to Apple, staples and verifies it, and packages a branded drag-to-Applications DMG. It then signs, notarizes, staples, and verifies the DMG. Outputs are under `.release/<version>/`:
 
-- `Cachalot-Studio-<version>-macOS-arm64.dmg` for direct distribution.
-- `Cachalot-Studio-<version>-macOS-arm64.zip` containing the notarized app.
+- `Cachalot-Lab-<version>-macOS-arm64.dmg` for direct distribution.
+- `Cachalot-Lab-<version>-macOS-arm64.zip` containing the notarized app.
 - `SHA256SUMS`, notarization receipts, and `SOURCE_COMMIT`.
 
 The script refuses an existing output directory to prevent accidental overwrite. Before publication, mount the DMG, confirm the drag-to-Applications layout and the installed app, and compare its SHA-256 hash to `SHA256SUMS`.
@@ -83,4 +90,4 @@ The script refuses an existing output directory to prevent accidental overwrite.
 
 Release from the exact commit recorded in `SOURCE_COMMIT`. After verification, push that commit and an annotated `v<version>` tag, then create or update the GitHub Release with the DMG, ZIP, checksums, source commit, notarization receipts, and verification report. Release notes must state minimum macOS, architecture, runtime requirements, working features, and limitations. Do not upload the temporary notary submission ZIP.
 
-After publishing, compare GitHub's asset SHA-256 digests with local `SHA256SUMS`, confirm the release is public, and inspect the repository CI run. The 0.1.0 release used this procedure; its [verification report](https://github.com/prooshani/cachalot-studio/releases/download/v0.1.0/RELEASE-REPORT.md) records the exact commit, hashes, and Apple submission IDs.
+After publishing, compare GitHub's asset SHA-256 digests with local `SHA256SUMS`, confirm the release is public, and inspect the repository CI run. The 0.1.0 release used this procedure; its [verification report](https://github.com/prooshani/cachalot-lab/releases/download/v0.1.0/RELEASE-REPORT.md) records the exact commit, hashes, and Apple submission IDs.

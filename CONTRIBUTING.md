@@ -1,6 +1,14 @@
 # Contributing
 
-Thanks for helping improve Cachalot Studio. Open an issue for a bug or proposed feature before starting a large change.
+Thanks for helping improve Cachalot Lab. Open an issue for a bug or proposed feature before starting a large change.
+
+Read [product direction](docs/PRODUCT_DIRECTION.md) and [delivery roadmap](docs/PLAN.md)
+before proposing a feature. Explain the engineering question, evidence source and
+scope, compatibility fallback, preservation of existing workflows, reproducibility,
+raw evidence, and collection overhead where applicable. Cachalot owns runtime policy
+and authoritative instrumentation; Lab presents and compares evidence. Do not ship
+decorative charts or treat modeled values as measurements. Follow the naming and
+stable-identifier rules in [rename compatibility](docs/RENAME.md).
 
 ## Local setup
 

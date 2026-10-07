@@ -73,7 +73,7 @@ it('retries a failed connection on the next status poll without a tight loop', a
   unmount()
 })
 
-it('disconnects only when stopping the endpoint Studio connected', async () => {
+it('disconnects only when stopping the endpoint Lab connected', async () => {
   const disconnect = vi.fn().mockResolvedValue(undefined)
   const runtime = {
     snapshot: { connected: true, healthy: true, endpoint: ready.endpoint },

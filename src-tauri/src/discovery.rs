@@ -160,7 +160,7 @@ mod tests {
     #[test]
     fn reports_scan_limits_and_oversized_configs() {
         let root =
-            std::env::temp_dir().join(format!("studio-discovery-limits-{}", std::process::id()));
+            std::env::temp_dir().join(format!("lab-discovery-limits-{}", std::process::id()));
         fs::create_dir_all(&root).unwrap();
         fs::write(
             root.join("config.json"),
@@ -179,7 +179,7 @@ mod tests {
     #[test]
     fn recognizes_metadata_without_following_symlinks_or_deep_trees() {
         let root = std::env::temp_dir().join(format!(
-            "studio-discovery-{}-{}",
+            "lab-discovery-{}-{}",
             std::process::id(),
             std::time::SystemTime::now()
                 .duration_since(std::time::UNIX_EPOCH)

@@ -18,7 +18,7 @@ import {
   type GenerationSettings,
 } from './conversations'
 import type { RuntimeConnection } from './runtime'
-import { useStudioStore } from './store'
+import { useLabStore } from './store'
 
 type ChatEvent = {
   chat_id: number
@@ -44,7 +44,7 @@ function updatedConversation(
 }
 
 export function ChatScreen({ runtime }: { runtime: RuntimeConnection }) {
-  const setScreen = useStudioStore((state) => state.setScreen)
+  const setScreen = useLabStore((state) => state.setScreen)
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [loaded, setLoaded] = useState(false)
@@ -362,7 +362,7 @@ export function ChatScreen({ runtime }: { runtime: RuntimeConnection }) {
   return (
     <div className="page chat-page">
       <div className="eyebrow">
-        <span className="eyebrow-line" /> STUDIO / CHAT
+        <span className="eyebrow-line" /> LAB / CHAT
       </div>
       <div className="page-heading">
         <div>
@@ -435,7 +435,7 @@ export function ChatScreen({ runtime }: { runtime: RuntimeConnection }) {
                 <p>
                   Messages go directly to the Cachalot server on this Mac.
                   {isTauri()
-                    ? ' Conversations are saved locally and can be reopened after restarting Studio.'
+                    ? ' Conversations are saved locally and can be reopened after restarting Lab.'
                     : ' Browser preview chats are temporary.'}
                 </p>
               </div>

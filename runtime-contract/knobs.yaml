@@ -1,6 +1,19 @@
-# Verified against Cachalot 0.60.0 (62c0f05). Null overrides in Studio profiles
+# Verified against Cachalot 0.61.2 (954dff8). Null overrides in Lab profiles
 # inherit the runtime's version-specific default; zero has each knob's stated effect.
 knobs:
+  - key: CACHALOT_READ_THROTTLE_GBPS
+    kind: env
+    families: [deepseek-v4.1-flash, glm, minimax]
+    type: float
+    unit: decimal-GB-per-second
+    default: 0
+    group: experimentation
+    effect: timing-only
+    restart_required: true
+    stability: shipped
+    since: 0.61.0
+    lab: Contract only; no launch control or manifest is implemented. Lab does not set or remove this environment key. Future manifests must label it emulated drive bandwidth and distinguish requested from reported settings.
+    summary: Read at reader-module import. Unset, empty, or zero disables throttling. Positive B shares one process-wide pipe across ExpertReader reads lasting at least 1 ms; faster reads bypass it. No HTTP field reports whether it is active. Non-numeric values fail runtime import; nonfinite inputs are not a supported Lab control.
   - key: CACHALOT_DECODE_MISS_BUDGET
     kind: env
     families: [deepseek-v4.1-flash]
@@ -11,8 +24,8 @@ knobs:
     restart_required: true
     stability: shipped
     since: 0.57.0
-    studio: Nullable DeepSeek-only switch. On writes 0; Off writes -1 for compatibility with 0.57+. Empty emits nothing and inherits the direct CLI exact path after inherited keys are removed.
-    summary: Caps non-resident expert reads per decode layer; remaining misses are dropped. Unset, empty, or negative disables dropping. Since 0.60, off and exact also disable it. Prefill and snapshot numerics are unchanged. No Studio speed or quality magnitude is promised.
+    lab: Nullable DeepSeek-only switch. On writes 0; Off writes -1 for compatibility with 0.57+. Empty emits nothing and inherits the direct CLI exact path after inherited keys are removed.
+    summary: Caps non-resident expert reads per decode layer; remaining misses are dropped. Unset, empty, or negative disables dropping. Since 0.60, off and exact also disable it. Prefill and snapshot numerics are unchanged. No Lab speed or quality magnitude is promised.
   - key: CACHALOT_SYSTEM_DATE_REUSE
     kind: env
     families: [deepseek-v4.1-flash]
@@ -23,7 +36,7 @@ knobs:
     restart_required: true
     stability: shipped
     since: 0.60.0
-    studio: Nullable DeepSeek-only switch; On writes 1, Off writes 0, empty inherits On. Inherited DAYS is removed so the documented seven-day window is used.
+    lab: Nullable DeepSeek-only switch; On writes 1, Off writes 0, empty inherits On. Inherited DAYS is removed so the documented seven-day window is used.
     summary: Reuses the leading system message's Conversation started date within the window. The model may see a date up to seven days old. system-dates.json beside snapshots persists the mapping; client history is untouched.
   - key: CACHALOT_SYSTEM_DATE_REUSE_DAYS
     kind: env
@@ -35,7 +48,7 @@ knobs:
     restart_required: true
     stability: shipped
     since: 0.60.0
-    studio: Not exposed; inherited value removed for managed launches.
+    lab: Not exposed; inherited value removed for managed launches.
     summary: Nonnegative reuse window in days; invalid integer falls back to 7 and negative clamps to 0 in runtime source.
   - key: CACHALOT_WIRED_CEILING_GIB
     kind: env
@@ -44,7 +57,7 @@ knobs:
     default: 76-percent-of-host-RAM
     since: 0.54.0
     effect: bit-identical
-    studio: Not exposed; runtime manages resident capacity. Expert budget is an upper bound.
+    lab: Not exposed; runtime manages resident capacity. Expert budget is an upper bound.
     summary: Zero or negative disables the wired-memory governor. Source constant is 0.76 despite an outdated 77 percent function docstring.
   - key: CACHALOT_WIRED_HYSTERESIS_GIB
     kind: env
@@ -53,7 +66,7 @@ knobs:
     default: 1.5
     since: 0.54.0
     effect: bit-identical
-    studio: Not exposed.
+    lab: Not exposed.
   - key: CACHALOT_WIRED_GROW_QUIET_S
     kind: env
     families: [deepseek-v4.1-flash]
@@ -61,7 +74,7 @@ knobs:
     default: 60
     since: 0.54.0
     effect: bit-identical
-    studio: Not exposed.
+    lab: Not exposed.
   - key: CACHALOT_WIRED_CHECK_EVERY
     kind: env
     families: [deepseek-v4.1-flash]
@@ -69,28 +82,28 @@ knobs:
     default: 16
     since: 0.54.0
     effect: bit-identical
-    studio: Not exposed.
+    lab: Not exposed.
   - key: CACHALOT_ROUTING_TRACE
     kind: env
     families: [deepseek-v4.1-flash]
     type: path
     since: 0.55.0
     effect: bit-identical
-    studio: Not exposed as normal tuning; measurement adds a device read per layer.
+    lab: Not exposed as normal tuning; measurement adds a device read per layer.
   - key: CACHALOT_GLM_VIDEO_MAX_FRAMES
     kind: env
     families: [glm-5.3-flash]
     type: int
     default: 128
     since: 0.52.0
-    studio: Not exposed; Studio media attachments remain pending.
+    lab: Not exposed; Lab media attachments remain pending.
   - key: CACHALOT_GLM_VIDEO_MAX_TOKENS
     kind: env
     families: [glm-5.3-flash]
     type: int
     default: 4000
     since: 0.52.0
-    studio: Not exposed; clip resolution is reduced to fit the token budget.
+    lab: Not exposed; clip resolution is reduced to fit the token budget.
   - key: CACHALOT_GLM_BANK
     kind: env
     families: [glm-5.3-flash]
@@ -100,7 +113,7 @@ knobs:
     restart_required: true
     stability: shipped
     since: 0.49.0
-    summary: Optional contiguous expert bank containing bank.json. Studio checks the manifest exists when enabled; the runtime validates its format and layer files.
+    summary: Optional contiguous expert bank containing bank.json. Lab checks the manifest exists when enabled; the runtime validates its format and layer files.
   - key: CACHALOT_GLM_BANK_ENABLED
     kind: env
     families: [glm-5.3-flash]
@@ -117,19 +130,19 @@ knobs:
     families: [glm-5.3-flash]
     type: int
     default: { glm-5.3-flash: 5 }
-    studio_range: [0, 288]
+    lab_range: [0, 288]
     group: speed
     effect: bit-identical
     restart_required: true
     stability: shipped
     since: 0.50.0
-    summary: Next-layer experts predicted during decode; 0 disables prediction. Studio bounds counts to GLM-5.3-Flash's 288 experts.
+    summary: Next-layer experts predicted during decode; 0 disables prediction. Lab bounds counts to GLM-5.3-Flash's 288 experts.
   - key: CACHALOT_GLM_PREDICT_LIMIT
     kind: env
     families: [glm-5.3-flash]
     type: int
     default: { glm-5.3-flash: 0 }
-    studio_range: [0, 288]
+    lab_range: [0, 288]
     group: speed
     effect: bit-identical
     restart_required: true
@@ -141,7 +154,7 @@ knobs:
     families: [glm-5.3-flash]
     type: int
     default: { glm-5.3-flash: 1 }
-    studio_range: [-1, 1]
+    lab_range: [-1, 1]
     group: speed
     effect: bit-identical
     restart_required: true
@@ -184,7 +197,7 @@ knobs:
     restart_required: true
     stability: debug
     since: 0.39.0
-    summary: Benchmark instrumentation only; not a Studio profile control.
+    summary: Benchmark instrumentation only; not a Lab profile control.
   - key: CACHALOT_LOOP_GUARD_REPEATS
     kind: env
     families: [glm-5.3-flash, minimax-m3]
@@ -202,13 +215,13 @@ knobs:
     families: [glm-5.3-flash, minimax-m3]
     type: int
     default: { glm-5.3-flash: 64, minimax-m3: 64 }
-    studio_range: [0, 4096]
+    lab_range: [0, 4096]
     group: decode
     effect: changes-outputs
     restart_required: true
     stability: shipped
     since: 0.46.0
-    summary: Stop invented list items that differ only by an integer counting up by one; 0 disables the guard. Studio rejects 1 because the runtime requires at least 2 items.
+    summary: Stop invented list items that differ only by an integer counting up by one; 0 disables the guard. Lab rejects 1 because the runtime requires at least 2 items.
   - key: CACHALOT_MINIMAX_DECODE_CACHE_GIB
     kind: env
     families: [minimax-m3]
@@ -321,4 +334,4 @@ knobs:
     effect: speed-only
     restart_required: true
     stability: shipped
-    summary: Maximum share of each expert read assigned to the mirror; requires a mirror path in Studio.
+    summary: Maximum share of each expert read assigned to the mirror; requires a mirror path in Lab.

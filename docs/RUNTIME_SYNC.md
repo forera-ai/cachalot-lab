@@ -1,6 +1,12 @@
 # Runtime compatibility workflow
 
-Cachalot Studio consumes the [Cachalot runtime](https://github.com/prooshani/cachalot). Runtime development happens in Claude Code; Studio development happens in Codex. At the start of every Studio development pass, check `/Users/hamedprooshani/Projects/deepseek-v41-mac/docs/studio/briefs` for new files. Treat each brief as a change proposal, then verify it against the checked-out runtime commit, API response, CLI help, changelog, or source before changing Studio. Record the runtime revision used for a compatibility change in `HANDOFF.md` and any resulting commit or pull request.
+The product is now **Cachalot Lab**. Historical review entries below retain their
+original Studio name and evidence. Use [product direction](PRODUCT_DIRECTION.md)
+and the [observability proposal](../runtime-contract/observability-proposal.md) for
+future instrumentation requests. The runtime-owned `docs/lab/briefs` path remains
+the compatibility inbox; a rename must not break that producer/consumer agreement.
+
+Cachalot Studio consumes the [Cachalot runtime](https://github.com/prooshani/cachalot). Runtime development happens in Claude Code; Studio development happens in Codex. At the start of every Studio development pass, check `/Users/hamedprooshani/Projects/deepseek-v41-mac/docs/lab/briefs` for new files. Treat each brief as a change proposal, then verify it against the checked-out runtime commit, API response, CLI help, changelog, or source before changing Studio. Record the runtime revision used for a compatibility change in `HANDOFF.md` and any resulting commit or pull request.
 
 For each runtime update:
 
@@ -49,3 +55,94 @@ DeepSeek's `serve.sh` budget is now 48 GiB, and its 0.54 wired governor changes 
 The important 0.60 default distinction is explicit: `serve.sh` exports `CACHALOT_DECODE_MISS_BUDGET=0`, but the direct CLI used by Studio defaults to exact decode when unset. Dive exposes nullable DeepSeek-only Decode drops misses and System date reuse switches. On writes budget `0`; Off writes `-1`, which selects exact decode on 0.57 and later without relying on the new 0.60 `off` spelling. Date reuse writes `1` or `0`; omitted inherits the 0.60 default On. All three inherited budget/date keys, including the unexposed DAYS window, are removed before launch so the shown seven-day date window is accurate. Older profiles retain omission; changing family clears tuning. Older runtimes ignore unsupported keys. The UI warns about changed outputs and possible lower quality without promising a magnitude, and that the model can see a date up to seven days old. The leading system date mapping persists in `system-dates.json` beside snapshots; Studio's history is unchanged. These are next-launch settings, not proof of an external server's active mode. This source review is not a live DeepSeek run or a measured performance result.
 
 On 2026-10-05, the SSD/validation pass reviewed Cachalot 0.60.1 commit `9d11bc061dcb434c40494be3d507521194d376dc`. The brief series still ends at 0.60.0. The diff from the reviewed 0.60.0 source changes the quality instrument, measurement documentation, and package versions, not runtime contracts. Studio retains its existing controls and warnings; no new quality or performance conclusion is inferred from the runtime's benchmark results.
+
+## Cachalot Lab rename review — 2026-10-05
+
+Committed runtime 0.60.3 (`2e77df47eee9f75ad6790f19d246e62b42ff4c82`) differs
+from the reviewed 0.60.1 runtime source only in its package version. The 0.60.2
+quality experiment and 0.60.3 charter do not add telemetry or change runtime policy.
+The owner concurrently prepared the 0.60.4 documentation rename: actual briefs now
+live in `docs/lab/briefs/`, including the new 0.60.4 brief. Lab updated its active
+inbox references. At review, the rename/version changes were still a working tree;
+this is not publication verification or a live model run.
+
+The brief requests app identity migration, but its example data/Keychain paths do
+not match this app's implementation and its updater reference is future work.
+Lab source uses bundle ID `com.prooshani.cachalotstudio`, application support under
+that identifier, and Keychain service `com.cachalot.studio.runtime-api-key`. The
+brand rename retains these stable identities, verified by preserved app data and
+native profile restoration; see [rename compatibility](RENAME.md). No supported
+runtime field or launch default changes. YAML documentation keys `studio` and
+`studio_range` become `lab` and `lab_range`; these are Lab annotations, not HTTP
+response fields or runtime configuration keys.
+
+Final follow-up on 2026-10-06: runtime 0.60.4 is now committed at
+`193aa662b6fa681f39f7a17309a3fc40d06dd5a2`. Its source diff from 0.60.3 changes
+only `src/cachalot/__init__.py`'s version. The renamed brief inbox and 0.60.4 brief
+are now committed evidence. Later local benchmark/test/ledger work was left
+untouched and is not treated as a shipped schema. The supported contract baseline
+and Lab handoff now record 0.60.4; no live model validation was added.
+
+## Runtime 0.61.0–0.61.1 review — 2026-10-07
+
+New briefs `2026-10-06-runtime-0.61.0.md` and `2026-10-06-runtime-0.61.1.md`
+were checked against clean Cachalot 0.61.1 commit
+`eef2bc5e7ac8fcc21bdefc94b5199007f591e53b`, its changelog, and the complete
+runtime source diff from the previously reviewed 0.60.4. Only the version,
+`storage/reader.py`, and `glm/engine.py` changed under `src/`. Intermediate
+0.60.5–0.60.10 work concerns measurement and script guards, not new Lab controls.
+
+0.61.0 introduces `CACHALOT_READ_THROTTLE_GBPS`, read at module import and disabled
+by default. Positive values emulate a shared decimal-GB/s pipe for ExpertReader
+reads lasting at least 1 ms; faster reads bypass it. Lab records the contract and
+future manifest label **emulated drive bandwidth**, without adding a control,
+changing inherited environment, or claiming a sweep UI. Stats do not report the
+active setting, so Lab explicitly retains that unknown.
+
+0.61.1 exposes eleven cumulative expert-store counters through `GlmEngine.stats()`
+and the existing `/v1/stats` route. Existing prefetch totals now work on GLM and
+MiniMax. The new collapsed Runtime table answers how much lookup/read activity and
+decode waiting the server has recorded: hits, misses, accounted bytes, reads,
+heuristic fast reads, summed read time, read busy time, decode wait, and waited
+misses. The table replaces traces within the panel while expanded, retaining a
+bounded scroll area. Older/partial responses show unavailable independently for
+each missing field; zero is valid. Seconds accept finite nonnegative values up to
+Number.MAX_SAFE_INTEGER; counts and bytes require nonnegative safe integers.
+Unhealthy and disconnected snapshots hide all these readings.
+
+Source semantics qualify the brief: fast reads indicate likely page-cache service
+from elapsed time, not a direct cache measurement; summed read durations overlap;
+decode waiting is not end-to-end latency. `ResidentExpertStore` also maintains
+separate `ssd_bytes_read` and `read_bytes` tallies, but the HTTP response exports
+only the former. Lab shows the reported total as **accounted read bytes**, and
+requests population alignment before calculating a busy rate. No delta/token
+view, wait percentage, busy rate, critical path, or benchmark prediction is added.
+No measurement figures from the briefs are advertised as this machine's results.
+
+Collection uses the existing 1 Hz visible / 0.2 Hz hidden poll and current raw
+snapshot. No new request, persistence, unbounded history, export, or runtime
+instrumentation is added. Inference-overhead and real-model performance were not
+measured. This work remains local and unreleased.
+
+Graph evidence used Verify tier: Lab generation `2026-10-05T21:31:03Z`, runtime
+generation `2026-10-06T21:46:02Z`; coverage metadata matched the material paths
+before editing with no recorded gaps. Exact source, route, reader, counter, and
+committed-diff checks supplemented graph results. Coverage is not proof of
+completeness.
+
+Verification for this local slice: 46 frontend tests, six mock-runtime tests,
+TypeScript, ESLint, Prettier, whitespace checks, production build, and Developer ID
+signed app build passed. A focused Cockpit rerun passed after the layout fix.
+The final app was installed with a recoverable previous copy; all four bundle
+files match the build and strict signature verification passed. Native inspection
+verified all nine new fields, healthy partial responses clearing them, bounded
+scrolling, and readable collapsed charts. Test mocks were stopped. Rust tests,
+real-model inference, Keychain reconnect, notarization, and publication were not
+part of this slice. See `HANDOFF.md` for the installation hash and backup path.
+
+Final review follow-up: the runtime advanced during this pass to clean 0.61.2
+commit `954dff83c54071e10aef649ae725dd0afd141528`. No new brief followed 0.61.1.
+The full source diff from 0.61.1 changes only `src/cachalot/__init__.py`'s version;
+the changelog reports live Hermes measurements and documentation. No supported
+API or launch default changed. These runtime-owned measurements do not replace
+Lab's outstanding live-model validation. Contracts and handoff record 0.61.2.

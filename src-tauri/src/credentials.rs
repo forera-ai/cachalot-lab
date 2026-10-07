@@ -2,6 +2,7 @@
 use crate::runtime::parse_local_endpoint;
 
 #[cfg(target_os = "macos")]
+// Stable Keychain namespace: the Lab rename must retain saved credentials.
 const SERVICE: &str = "com.cachalot.studio.runtime-api-key";
 
 fn account(endpoint: &str) -> Result<String, String> {
@@ -126,7 +127,7 @@ mod tests {
             delete_generic_password, get_generic_password, set_generic_password,
         };
         let service = format!(
-            "com.cachalot.studio.test.{}.{}",
+            "com.cachalot.lab.test.{}.{}",
             std::process::id(),
             std::time::SystemTime::now()
                 .duration_since(std::time::UNIX_EPOCH)

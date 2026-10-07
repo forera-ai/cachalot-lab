@@ -1,32 +1,95 @@
-# Implementation plan
+# Delivery roadmap
 
-## 0.1.0 Foundation
+Reframed on 2026-10-05 under [Product direction](PRODUCT_DIRECTION.md), preserving the [owner's original mission](mission/2026-10-05-owner-mission.txt) and [previous plan](mission/2026-10-05-previous-plan.md). This is a dependency-led roadmap, not a release schedule or a claim that research features already ship.
 
-1. Owner-selected mark: traced its graphic shape into `assets/logo/` and exported theme/size variants. Studio-specific icon treatment and usage refinements remain.
-2. Define primitive, semantic, and component tokens for Abyss and Surface. Create high-fidelity static mockups for ten named surfaces in both themes. Review before deeper screen implementation.
-3. Scaffold Tauri 2, React 19, TypeScript, Vite, and Tailwind CSS v4. Add navigation, theme control, command palette, and a development style guide. The owner prioritized the macOS app after confirming the mark, so the foundation shell is implemented ahead of the mockup set.
-4. Add a controllable mock HTTP runtime with slow startup, long prefill keep-alives, missing telemetry fields, auth failures, queueing, and crashes. Cover mock behavior with tests.
-5. Add CI gates for format, lint, typecheck, Rust tests, frontend tests, and builds. Record screenshots and update this plan and `HANDOFF.md`.
+## Baseline and changed priority
 
-## 0.1.0 release client
+Lab 0.6.0 provides local connection, streaming chat and saved conversations, per-chat generation settings, managed runtime profiles and process supervision, Cockpit runtime/host/physical-drive traces, model discovery, optional Keychain credentials, themes, Doctor, and Logs. Preserve these workflows and data. Live GLM/DeepSeek launch/generation/stop validation and authenticated saved-key reconnect across restart remain outstanding; see [SSD validation](SSD_VALIDATION.md) and [discovery/Keychain](DISCOVERY_KEYCHAIN.md).
 
-Local runtime connection, health and telemetry polling, streaming chat, API setup, and a signed/notarized macOS release were brought forward at the owner's request. Version 0.1.0 was published on GitHub on 2026-09-29. Placeholder routes are hidden from the distribution build.
+Lab 0.6.0 adds a collapsed runtime read/wait evidence table and the compatible Lab rename. Request-level attribution, percentages, and busy-rate derivations remain deferred.
 
-## Later milestones
+Runtime and host histories are currently bounded live traces, not a durable benchmark archive. Dedicated experiment records, token profiling, and historical benchmark comparison are planned. The reviewed runtime remains Cachalot 0.61.2 at `954dff83c54071e10aef649ae725dd0afd141528`, briefs through 0.61.1; source review does not equal live model validation.
 
-- The persistent telemetry strip, visibility-aware polling, and a compact dashboard ship in 0.2.0; richer field coverage remains under 0.4.0.
-- 0.2.0: profile schema, compiler, single-child supervision, Dive controls, startup readiness, automatic connection, raw Logs, and Doctor status. The owner approved the static Dive mockups as a design reference. A native managed MiniMax 0.45.1 launch reached readiness, auto-connected, streamed a two-token reply, and stopped cleanly on 2026-09-29. Recovery after an abrupt app exit remains manual: Studio never attaches to or stops a prior process, and an occupied port blocks a new launch.
-- 0.3.0: per-conversation Thinking, output length, and optional temperature controls. Local saved conversations were brought forward into 0.2.0. Editing and retrying messages and searching saved chats remain future chat work.
-- 0.4.0: optional runtime prefetch read/used and image input totals; saved Silent running for paused traces and interface transitions while readings and lifecycle continue; GLM bank/prefetch and DeepSeek decode/date launch controls. GLM HTTP telemetry parity, live GLM/DeepSeek validation, and measured performance remain outstanding after this capability release.
-- 0.5.0: the owner selected SSD telemetry and GLM/DeepSeek live integration validation for the current slice on 2026-10-05. Per-drive read/write counters, charts, and drive selection ship in 0.5.0; native verification and model validation evidence are tracked in `SSD_VALIDATION.md`. The owner subsequently expanded the same slice to include bounded model discovery and optional Keychain credentials; implementation and verification are tracked in `DISCOVERY_KEYCHAIN.md`. Dive UI refinement adds consistent actions, deletion confirmation, structured previews, responsive discovery/forms, and runtime ownership feedback. 0.5.0 was published with these capabilities on 2026-10-05; live GLM/DeepSeek model validation remains outstanding.
-- 0.6.0: signed Studio and managed runtime updates with rollback.
-- 0.7.0: menu bar, accessibility, onboarding.
-- 1.0.0: reviewed release candidate.
+The main path now prioritizes trustworthy evidence, reproducible comparisons, and explanatory profiling. The former assignments of 0.6.0 to updates, 0.7.0 to menu bar/onboarding, and 1.0.0 to a release candidate are superseded. Those capabilities remain backlog items; choose actual versions when a verified slice ships under [the release gate](RELEASE.md). No dates or binary version changes are implied by this planning pass.
 
-## Gates
+## Phase A — Evidence foundation and baseline validation
 
-The owner-selected graphic mark anchors tokens and screen design. The foundation shell follows the owner's updated priority. The owner authorized signing and notarization on 2026-09-28 and GitHub publication on 2026-09-29. Real model performance claims require measured results.
+**Question:** Which observations are trustworthy, attributable, and comparable today?
 
-The 0.51–0.52 runtime follow-ups add image and video input plus optional image-input telemetry. Studio image/video attachment selection, bounded storage, persisted multimodal messages, request transport, and explicit capability handling remain a separate chat slice; zero `images_served` is not a capability advertisement.
+**Lab deliverables:** inventory each current metric's source, scope, units, interval, reset behavior, model-family coverage, and unknowns; design the measured/derived/predicted/hypothetical language and missing/stale/partial states; inventory persistence and privacy constraints. Keep whole-Mac/whole-drive telemetry separate from runtime metrics and requested settings separate from reported active settings. Complete existing live validation when machine resources permit, without competing with another inference workload.
 
-The 2026-10-05 runtime-sync slice adopts 0.60 source contracts with nullable DeepSeek decode miss dropping and system-date reuse controls. Explicit warnings distinguish direct CLI exact defaults from `serve.sh` budget 0 and explain the seven-day date cost. Existing profiles keep defaults. Remaining: live DeepSeek validation, GLM bank/prefetch validation, media transport, measured performance, with follow-up changes subject to the versioned release gate.
+**Runtime dependency:** documented identity/capabilities, active settings, counter lifetimes, and telemetry parity; proposals in [runtime requests](RUNTIME_REQUESTS.md) and [observability requirements](../runtime-contract/observability-proposal.md).
+
+**Exit evidence:** audited metric inventory and compatibility fixtures; scoped unknowns; controlled current-family readiness/stream/cancel/stop evidence or an explicit unavailable-family limitation; saved-key restart evidence; privacy and artifact schema design; agreed overhead measurement procedure. This phase can deliver useful labeling and validation before every runtime request is fulfilled.
+
+## Phase B — Reproducible run records and baseline comparison
+
+**Question:** What changed between equivalent runs, and what tradeoff did it create?
+
+**Lab deliverables:** a versioned durable run manifest and bounded local evidence store; explicit capture/import/export and run outcome; baseline/A/B comparison for supported metrics; configuration differences, repetitions, warm/cold state, workload identity, and raw-evidence links. Begin with trustworthy existing aggregates and disclose their windows rather than waiting for a complete profiler.
+
+**Runtime dependency:** request boundaries and defined TTFT, prefill/decode timing, counts, active configuration, and stable identities for request-specific metrics. Unsupported fields remain unavailable; partial imported records cannot claim full reproducibility.
+
+**Exit evidence:** export/import round trip with provenance and units; cancellation/failure and incomplete metadata remain visible; counter resets do not manufacture deltas; controlled equivalent runs compare correctly; storage is bounded and sensitive content/credentials are handled explicitly. No automatic winner or silent policy tuning. Update privacy documentation before shipping evidence capture.
+
+## Phase C — Anatomy of a token
+
+**Question:** Why did this token take this long, and which work overlapped or blocked progress?
+
+**Lab deliverables:** opt-in token timeline, runtime-defined lanes, operation detail, overlap, exposed wait versus activity, and dependency-backed critical-path inspection. Keep incomplete traces clearly marked. Add low-overhead versus detailed collection choices when supported, with bounded rendering and raw trace export.
+
+**Runtime dependency:** authoritative token/request-correlated events, monotonic clock semantics, CPU/GPU completion timing, dependencies, waits, and loss/backpressure metadata. Sampled stats cannot meet this gate. Cachalot implements instrumentation.
+
+**Exit evidence:** known sequential/parallel/wait traces render and account correctly; timestamps and request/token attribution are verified; concurrent durations are not added as sequential costs; dropped events prevent unqualified conclusions; raw trace reproduces the explanation. Matched instrumentation-off/low/detail runs quantify inference, serialization, transport, storage, and UI overhead against an agreed workload budget.
+
+## Phase D — Memory, storage, and expert explanations
+
+**Question:** What was resident, what moved, why, and what did it cost?
+
+**Lab deliverables:** memory hierarchy with capacity/occupancy/movement; runtime-scoped bytes and requests/token, read-size/latency distributions, queue depth, demand/prefetch usefulness and exposed I/O; expert selection/residency/hit/miss/eviction/reuse views. Preserve physical-drive monitoring as host context. Select heat maps and timelines only when they answer an investigation question.
+
+**Runtime dependency:** non-overlapping allocation semantics or explicit shared backing; runtime I/O populations, request timing and transfer causes; model/layer/expert identity and lifecycle; prefetch use/unused horizon. Independent verified aggregate views may ship before full lifecycle tracing.
+
+**Exit evidence:** memory categories do not double-count; quantiles name their sample population; expert identity is stable within the run; resets/evictions/prefetch outcomes are tested; attribution is honest; each visualization has a stated decision/hypothesis and measured collection cost.
+
+## Phase E — Sweeps, revision history, and bottleneck migration
+
+**Question:** Where does improvement saturate, did a regression hide behind throughput, and where did the bottleneck move?
+
+**Lab deliverables:** controlled parameter-sweep records and curves; revision comparisons across latency/throughput, memory, cache, traffic and available energy; knees, thresholds, nonlinearities, variability, and before/after bottleneck evidence. Experiment orchestration uses explicit supported settings, controlled run order, and existing managed-process ownership. Never change inference policy silently.
+
+**Dependencies:** Phase B records; Phase C/D evidence for overlap, expert, and critical-path interpretations. Aggregate sweeps need not wait for every detailed metric. Control context, workload, seeds where supported, warm/cold state, and output-changing settings; disclose incomparable records.
+
+**Exit evidence:** repeats and configuration differences are inspectable; raw artifacts support trend/regression findings; sparse points are not presented as validated predictions; bottleneck conclusions retain measured evidence and heuristic labels. Show tradeoffs, including available quality evidence, without declaring a universal best configuration.
+
+## Phase F — Energy and efficiency
+
+**Question:** What energy/performance tradeoff does this configuration make?
+
+**Lab deliverables:** current/average power, integrated energy, joules/token and tokens/joule, comparisons, and source/attribution labels.
+
+**Dependency:** reliable platform/runtime power telemetry with sampling, measurement versus estimation, integration interval, and idle treatment. Phase B provides run alignment. This phase can proceed independently of complete expert tracing when its evidence is reliable.
+
+**Exit evidence:** energy integration and token denominator use the same interval; host/process scope is explicit; measured and estimated power are distinct; overhead is measured; exports preserve method and units. Unsupported energy remains unavailable.
+
+## Phase G — Validated models and optional economics
+
+**Question:** Does a performance model predict the measured change, and what assumptions determine its economic tradeoff?
+
+**Lab deliverables:** counterfactual inputs for supported memory/bandwidth/prefetch scenarios, predicted outcomes and validation-domain/uncertainty display, followed by prediction-versus-measurement comparison. Provide a separate optional economic layer with explicit hardware cost, useful lifetime, electricity price, utilization, and maintenance assumptions.
+
+**Dependencies:** Cachalot-owned validated performance models and validation artifacts; Phase B/E measured comparisons; reliable Phase F energy for measured-energy-based economics. Economic scenarios using estimated energy must disclose that input. No fabricated model or measured label for economic results.
+
+**Exit evidence:** model/version and assumptions accompany every prediction; outside-domain scenarios are hypothetical; measured results can validate/reject predictions; economic assumptions are editable/exportable and modeled output is visually separate from telemetry. No automatic configuration winner.
+
+## Cross-cutting work and remaining backlog
+
+All phases retain layered Runtime/Performance/Profiler/Research disclosure, accessible text labels, keyboard access, reduced motion, Silent running, Abyss/Surface coherence, bounded buffers and storage, honest missing fields, and existing loopback/credential/process safeguards. Accessibility is a continuous acceptance condition, not postponed until a numbered release.
+
+Signed Lab/runtime updates with rollback, menu-bar integration, onboarding, chat edit/retry/search, and media attachments remain worthwhile secondary work. Media requires explicit runtime capability and bounded storage/transport; image totals cannot advertise capability. Prioritize these when they support safe ordinary use or evidence workflows, without displacing the governing research objective by default. A 1.0 milestone requires explicit reviewed product and compatibility criteria, not completion of every speculative research feature.
+
+## Next implementation slice
+
+Start with Phase A's metric/provenance inventory and Phase B's run-manifest design. Resolve counter lifetimes, request identity and active configuration with Cachalot before promising request-level comparisons. Track remaining GLM/DeepSeek and saved-key validation alongside this work. Token tracing, energy sources, and validated models remain separate dependencies; this mission adoption does not implement them.
+
+Each slice must state its engineering question, evidence contract, fallback, preservation/migration needs, raw export/retention plan, verification, and overhead budget where relevant. Follow runtime brief review before development, fresh local build/install before native UI testing, and exact-source signed/notarized publication for every pushed implementation. Documentation-only direction changes do not require a binary release.

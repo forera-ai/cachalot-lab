@@ -1,7 +1,7 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "Core window access for the Studio shell",
+  "description": "Core window access for the Lab shell",
   "windows": ["main"],
   "permissions": ["core:default"]
 }
