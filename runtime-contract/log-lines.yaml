@@ -1,4 +1,14 @@
 patterns:
+  - id: glm_decode_miss_budget
+    since: 0.62.14
+    families: [glm-5.3-flash]
+    regex: '^GLM decode miss budget (?P<budget>\d+): .+$'
+    meaning: Startup names an output-changing GLM decode cap. Raw Logs only; not a quality or live-mode signal.
+  - id: routing_trace_warning
+    since: 0.62.0
+    families: [minimax-m3]
+    regex: '^routing trace WARNING: .+$'
+    meaning: MiniMax substitution affects recorded route semantics. Raw Logs only.
   - id: deepseek_decode_miss_budget
     since: 0.57.0
     families: [deepseek-v4.1-flash]
@@ -21,7 +31,9 @@ patterns:
     meaning: Runtime changed resident capacity under whole-system wired pressure. Cockpit reads resident_experts from HTTP rather than parsing this line.
   - id: routing_trace
     since: 0.55.0
-    families: [deepseek-v4.1-flash]
+    families: [deepseek-v4.1-flash, glm-5.3-flash, minimax-m3]
+    since_glm_minimax: 0.62.0
+    glm_log_weights_predictions_since: 0.62.10
     regex: '^routing trace (on|saved): .+$'
     meaning: Measurement trace start or save; not normal tuning or a performance result.
   - id: glm_expert_bank

@@ -53,8 +53,8 @@ This local test installation does not make an uncommitted build a release.
 
 ## Scope
 
-The [0.6.0 release](https://github.com/forera-ai/cachalot-lab/releases/tag/v0.6.0)
-adds runtime read/wait evidence and ships the compatible Cachalot Lab rename.
+The [0.7.0 release](https://github.com/forera-ai/cachalot-lab/releases/tag/v0.7.0)
+adds skipped-expert evidence and an explicit GLM decode miss-budget control.
 It retains physical-drive telemetry, bounded local model discovery, optional
 Keychain credentials, Dive controls, chat settings, managed process ownership,
 and host telemetry. Live GLM/DeepSeek inference, saved-key restart, and performance

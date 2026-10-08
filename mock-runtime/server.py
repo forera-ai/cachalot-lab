@@ -105,7 +105,7 @@ class Handler(BaseHTTPRequestHandler):
                                   "ssd_bytes_read": 1000000000, "expert_reads": 80,
                                   "expert_fast_reads": 20, "expert_read_seconds": 12.5,
                                   "expert_read_busy_seconds": 4.25,
-                                  "decode_wait_seconds": 2.125, "decode_waited_misses": 30})
+                                  "decode_wait_seconds": 2.125, "decode_waited_misses": 30, "skipped_experts": 42})
             self.json_response(200, stats)
             return
         self.json_response(404, {"error": {"message": "Not found"}})

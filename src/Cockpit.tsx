@@ -25,6 +25,7 @@ function runtimeTotal(runtime: RuntimeConnection, key: string): string {
 const readEvidenceFields = [
   ['expert_hits', 'Expert hits', ''],
   ['expert_misses', 'Expert misses', ''],
+  ['skipped_experts', 'Skipped experts', ''],
   ['ssd_bytes_read', 'Accounted read bytes', 'B'],
   ['expert_reads', 'Expert reads', ''],
   ['expert_fast_reads', 'Fast reads (cache heuristic)', ''],
@@ -74,9 +75,11 @@ function ReadEvidence({ runtime }: { runtime: RuntimeConnection }) {
           </tbody>
         </table>
         <p>
-          Read durations overlap; summed time is not elapsed time. Busy time
-          means at least one read in flight. Decode wait is caller waiting, not
-          a latency percentage or a critical path.
+          Skipped experts count dropped expert computations; zero does not prove
+          exact outputs or reveal the active budget. Read durations overlap;
+          summed time is not elapsed time. Busy time means at least one read in
+          flight. Decode wait is caller waiting, not a latency percentage or a
+          critical path.
         </p>
         <p>
           Fast reads use a timing heuristic for page-cache hits. Accounted bytes
@@ -276,6 +279,7 @@ export function Cockpit({
     }))
   const decode = runtimeNumber(snapshot.stats, 'decode_tps')
   const hitRate = runtimeNumber(snapshot.stats, 'expert_hit_rate')
+  const skipped = runtimeTotal(runtime, 'skipped_experts')
   const ssdRate = runtimeNumber(snapshot.stats, 'ssd_gbps')
   const storage = storageRate(ssdRate)
   const residents = runtimeNumber(snapshot.stats, 'resident_experts')
@@ -366,7 +370,11 @@ export function Cockpit({
           label="EXPERT REUSE"
           value={hitRate === null ? '—' : (hitRate * 100).toFixed(1)}
           unit="%"
-          detail="Cache hit rate"
+          detail={
+            skipped !== '—' && skipped !== '0'
+              ? `${skipped} skipped · outputs changed`
+              : 'Cache hit rate'
+          }
           color="var(--cockpit-violet)"
           data={history.map((point) => ({
             at: point.at,
@@ -812,7 +820,9 @@ function Readout({
         <strong>{value}</strong>
         <span>{unit}</span>
       </div>
-      <span className="readout-detail">{detail}</span>
+      <span className="readout-detail" title={detail}>
+        {detail}
+      </span>
       <TrendChart
         className="readout-chart"
         data={data}

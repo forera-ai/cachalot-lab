@@ -360,14 +360,14 @@ it('shows independent runtime read and wait totals without inventing latency att
   }
   runtime.snapshot.stats = { expert_hits: 0.5 }
   rerender(view())
-  expect(table().getAllByText('—')).toHaveLength(9)
+  expect(table().getAllByText('—')).toHaveLength(10)
   for (const [connected, healthy] of [
     [true, false],
     [false, true],
   ] as const) {
     runtime.snapshot = { ...runtime.snapshot, stats, connected, healthy }
     rerender(view())
-    expect(table().getAllByText('—')).toHaveLength(9)
+    expect(table().getAllByText('—')).toHaveLength(10)
   }
 })
 
@@ -429,4 +429,52 @@ it('shows drive rates offline, changes drive, and clears disconnected or failed 
   host.error = 'sampling failed'
   rerender(view())
   expect(rates().getAllByText('— MB/s')).toHaveLength(2)
+})
+
+it('shows skipped experts as output-changing evidence and preserves unknowns', () => {
+  const runtime = connection()
+  const view = () => (
+    <Cockpit
+      platform={platform}
+      platformError={null}
+      host={{ history: [], error: null }}
+      openScreen={vi.fn()}
+      runtime={runtime}
+    />
+  )
+  runtime.snapshot.stats = { skipped_experts: 42 }
+  const { rerender } = render(view())
+  expect(screen.getByText(/42 skipped.*outputs changed/)).toBeInTheDocument()
+  fireEvent.click(screen.getByRole('button', { name: 'Runtime' }))
+  const reading = () =>
+    within(screen.getByRole('row', { name: /Skipped experts/ })).getByRole(
+      'cell',
+    )
+  expect(reading()).toHaveTextContent('42')
+  runtime.snapshot.stats = { skipped_experts: 0 }
+  rerender(view())
+  expect(reading()).toHaveTextContent('0')
+  expect(screen.queryByText(/skipped.*outputs changed/)).not.toBeInTheDocument()
+  for (const value of [
+    undefined,
+    null,
+    '42',
+    -1,
+    0.5,
+    Infinity,
+    Number.MAX_SAFE_INTEGER + 1,
+  ]) {
+    runtime.snapshot.stats = { skipped_experts: value }
+    rerender(view())
+    expect(reading()).toHaveTextContent('—')
+  }
+  runtime.snapshot.stats = { skipped_experts: 42 }
+  runtime.snapshot.healthy = false
+  rerender(view())
+  expect(reading()).toHaveTextContent('—')
+  expect(screen.queryByText(/skipped.*outputs changed/)).not.toBeInTheDocument()
+  runtime.snapshot.healthy = true
+  runtime.snapshot.connected = false
+  rerender(view())
+  expect(reading()).toHaveTextContent('—')
 })

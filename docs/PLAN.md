@@ -4,11 +4,11 @@ Reframed on 2026-10-05 under [Product direction](PRODUCT_DIRECTION.md), preservi
 
 ## Baseline and changed priority
 
-Lab 0.6.0 provides local connection, streaming chat and saved conversations, per-chat generation settings, managed runtime profiles and process supervision, Cockpit runtime/host/physical-drive traces, model discovery, optional Keychain credentials, themes, Doctor, and Logs. Preserve these workflows and data. Live GLM/DeepSeek launch/generation/stop validation and authenticated saved-key reconnect across restart remain outstanding; see [SSD validation](SSD_VALIDATION.md) and [discovery/Keychain](DISCOVERY_KEYCHAIN.md).
+Lab 0.7.0 provides local connection, streaming chat and saved conversations, per-chat generation settings, managed runtime profiles and process supervision, Cockpit runtime/host/physical-drive traces, model discovery, optional Keychain credentials, themes, Doctor, and Logs. Preserve these workflows and data. Live GLM/DeepSeek launch/generation/stop validation and authenticated saved-key reconnect across restart remain outstanding; see [SSD validation](SSD_VALIDATION.md) and [discovery/Keychain](DISCOVERY_KEYCHAIN.md).
 
-Lab 0.6.0 adds a collapsed runtime read/wait evidence table and the compatible Lab rename. Request-level attribution, percentages, and busy-rate derivations remain deferred.
+Lab 0.6.0 added a collapsed runtime read/wait evidence table and the compatible Lab rename. Lab 0.7.0 adds skipped-expert evidence and explicit GLM decode miss-budget intent with output warnings. Request-level attribution, percentages, and busy-rate derivations remain deferred.
 
-Runtime and host histories are currently bounded live traces, not a durable benchmark archive. Dedicated experiment records, token profiling, and historical benchmark comparison are planned. The reviewed runtime remains Cachalot 0.61.2 at `954dff83c54071e10aef649ae725dd0afd141528`, briefs through 0.61.1; source review does not equal live model validation.
+Runtime and host histories are currently bounded live traces, not a durable benchmark archive. Dedicated experiment records, token profiling, and historical benchmark comparison are planned. The reviewed runtime remains Cachalot 0.62.18 at `2c319ec36c2930bc7b754ecc590a818364ca8f5d`, briefs through 0.62.14; source review does not equal live model validation.
 
 The main path now prioritizes trustworthy evidence, reproducible comparisons, and explanatory profiling. The former assignments of 0.6.0 to updates, 0.7.0 to menu bar/onboarding, and 1.0.0 to a release candidate are superseded. Those capabilities remain backlog items; choose actual versions when a verified slice ships under [the release gate](RELEASE.md). No dates or binary version changes are implied by this planning pass.
 

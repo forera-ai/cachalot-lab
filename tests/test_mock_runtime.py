@@ -80,7 +80,7 @@ class MockRuntimeTests(unittest.TestCase):
                     "ssd_bytes_read": 1000000000, "expert_reads": 80,
                     "expert_fast_reads": 20, "expert_read_seconds": 12.5,
                     "expert_read_busy_seconds": 4.25,
-                    "decode_wait_seconds": 2.125, "decode_waited_misses": 30}
+                    "decode_wait_seconds": 2.125, "decode_waited_misses": 30, "skipped_experts": 42}
         for scenario in (mock_server.Scenario(), mock_server.Scenario(read_stats=True),
                          mock_server.Scenario(read_stats=True, missing_stats=True)):
             self.runtime.scenario = scenario

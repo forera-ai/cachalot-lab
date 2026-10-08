@@ -1,6 +1,19 @@
-# Verified against Cachalot 0.61.2 (954dff8). Null overrides in Lab profiles
+# Verified against Cachalot 0.62.18 (2c319ec). Null overrides in Lab profiles
 # inherit the runtime's version-specific default; zero has each knob's stated effect.
 knobs:
+  - key: CACHALOT_GLM_DECODE_MISS_BUDGET
+    kind: env
+    families: [glm-5.3-flash]
+    type: int-or-off
+    default: null
+    lab_range: [-1, 288]
+    group: speed
+    effect: changes-outputs
+    restart_required: true
+    stability: shipped
+    since: 0.62.14
+    lab: Optional GLM-only next-launch integer; empty inherits off, -1 explicitly disables the budget, 0 drops all non-resident misses. Inherited key is removed before applying profile overrides. Older profiles omit it; family changes clear it.
+    summary: Per decode layer reads at most N non-resident experts, highest router weight first; drops others and scales kept outputs by total/kept router weight. Prefill is unchanged. Unset, empty, off, exact, or negative disables it. Lab makes no speed or quality magnitude claim.
   - key: CACHALOT_READ_THROTTLE_GBPS
     kind: env
     families: [deepseek-v4.1-flash, glm, minimax]
@@ -13,7 +26,7 @@ knobs:
     stability: shipped
     since: 0.61.0
     lab: Contract only; no launch control or manifest is implemented. Lab does not set or remove this environment key. Future manifests must label it emulated drive bandwidth and distinguish requested from reported settings.
-    summary: Read at reader-module import. Unset, empty, or zero disables throttling. Positive B shares one process-wide pipe across ExpertReader reads lasting at least 1 ms; faster reads bypass it. No HTTP field reports whether it is active. Non-numeric values fail runtime import; nonfinite inputs are not a supported Lab control.
+    summary: Read at reader-module import. Unset, empty, or zero disables throttling. Positive B shares one process-wide pipe across ExpertReader reads (and MiniMax coded-bank records since 0.61.14) lasting at least 1 ms; faster reads bypass it. No HTTP field reports whether it is active. Non-numeric values fail runtime import; nonfinite inputs are not a supported Lab control.
   - key: CACHALOT_DECODE_MISS_BUDGET
     kind: env
     families: [deepseek-v4.1-flash]
@@ -85,11 +98,14 @@ knobs:
     lab: Not exposed.
   - key: CACHALOT_ROUTING_TRACE
     kind: env
-    families: [deepseek-v4.1-flash]
+    families: [deepseek-v4.1-flash, glm-5.3-flash, minimax-m3]
     type: path
     since: 0.55.0
-    effect: bit-identical
-    lab: Not exposed as normal tuning; measurement adds a device read per layer.
+    since_glm_minimax: 0.62.0
+    since_glm_weights_predictions: 0.62.10
+    effect: instrumentation
+    lab: Contract only; no viewer, trace control, or capture is implemented. Traced runs are not uninstrumented speed baselines; end-to-end overhead remains unmeasured by Lab.
+    summary: NPZ contains phase, layer, position, experts, segments. GLM 0.62.10+ optionally adds float32 weights shaped like experts and pred_source/pred_target/pred_position/pred_experts/pred_weights, as DeepSeek does. MiniMax has no router weights; substitution makes its prefill routes post-substitution and decode routes router picks. GLM/MiniMax positions are per-(phase, layer) counters unique within a run, not reset per request. Decode token boundaries in predicted_used_mask follow a layer that stops ascending; this is offline routing evidence, not a timed token profile.
   - key: CACHALOT_GLM_VIDEO_MAX_FRAMES
     kind: env
     families: [glm-5.3-flash]
@@ -124,12 +140,12 @@ knobs:
     restart_required: true
     stability: shipped
     since: 0.49.0
-    summary: 0 ignores a configured bank and uses checkpoint experts. Unset bank path still means no bank.
+    summary: 0 ignores a configured bank and uses checkpoint experts. Unset bank path still means no bank in the direct CLI. Since 0.61.9 serve-glm.sh conditionally selects /Volumes/X10Pro/models/GLM-5.3-Flash-bank when bank.json exists and the key is unset; empty key or ENABLED=0 disables that script selection. Lab does not adopt the owner-specific path.
   - key: CACHALOT_GLM_PREDICT_TOPK
     kind: env
     families: [glm-5.3-flash]
     type: int
-    default: { glm-5.3-flash: 5 }
+    default: { direct_cli: 5, serve_script_since_0_62_14: 0 }
     lab_range: [0, 288]
     group: speed
     effect: bit-identical

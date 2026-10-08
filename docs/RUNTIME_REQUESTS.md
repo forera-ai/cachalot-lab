@@ -36,3 +36,7 @@ The 0.51.0 brief adds GLM image input, but an `images_served` total is not a cap
 ## DeepSeek active settings
 
 Runtime 0.60.0 reports `decode_miss_budget` and `skipped_experts` through DeepSeek stats; this does not describe every output-changing path or a quality magnitude. Please also expose runtime version, system-date reuse enabled state and window, and per-request true/shown dates through documented optional fields. Lab's new Dive controls describe next-launch intent only. The GLM/MiniMax prediction-counter gap existed in 0.60.0 and is resolved in 0.61.1. Explicit video content capability remains requested alongside images; `images_served` now includes video steps and still cannot advertise support.
+
+## GLM decode budget and trace provenance (reviewed 0.62.18)
+
+GLM 0.62.14 adds `skipped_experts` but does not report its active miss budget. Please expose family/version, requested-versus-active budget and trace mode through optional structured fields with lifetimes and compatibility semantics. Zero drops cannot establish exact outputs. GLM/MiniMax routing-trace positions are per-run layer counters without request boundaries; a future viewer or manifest needs authoritative request association and collection/overhead metadata. Trace weights and predicted sets are routing evidence, not timing or critical-path evidence. Lab now records explicit next-launch budget intent and cumulative drops only.

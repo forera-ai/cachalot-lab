@@ -495,7 +495,23 @@ export function DiveScreen({
                             }
                           />
                           <OptionalNumber
-                            label="GLM prefetch experts · 0.50+ default 5; 0 off"
+                            label="GLM decode miss budget · 0.62.14+; -1 off"
+                            value={draft.tuning.glm_decode_miss_budget ?? null}
+                            min={-1}
+                            max={288}
+                            onChange={(glm_decode_miss_budget) =>
+                              updateTuning({ glm_decode_miss_budget })
+                            }
+                          />
+                          <p className="panel-intro">
+                            Decode miss budget changes outputs and may lower
+                            quality. Nonnegative values cap non-resident expert
+                            reads per layer; 0 drops all misses. Empty or -1
+                            disables this budget. Prefill is unchanged. Next
+                            launch only; older runtimes ignore this control.
+                          </p>
+                          <OptionalNumber
+                            label="GLM prefetch experts · CLI default 5; 0 off"
                             value={draft.tuning.glm_predict_topk ?? null}
                             min={0}
                             max={288}
@@ -647,7 +663,10 @@ export function DiveScreen({
                         fields use runtime defaults; older runtimes ignore these
                         controls. A bank needs bank.json; Off retains its saved
                         path but uses checkpoint experts. Bank reads and
-                        prefetch preserve model outputs.
+                        prefetch preserve model outputs. Lab uses the direct
+                        CLI: empty prefetch remains 5; serve-glm.sh defaults to
+                        0 since 0.62.14. Its automatic bank selection is not
+                        applied here.
                       </p>
                     )}
                     {draft.family === 'minimax' && (
@@ -727,6 +746,15 @@ export function DiveScreen({
                   </div>
                 )}
               </div>
+              {selected.family === 'glm' &&
+                selected.tuning.glm_decode_miss_budget != null &&
+                selected.tuning.glm_decode_miss_budget >= 0 && (
+                  <p className="panel-intro">
+                    GLM decode budget {selected.tuning.glm_decode_miss_budget} ·
+                    output-changing next-launch setting; active server mode is
+                    unreported.
+                  </p>
+                )}
               <div className="managed-actions">
                 {ownsSelected ? (
                   <button

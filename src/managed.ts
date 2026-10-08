@@ -18,6 +18,7 @@ export type RuntimeTuning = {
   minimax_bank_path: string | null
   minimax_mirror_path: string | null
   minimax_mirror_fraction: number | null
+  glm_decode_miss_budget: number | null
   glm_bank_path: string | null
   glm_bank_enabled: boolean | null
   glm_predict_topk: number | null
@@ -81,6 +82,7 @@ export function newProfile(): LaunchProfile {
       minimax_bank_path: null,
       minimax_mirror_path: null,
       minimax_mirror_fraction: null,
+      glm_decode_miss_budget: null,
       glm_bank_path: null,
       glm_bank_enabled: null,
       glm_predict_topk: null,

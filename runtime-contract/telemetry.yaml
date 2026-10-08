@@ -1,7 +1,7 @@
 # Source-reviewed HTTP fields, not inferred from launch knobs or startup logs.
 reviewed_runtime:
-  version: 0.61.2
-  commit: 954dff83c54071e10aef649ae725dd0afd141528
+  version: 0.62.18
+  commit: 2c319ec36c2930bc7b754ecc590a818364ca8f5d
 endpoint: /v1/stats
 fields:
   decode_miss_budget:
@@ -10,10 +10,12 @@ fields:
     optional: true
     lab: Not yet displayed; do not infer exactness of all output paths from this single field.
   skipped_experts:
-    meaning: Cumulative dropped expert count, not a quality score.
+    meaning: Cumulative dropped experts since server start, not a quality score or active-mode declaration. GLM always reports zero with its budget off; MiniMax reports zero through the shared engine.
     type: nonnegative_integer
     optional: true
-    lab: Not yet displayed.
+    families: [deepseek, glm, minimax]
+    since_glm_minimax: 0.62.14
+    lab: Always shown in read/wait evidence with independent unknown/zero validation; positive totals also qualify the cache hit-rate readout as outputs changed. Zero does not establish exact outputs.
   predicted_loads:
     meaning: Number of predicted expert reads submitted by the resident store.
     type: nonnegative_integer

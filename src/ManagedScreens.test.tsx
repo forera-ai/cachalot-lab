@@ -37,6 +37,8 @@ it('saves, reopens, and clears optional GLM controls when family changes', async
   const bank = screen.getByLabelText(/GLM expert bank directory/)
   const enabled = screen.getByLabelText(/GLM expert bank ·/)
   const topk = screen.getByLabelText(/GLM prefetch experts/)
+  const budget = screen.getByLabelText(/GLM decode miss budget/)
+  expect(budget).toHaveValue(null)
   const limit = screen.getByLabelText(/GLM prefetch read limit/)
   const scheduling = screen.getByLabelText(/GLM prefetch scheduling/)
   expect(topk).toHaveValue(null)
@@ -45,6 +47,7 @@ it('saves, reopens, and clears optional GLM controls when family changes', async
   await user.selectOptions(enabled, 'false')
   await user.type(topk, '0')
   await user.type(limit, '3')
+  await user.type(budget, '2')
   await user.selectOptions(scheduling, '-1')
   await user.click(screen.getByRole('button', { name: 'Save profile' }))
   await waitFor(() =>
@@ -56,13 +59,18 @@ it('saves, reopens, and clears optional GLM controls when family changes', async
           glm_bank_enabled: false,
           glm_predict_topk: 0,
           glm_predict_limit: 3,
+          glm_decode_miss_budget: 2,
           glm_predict_after_demand: -1,
         }),
       }),
     }),
   )
+  expect(
+    screen.getByText(/GLM decode budget 2.*output-changing/),
+  ).toBeInTheDocument()
   await user.click(screen.getByRole('button', { name: 'Edit' }))
   expect(screen.getByLabelText(/GLM prefetch experts/)).toHaveValue(0)
+  expect(screen.getByLabelText(/GLM decode miss budget/)).toHaveValue(2)
   expect(screen.getByLabelText(/GLM prefetch scheduling/)).toHaveValue('-1')
   await user.selectOptions(screen.getByLabelText('Model family'), 'minimax')
   expect(
@@ -72,6 +80,7 @@ it('saves, reopens, and clears optional GLM controls when family changes', async
   expect(profiles[0]?.tuning.glm_bank_path).toBeNull()
   expect(profiles[0]?.tuning.glm_bank_enabled).toBeNull()
   expect(profiles[0]?.tuning.glm_predict_topk).toBeNull()
+  expect(profiles[0]?.tuning.glm_decode_miss_budget).toBeNull()
 })
 
 it('keeps omitted fields empty when editing an older GLM profile', async () => {
@@ -91,6 +100,7 @@ it('keeps omitted fields empty when editing an older GLM profile', async () => {
   expect(screen.getByLabelText(/GLM expert bank ·/)).toHaveValue('inherit')
   expect(screen.getByLabelText(/GLM prefetch experts/)).toHaveValue(null)
   expect(screen.getByLabelText(/GLM prefetch read limit/)).toHaveValue(null)
+  expect(screen.getByLabelText(/GLM decode miss budget/)).toHaveValue(null)
   expect(screen.getByLabelText(/GLM prefetch scheduling/)).toHaveValue(
     'inherit',
   )

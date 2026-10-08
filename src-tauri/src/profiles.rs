@@ -12,7 +12,7 @@ const STORE_VERSION: u8 = 1;
 const MAX_STORE_BYTES: usize = 256 * 1024;
 const MAX_PROFILES: usize = 50;
 
-pub(crate) const CONTROLLED_ENV_KEYS: [&str; 23] = [
+pub(crate) const CONTROLLED_ENV_KEYS: [&str; 24] = [
     "CACHALOT_DECODE_MISS_BUDGET",
     "CACHALOT_SYSTEM_DATE_REUSE",
     "CACHALOT_SYSTEM_DATE_REUSE_DAYS",
@@ -31,6 +31,7 @@ pub(crate) const CONTROLLED_ENV_KEYS: [&str; 23] = [
     "CACHALOT_MINIMAX_BANK",
     "CACHALOT_MINIMAX_BANK_MIRROR",
     "CACHALOT_MIRROR_FRACTION",
+    "CACHALOT_GLM_DECODE_MISS_BUDGET",
     "CACHALOT_GLM_BANK",
     "CACHALOT_GLM_BANK_ENABLED",
     "CACHALOT_GLM_PREDICT_TOPK",
@@ -83,6 +84,8 @@ pub struct RuntimeTuning {
     minimax_mirror_path: Option<String>,
     #[serde(default)]
     minimax_mirror_fraction: Option<f64>,
+    #[serde(default)]
+    glm_decode_miss_budget: Option<i16>,
     #[serde(default)]
     glm_bank_path: Option<String>,
     #[serde(default)]
@@ -303,7 +306,8 @@ fn validate(profile: &LaunchProfile) -> Result<(), String> {
     {
         return Err("DeepSeek tuning requires a DeepSeek profile family.".to_owned());
     }
-    if (tuning.glm_bank_path.is_some()
+    if (tuning.glm_decode_miss_budget.is_some()
+        || tuning.glm_bank_path.is_some()
         || tuning.glm_bank_enabled.is_some()
         || tuning.glm_predict_topk.is_some()
         || tuning.glm_predict_limit.is_some()
@@ -311,6 +315,12 @@ fn validate(profile: &LaunchProfile) -> Result<(), String> {
         && profile.family != ModelFamily::Glm
     {
         return Err("GLM tuning requires a GLM profile family.".to_owned());
+    }
+    if tuning
+        .glm_decode_miss_budget
+        .is_some_and(|value| !(-1..=288).contains(&value))
+    {
+        return Err("GLM decode miss budget must be between -1 (off) and 288.".to_owned());
     }
     if tuning.glm_bank_path.as_ref().is_some_and(|path| {
         path.len() > 1024 || path.chars().any(char::is_control) || !Path::new(path).is_absolute()
@@ -448,6 +458,12 @@ pub(crate) fn compile(profile: &LaunchProfile) -> Result<LaunchCommand, String> 
         );
     }
 
+    if let Some(value) = tuning.glm_decode_miss_budget {
+        environment.insert(
+            "CACHALOT_GLM_DECODE_MISS_BUDGET".to_owned(),
+            value.to_string(),
+        );
+    }
     if let Some(path) = &tuning.glm_bank_path {
         environment.insert("CACHALOT_GLM_BANK".to_owned(), path.clone());
     }
@@ -958,6 +974,41 @@ mod tests {
         let command = compile(&profile).expect("older GLM launch");
         assert_eq!(command.environment.len(), 1);
         assert_eq!(command.environment["CACHALOT_LOOP_GUARD_REPEATS"], "6");
+    }
+
+    #[test]
+    fn glm_miss_budget_is_explicit_validated_and_backward_compatible() {
+        let mut profile = sample();
+        profile.family = ModelFamily::Glm;
+        assert!(!compile(&profile)
+            .unwrap()
+            .environment
+            .contains_key("CACHALOT_GLM_DECODE_MISS_BUDGET"));
+        for budget in [-1, 0, 2, 288] {
+            profile.tuning.glm_decode_miss_budget = Some(budget);
+            let command = compile(&profile).unwrap();
+            assert_eq!(
+                command.environment["CACHALOT_GLM_DECODE_MISS_BUDGET"],
+                budget.to_string()
+            );
+            let loaded: LaunchProfile =
+                serde_json::from_slice(&serde_json::to_vec(&profile).unwrap()).unwrap();
+            assert_eq!(loaded.tuning.glm_decode_miss_budget, Some(budget));
+        }
+        for budget in [-2, 289] {
+            profile.tuning.glm_decode_miss_budget = Some(budget);
+            assert!(compile(&profile).is_err());
+        }
+        profile.tuning.glm_decode_miss_budget = Some(2);
+        for family in [
+            ModelFamily::Auto,
+            ModelFamily::Deepseek,
+            ModelFamily::Minimax,
+        ] {
+            profile.family = family;
+            assert!(compile(&profile).is_err());
+        }
+        assert!(CONTROLLED_ENV_KEYS.contains(&"CACHALOT_GLM_DECODE_MISS_BUDGET"));
     }
 
     #[test]

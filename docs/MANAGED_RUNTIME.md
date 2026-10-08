@@ -37,3 +37,7 @@ Dive can scan an absolute folder path for supported model configurations within 
 ## Dive interaction refinements (Lab 0.5.0)
 
 Preview opens a labeled executable/arguments/environment section with bounded scrolling and a Hide preview control. Arguments are represented as individually quoted values, not a shell command. Selecting a different profile discards any earlier preview request. Delete profile is a separate destructive action; Keep profile cancels and Confirm delete removes only the saved configuration. An owned profile cannot be deleted. When a different profile owns the running runtime, Start is disabled and the user is directed to that profile to stop it. Recent runtime output is collapsed by default; expand it or use Logs to inspect output.
+
+## GLM budget control (Lab 0.7.0)
+
+Cachalot 0.62.14 adds a GLM-only decode miss budget. Dive accepts an empty field (off), -1 (explicit off), or 0–288 (maximum non-resident expert reads per decode layer). A budget changes outputs and may lower quality; 0 drops all misses. Prefill is unchanged. The selected profile marks nonnegative values as output-changing next-launch settings; it does not assert active server mode. Older profiles omit the field, other families reject it, and inherited values are removed before explicit overrides. Save/reopen and family changes preserve the existing profile contract. Lab retains the direct CLI's prefetch default 5 and requires an explicit bank path; it does not apply serve-glm.sh's new default 0 or conditional bank selection.

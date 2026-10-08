@@ -1,11 +1,16 @@
-# Reviewed committed runtime: 0.61.2 at 954dff8. The HTTP response does not expose
+# Reviewed committed runtime: 0.62.18 at 2c319ec. The HTTP response does not expose
 # package version or active numerics mode, so external-server mode stays unknown.
 reviewed_runtime:
-  version: 0.61.2
-  commit: 954dff83c54071e10aef649ae725dd0afd141528
+  version: 0.62.18
+  commit: 2c319ec36c2930bc7b754ecc590a818364ca8f5d
 brief_inbox: docs/lab/briefs
-# Briefs 0.61.0 and 0.61.1 add optional read emulation and GLM/MiniMax stats parity.
+# Briefs reviewed through 0.62.14; later changes are measurements and metadata.
 features:
+  glm_decode_miss_budget: '>=0.62.14'
+  glm_skipped_experts: '>=0.62.14'
+  glm_minimax_routing_trace: '>=0.62.0'
+  glm_weighted_routing_trace: '>=0.62.10'
+  minimax_coded_bank_read_emulation: '>=0.61.14'
   expert_read_bandwidth_emulation: '>=0.61.0'
   glm_minimax_read_wait_stats: '>=0.61.1'
   minimax_miss_substitution: '>=0.39.0'
@@ -31,6 +36,10 @@ features:
   deepseek_disk_chunk_pins: '>=0.59.0'
   deepseek_system_date_reuse: '>=0.60.0'
 launch_defaults:
+  glm_direct_cli_decode_miss_budget: null
+  glm_direct_cli_predict_topk: 5
+  glm_serve_script_predict_topk_since_0_62_14: 0
+  glm_serve_script_bank_since_0_61_9: conditional-owner-path-bank-manifest
   direct_cli_temperature: 0.6
   deepseek_direct_cli_decode_miss_budget: null
   deepseek_serve_script_decode_miss_budget_since_0_60_0: 0

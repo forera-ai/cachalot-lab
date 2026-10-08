@@ -2,8 +2,18 @@
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-10-08
+
+This backward-compatible minor release adds skipped-expert evidence and an explicit GLM decode miss-budget control. Existing profiles, conversations, app/credential identities and direct CLI defaults are preserved.
+
+- Review runtime briefs through 0.62.14 against clean 0.62.18 (`2c319ec`). Record script-only GLM bank/prefetch defaults, family-specific routing-trace formats, and MiniMax bank read-emulation coverage.
+- Show optional skipped-expert totals in Cockpit read/wait evidence and qualify positive drops beside cache hit rate. Preserve missing, invalid, zero and offline values; zero is not proof of exact outputs.
+- Add an explicit GLM-only decode miss budget for next launch, with output-changing warnings, family/range validation, inherited-key isolation, older-profile fallback, and save/reopen coverage. Existing prefetch and bank choices retain direct CLI behavior.
+
 - Document the repository transfer to `forera-ai/cachalot-lab` and Forera AI ownership. Update active repository, release, CI, and runtime links and persistent agent project references. This documentation-only change does not alter the 0.6.0 app or its compatibility identities.
 - Update the copyright notice to `Copyright (c) 2026 forera.ai and contributors` at the owner's request; retain the MIT license terms.
+
+Validation: local preparation passed 47 frontend tests, 32 normal Rust tests and six mock tests, types/lint/format/clippy, signed production builds and native zero/positive-drop/form inspection. The exact-source release report records fresh signed/notarized artifacts and release checks. Live miss-budget inference, output quality, sustained performance, instrumentation overhead and authenticated saved-key restart remain unverified.
 
 ## [0.6.0] - 2026-10-07
 

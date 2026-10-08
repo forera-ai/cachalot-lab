@@ -146,3 +146,71 @@ The full source diff from 0.61.1 changes only `src/cachalot/__init__.py`'s versi
 the changelog reports live Hermes measurements and documentation. No supported
 API or launch default changed. These runtime-owned measurements do not replace
 Lab's outstanding live-model validation. Contracts and handoff record 0.61.2.
+
+## Runtime 0.61.9–0.62.14 briefs — local compatibility pass, 2026-10-08
+
+Reviewed all four new briefs (0.61.9, 0.62.0, 0.62.10, 0.62.14) against clean
+Cachalot **0.62.18**, commit `2c319ec36c2930bc7b754ecc590a818364ca8f5d`,
+the changelog and source diff from the last reviewed 0.61.2. Versions 0.62.15–18
+add measurements and metadata, not new HTTP or launch behavior. Runtime-owned
+measurements are not Lab performance or quality validation.
+
+Cockpit now shows optional `skipped_experts` in read/wait evidence and qualifies
+the hit-rate readout when positive. Missing, invalid, unhealthy and disconnected
+values remain unavailable; zero remains zero and never establishes exact outputs.
+GLM adds this field in 0.62.14; MiniMax reports zero from the shared engine.
+
+Dive adds an explicit GLM-only decode miss budget (-1 off, 0–288 capped reads,
+empty off). Nonnegative settings are marked output-changing next-launch intent;
+active mode is unreported. Rust validates family/range, removes the inherited key,
+and compiles only explicit overrides. Older profiles remain valid. GLM prefill
+is unchanged; no quality magnitude or speed gain is promised.
+
+Lab launches the CLI directly. Its omitted GLM prefetch remains 5; `serve-glm.sh`
+now defaults to 0. The script's conditional owner-specific bank selection is not
+adopted by Lab. Existing bank/prefetch profiles retain their choices. Routing
+trace extension and GLM weight/prediction arrays are recorded in the contract;
+no trace viewer, capture, per-request routing attribution or profiler is claimed.
+Trace positions do not restart per request. MiniMax substitution affects trace
+semantics. Traced runs must not be presented as uninstrumented speed baselines.
+The source diff also confirms 0.61.14 read emulation covers MiniMax coded banks.
+
+Engineering question: did a reported cache hit rate coexist with expert drops,
+and which explicit next-launch budget did the user select? Evidence remains
+runtime cumulative counters and requested profile configuration. The existing
+poll, raw snapshot and bounded UI remain unchanged; no new collector, request,
+persistence, export, or inferred critical path is added. Inference overhead and
+live GLM budget behavior remain unmeasured.
+
+Graph Verify tier used Lab generation `2026-10-08T19:22:58Z` and runtime generation
+`2026-10-08T19:23:51Z`; material coverage metadata matched with no recorded gaps.
+Exact source checks supplemented graph evidence; coverage is best-effort only.
+This pass is local, uncommitted and unreleased; app version remains 0.6.0.
+
+Verification: 47 frontend tests, 32 Rust tests (one unrelated real Keychain test ignored),
+six Python mock tests, TypeScript, ESLint, Prettier, Rust formatting/clippy,
+production build, and diff whitespace checks passed. Final JSX copy/tooltip changes
+passed the 20 affected frontend tests and fresh types/lint/format checks. Developer ID
+signed native build passed, with the known nonfatal rust-objcopy/libLLVM stripping
+warning. This local build is not notarized or published and still reports 0.6.0.
+
+Installed at `/Applications/Cachalot Lab.app`; all four bundle files match the fresh
+build and strict signature verification passed. Executable SHA-256:
+`069b84c99fa86f1bfaccae171c365d8c44202a800abf3cc2d4497811e80672ad`.
+Backup and receipts: `.release/local-runtime-0.62.14-2026-10-08/`, including
+`previous-Cachalot Lab.app` and `installation.json`. Native standard-window inspection
+verified live GLM zero drops, the synthetic positive-drop warning, and GLM's empty
+budget default, unsaved entry and visible output warning/direct CLI distinction.
+The unsaved draft was discarded and original endpoint 8011 restored. Profiles,
+conversations and managed log remained byte-identical. No real model launch, stop,
+generation or credential change was performed. Live budget inference, output quality,
+instrumentation overhead and other theme/breakpoint inspection remain unverified.
+
+## Lab 0.7.0 release preparation — 2026-10-08
+
+The owner authorized publication of the compatibility slice above. Version 0.7.0
+reflects additive skipped-expert evidence and explicit GLM launch control. Runtime
+source and briefs are unchanged at review: 0.62.18 (`2c319ec`), briefs through 0.62.14.
+Fresh exact-source build, signing/notarization, artifact/public verification, CI and
+release installation are required under [RELEASE.md](RELEASE.md). Historical local
+0.6.0 test-build evidence is not publication verification; see HANDOFF for final status.
