@@ -1,5 +1,27 @@
 # Handoff
 
+## Repository transfer — 2026-10-08
+
+Cachalot Lab is now owned and maintained by [Forera AI](https://github.com/forera-ai).
+The canonical repository is [forera-ai/cachalot-lab](https://github.com/forera-ai/cachalot-lab),
+and local `origin` now uses `https://github.com/forera-ai/cachalot-lab.git` for fetch
+and push. GitHub's API resolves the previous `prooshani/cachalot-lab` address to
+the same repository ID (`1393165525`) under Forera AI. The separate
+`forera-ai/cachalot` repository is the runtime, not Lab.
+
+README ownership, badges, downloads, and runtime links now use Forera AI. Active
+release and naming documentation, repository instructions, and shared agent
+project references record the transfer. Historical names, original author
+attribution, signed release artifacts, stable app/data identifiers, and the
+workspace remain unchanged. This is a documentation and local Git configuration
+update; app version remains 0.6.0 and no new binary release is required under
+`docs/RELEASE.md`. The runtime review and release evidence below remain the last
+completed implementation verification.
+
+At the owner's request, `LICENSE` and README now state
+`Copyright (c) 2026 forera.ai and contributors`. The MIT license terms are unchanged;
+shared project memory records this explicit copyright update.
+
 ## Start here — Cachalot Lab 0.6.0 release, 2026-10-07
 
 The owner renamed this product **Cachalot Lab** and adopted the full long-term
@@ -11,14 +33,14 @@ The former fixed 0.6/0.7/1.0 roadmap assignments are superseded, with useful wor
 as backlog. No research capability is claimed as shipped by these document changes.
 
 Release **0.6.0 is published** at
-[GitHub Release](https://github.com/prooshani/cachalot-lab/releases/tag/v0.6.0),
+[GitHub Release](https://github.com/forera-ai/cachalot-lab/releases/tag/v0.6.0),
 from implementation commit `769a6c652867a9b838d3112597b34556d4662f08`
 and matching annotated tag `v0.6.0`. The minor version reflects the additive
 runtime read/wait evidence capability and compatible Lab rename. Package and
 native versions are 0.6.0. All seven public assets were downloaded and hash-compared
 with local files and GitHub digests. The source record, signed/notarized DMG and ZIP,
 checksums, notarization receipts, and
-[verification report](https://github.com/prooshani/cachalot-lab/releases/download/v0.6.0/RELEASE-REPORT.md)
+[verification report](https://github.com/forera-ai/cachalot-lab/releases/download/v0.6.0/RELEASE-REPORT.md)
 are published.
 
 Release evidence: app notarization `d4d9564b-572f-4c55-90a5-5904ae5829eb`;
@@ -43,8 +65,8 @@ Mocks were disconnected and stopped; app left on Cockpit/Drives. The prior local
 app is recoverable under `.release/local-before-v0.6.0/previous-Cachalot Lab.app`;
 local installation and public verification records are under `.release/0.6.0/`.
 
-Both exact-source [main CI](https://github.com/prooshani/cachalot-lab/actions/runs/37599719902)
-and [tag CI](https://github.com/prooshani/cachalot-lab/actions/runs/37599719511)
+Both exact-source [main CI](https://github.com/forera-ai/cachalot-lab/actions/runs/37599719902)
+and [tag CI](https://github.com/forera-ai/cachalot-lab/actions/runs/37599719511)
 passed, including native app builds. Runner annotations note action-runtime Node
 20 deprecation/forced Node 24 and possible arm64 queue delays; checks succeeded.
 The app's test/build Node version remains 22.

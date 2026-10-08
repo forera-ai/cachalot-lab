@@ -53,7 +53,7 @@ This local test installation does not make an uncommitted build a release.
 
 ## Scope
 
-The [0.6.0 release](https://github.com/prooshani/cachalot-lab/releases/tag/v0.6.0)
+The [0.6.0 release](https://github.com/forera-ai/cachalot-lab/releases/tag/v0.6.0)
 adds runtime read/wait evidence and ships the compatible Cachalot Lab rename.
 It retains physical-drive telemetry, bounded local model discovery, optional
 Keychain credentials, Dive controls, chat settings, managed process ownership,
@@ -90,4 +90,4 @@ The script refuses an existing output directory to prevent accidental overwrite.
 
 Release from the exact commit recorded in `SOURCE_COMMIT`. After verification, push that commit and an annotated `v<version>` tag, then create or update the GitHub Release with the DMG, ZIP, checksums, source commit, notarization receipts, and verification report. Release notes must state minimum macOS, architecture, runtime requirements, working features, and limitations. Do not upload the temporary notary submission ZIP.
 
-After publishing, compare GitHub's asset SHA-256 digests with local `SHA256SUMS`, confirm the release is public, and inspect the repository CI run. The 0.1.0 release used this procedure; its [verification report](https://github.com/prooshani/cachalot-lab/releases/download/v0.1.0/RELEASE-REPORT.md) records the exact commit, hashes, and Apple submission IDs.
+After publishing, compare GitHub's asset SHA-256 digests with local `SHA256SUMS`, confirm the release is public, and inspect the repository CI run. The 0.1.0 release used this procedure; its [verification report](https://github.com/forera-ai/cachalot-lab/releases/download/v0.1.0/RELEASE-REPORT.md) records the exact commit, hashes, and Apple submission IDs.

@@ -2,7 +2,8 @@
 
 ## [Unreleased]
 
-No pending changes.
+- Document the repository transfer to `forera-ai/cachalot-lab` and Forera AI ownership. Update active repository, release, CI, and runtime links and persistent agent project references. This documentation-only change does not alter the 0.6.0 app or its compatibility identities.
+- Update the copyright notice to `Copyright (c) 2026 forera.ai and contributors` at the owner's request; retain the MIT license terms.
 
 ## [0.6.0] - 2026-10-07
 

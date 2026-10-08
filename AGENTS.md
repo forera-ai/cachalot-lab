@@ -2,6 +2,20 @@
 
 @/Users/hamedprooshani/.codex/RTK.md
 
+## Repository identity and ownership
+
+Cachalot Lab is owned and maintained by Forera AI (`https://github.com/forera-ai`).
+Since 2026-10-08, its canonical repository is
+`https://github.com/forera-ai/cachalot-lab` and local `origin` is
+`https://github.com/forera-ai/cachalot-lab.git`. Use this repository for Lab issues,
+pull requests, CI, and releases. `https://github.com/forera-ai/cachalot.git` is the
+separate Cachalot runtime repository, not Lab's remote.
+The canonical workspace remains `/Volumes/X10Pro/Cachalot Lab`; the Studio path
+is a compatibility alias. Preserve stable app/data identities, original author
+attribution, and historical release evidence when updating repository ownership.
+At the owner's request on 2026-10-08, the current MIT license copyright notice is
+`Copyright (c) 2026 forera.ai and contributors`.
+
 ## Governing product direction
 
 The product is **Cachalot Lab**. Read `docs/PRODUCT_DIRECTION.md` and

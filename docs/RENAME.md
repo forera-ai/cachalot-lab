@@ -7,11 +7,12 @@ implement the owner's observability, profiling, and experimentation mission.
 
 ## Current names
 
+- Project owner and maintainer: [Forera AI](https://github.com/forera-ai), following the repository transfer on 2026-10-08.
 - Product, native window, application, installer, and current documentation: Cachalot Lab.
 - Repository/package: `cachalot-lab`; Rust library: `cachalot_lab_lib`.
 - Canonical workspace: `/Volumes/X10Pro/Cachalot Lab`.
 - Installed local app: `/Applications/Cachalot Lab.app`.
-- GitHub repository: `https://github.com/prooshani/cachalot-lab`.
+- GitHub repository: `https://github.com/forera-ai/cachalot-lab`.
 - `/ca` keeps its invocation and Cachalot runtime default; explicit Lab work loads the
   Lab workspace, `AGENTS.md`, product direction, roadmap, and handoff.
 
@@ -120,7 +121,7 @@ tool is read-only, no rename tool is exposed, and UI automation of Codex was den
 by the tool's safety policy. This label requires a manual product-level rename.
 The old path alias keeps the existing chat usable. No private Codex database was edited.
 
-The [published 0.6.0 release](https://github.com/prooshani/cachalot-lab/releases/tag/v0.6.0)
+The [published 0.6.0 release](https://github.com/forera-ai/cachalot-lab/releases/tag/v0.6.0)
 ships the rename and read/wait telemetry from exact committed source
 `769a6c652867a9b838d3112597b34556d4662f08`. Both app and DMG were signed,
 notarized, stapled and verified. All seven public assets were downloaded and

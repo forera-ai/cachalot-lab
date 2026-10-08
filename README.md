@@ -4,10 +4,14 @@
 
 # Cachalot Lab
 
-<p align="center">An inference observability and experimentation environment for <a href="https://github.com/prooshani/cachalot">Cachalot</a> on macOS.</p>
+Owned and maintained by [Forera AI](https://github.com/forera-ai). The canonical repository is [forera-ai/cachalot-lab](https://github.com/forera-ai/cachalot-lab).
 
-[![Release](https://img.shields.io/github/v/release/prooshani/cachalot-lab)](https://github.com/prooshani/cachalot-lab/releases/latest)
-[![CI](https://github.com/prooshani/cachalot-lab/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/prooshani/cachalot-lab/actions/workflows/ci.yml)
+Copyright (c) 2026 forera.ai and contributors. Licensed under the [MIT License](LICENSE).
+
+<p align="center">An inference observability and experimentation environment for <a href="https://github.com/forera-ai/cachalot">Cachalot</a> on macOS.</p>
+
+[![Release](https://img.shields.io/github/v/release/forera-ai/cachalot-lab)](https://github.com/forera-ai/cachalot-lab/releases/latest)
+[![CI](https://github.com/forera-ai/cachalot-lab/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/forera-ai/cachalot-lab/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 **Cachalot Lab** is the new name of Cachalot Studio. Its governing goal is to make invisible inference behavior visible: explain time, concurrency, resource activity, data movement, and experimental tradeoffs. Cachalot remains the inference engine; Lab is the human-facing instrument panel. See [product direction](docs/PRODUCT_DIRECTION.md), [delivery roadmap](docs/PLAN.md), and [rename compatibility](docs/RENAME.md).
@@ -16,16 +20,16 @@ The existing app launches or connects to local Cachalot, inspects live health an
 
 ## Download
 
-**Current release:** [Cachalot Lab 0.6.0](https://github.com/prooshani/cachalot-lab/releases/tag/v0.6.0) for Apple Silicon, macOS 14 or newer. It adds runtime read/wait evidence and ships the Lab name. Existing profiles, conversations, preferences, and credential namespaces are preserved.
+**Current release:** [Cachalot Lab 0.6.0](https://github.com/forera-ai/cachalot-lab/releases/tag/v0.6.0) for Apple Silicon, macOS 14 or newer. It adds runtime read/wait evidence and ships the Lab name. Existing profiles, conversations, preferences, and credential namespaces are preserved.
 
-1. Download the signed and notarized [DMG](https://github.com/prooshani/cachalot-lab/releases/download/v0.6.0/Cachalot-Lab-0.6.0-macOS-arm64.dmg).
+1. Download the signed and notarized [DMG](https://github.com/forera-ai/cachalot-lab/releases/download/v0.6.0/Cachalot-Lab-0.6.0-macOS-arm64.dmg).
 2. Open it and drag **Cachalot Lab** into **Applications**.
 3. Open Lab. It first tries an existing Cachalot server at `http://127.0.0.1:8011`.
 4. Use **Dive** to launch a local runtime, or enter another loopback port and optional API key in **API**.
 
-The release also includes a [ZIP](https://github.com/prooshani/cachalot-lab/releases/download/v0.6.0/Cachalot-Lab-0.6.0-macOS-arm64.zip) and [SHA-256 checksums](https://github.com/prooshani/cachalot-lab/releases/download/v0.6.0/SHA256SUMS). The [release notes](https://github.com/prooshani/cachalot-lab/releases/tag/v0.6.0) state the exact scope and verification.
+The release also includes a [ZIP](https://github.com/forera-ai/cachalot-lab/releases/download/v0.6.0/Cachalot-Lab-0.6.0-macOS-arm64.zip) and [SHA-256 checksums](https://github.com/forera-ai/cachalot-lab/releases/download/v0.6.0/SHA256SUMS). The [release notes](https://github.com/forera-ai/cachalot-lab/releases/tag/v0.6.0) state the exact scope and verification.
 
-Lab does not install Cachalot, Python, or model weights. Prepare a model and environment using the [runtime documentation](https://github.com/prooshani/cachalot). Dive needs the absolute path to a Python interpreter with Cachalot installed, the model directory, and any separate expert bank. You can also start the server yourself:
+Lab does not install Cachalot, Python, or model weights. Prepare a model and environment using the [runtime documentation](https://github.com/forera-ai/cachalot). Dive needs the absolute path to a Python interpreter with Cachalot installed, the model directory, and any separate expert bank. You can also start the server yourself:
 
 ```sh
 python -m cachalot.cli serve --model /path/to/your/model --port 8011
