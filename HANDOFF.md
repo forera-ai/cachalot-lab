@@ -1,21 +1,64 @@
 # Handoff
 
-## Start here — Cachalot Lab 0.7.0 release preparation, 2026-10-08
+## Start here — Cachalot Lab 0.7.0 published, 2026-10-08
 
-Release target: [v0.7.0](https://github.com/forera-ai/cachalot-lab/releases/tag/v0.7.0).
-The owner authorized publication. This minor release adds skipped-expert evidence
-and an explicit GLM decode miss-budget control; existing data and direct CLI defaults
-remain compatible. All package/native manifests are 0.7.0. The release is pending
-exact-source signing, notarization, artifact verification, publication, CI and
-installation from the verified public DMG. Do not call it published until these gates
-complete. Keep implementation local if a gate fails.
+Published [v0.7.0](https://github.com/forera-ai/cachalot-lab/releases/tag/v0.7.0)
+from implementation commit `6d75c5437f4ae4094bf1966fd42c0483264813f1`
+and its annotated tag. This minor release adds skipped-expert evidence and an explicit
+GLM decode miss-budget control. All package/native manifests are 0.7.0; stable app/data
+identifiers and direct CLI defaults remain compatible. This section is a documentation-only
+post-publication follow-up; the release's source commit remains the one above.
 
-Runtime review remains 0.62.18, commit `2c319ec36c2930bc7b754ecc590a818364ca8f5d`,
-briefs through 0.62.14. No later brief or runtime source change was found during
-release preparation. The historical local 0.6.0 build evidence below is pre-release
-verification, not evidence for the new version. Fresh immutable release evidence
-will be published as `SOURCE_COMMIT`, notarization receipts, checksums and
-`RELEASE-REPORT.md`. A documentation-only follow-up will record public verification.
+Runtime review remains **0.62.18**, commit
+`2c319ec36c2930bc7b754ecc590a818364ca8f5d`, briefs through 0.62.14.
+No later brief or runtime source change was found during release preparation.
+The historical local 0.6.0 evidence below describes the earlier uncommitted test build.
+
+The fresh exact-source release build passed formatting, lint, types, 47 frontend tests,
+six Python mock tests, Rust formatting/clippy, 32 Rust tests (one existing real Keychain
+test ignored), production Vite and signed Tauri builds. The known optional
+rust-objcopy/libLLVM stripping warning was nonfatal. Developer ID signing, Hardened
+Runtime, secure timestamp, strict signatures, stapling, Gatekeeper app/DMG assessment,
+DMG integrity and ZIP integrity passed. App notarization
+`122862d8-3bd3-4cba-93a1-491582501e20` and DMG notarization
+`b2535f8d-f28c-4d4e-b179-503dbf59c46c` were Accepted.
+
+The release is public and latest. All seven downloaded assets matched local bytes and
+GitHub SHA-256 digests: DMG, ZIP, SHA256SUMS, SOURCE_COMMIT, both Apple receipts and
+[RELEASE-REPORT.md](https://github.com/forera-ai/cachalot-lab/releases/download/v0.7.0/RELEASE-REPORT.md).
+Published package hashes:
+
+- DMG: `aa9c362d85836a60541c4ff4ba3c6f019d3c2291aae99d3d2a74d6672f2dbea1`
+- ZIP: `f92d86dd3fe87c8dbad27d3073ba568efd0dfb633b68dbc6c96176d12af5c3ee`
+
+Exact-source GitHub CI passed on both
+[main](https://github.com/forera-ai/cachalot-lab/actions/runs/37846848265) and
+[v0.7.0](https://github.com/forera-ai/cachalot-lab/actions/runs/37846847800), including
+the macOS native build. All release gates are complete.
+
+Installed `/Applications/Cachalot Lab.app` from the verified public DMG, with all five
+bundle files matching the release. Executable SHA-256:
+`d3d9ebf2ece206add5425b7c338c7f71940c5ad165ac7638f331772e4afacd93`.
+Strict signatures, stapled ticket and Gatekeeper passed again after installation.
+Native inspection confirmed LAB 0.7.0, the preserved MiniMax profile, existing external
+GLM connection, cumulative positive skipped-expert counter and outputs-changed warning.
+The exact same bundle was inspected before publication for GLM's empty budget default,
+unsaved value 2, output warning and direct CLI prefetch distinction; the draft was canceled.
+Every app-data file remained byte-identical across both installations and inspections.
+No model launch, stop, generation request or credential change was performed.
+
+The branded drag-to-Applications DMG layout was inspected in Finder; the mounted
+volumes were ejected after verification. Local receipts are in `.release/0.7.0/`, including
+`public-verification.json`, `public-installation.json` and CI logs. Recoverable prior
+installations remain in `.release/local-before-v0.7.0/previous-Cachalot Lab.app` and
+`.release/local-before-public-v0.7.0/previous-Cachalot Lab.app`.
+
+Live managed GLM budget inference, output quality, performance gains, instrumentation
+overhead, saved-key restart and other theme/breakpoint inspection remain unverified.
+The external GLM observation does not validate Lab-managed budget launches. Active output
+mode remains unreported; routing trace capture/viewer remains planned. Published notes and
+the verification report retain these limits. Release requirements remain Apple Silicon,
+macOS 14+, and separately installed Python/runtime/checkpoints.
 
 ## Runtime 0.61.9–0.62.14 briefs — local compatibility pass, 2026-10-08
 

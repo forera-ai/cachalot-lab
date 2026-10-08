@@ -214,3 +214,26 @@ source and briefs are unchanged at review: 0.62.18 (`2c319ec`), briefs through 0
 Fresh exact-source build, signing/notarization, artifact/public verification, CI and
 release installation are required under [RELEASE.md](RELEASE.md). Historical local
 0.6.0 test-build evidence is not publication verification; see HANDOFF for final status.
+
+## Lab 0.7.0 published — 2026-10-08
+
+The owner-authorized release is public and latest at
+[v0.7.0](https://github.com/forera-ai/cachalot-lab/releases/tag/v0.7.0), with exact
+implementation source `6d75c5437f4ae4094bf1966fd42c0483264813f1`. Runtime review remains
+0.62.18 (`2c319ec36c2930bc7b754ecc590a818364ca8f5d`), briefs through 0.62.14.
+Fresh local gates, Developer ID signing, app/DMG notarization, stapling, Gatekeeper,
+ZIP/DMG integrity and all seven public asset download/digest comparisons passed.
+The verified public DMG was installed at `/Applications/Cachalot Lab.app`; all bundle
+files match, native version/live skipped-expert warning and saved profile were checked,
+and all app-data files remained byte-identical.
+
+Exact-source GitHub CI passed on both
+[main](https://github.com/forera-ai/cachalot-lab/actions/runs/37846848265) and
+[v0.7.0](https://github.com/forera-ai/cachalot-lab/actions/runs/37846847800), including
+the macOS native build. All release gates are complete.
+
+See [HANDOFF.md](../HANDOFF.md) and the published
+[verification report](https://github.com/forera-ai/cachalot-lab/releases/download/v0.7.0/RELEASE-REPORT.md)
+for exact hashes, Apple submission IDs, rollback paths and verification scope. Read-only
+external GLM observation is not managed budget inference or performance/quality validation;
+those checks and instrumentation overhead remain outstanding.
