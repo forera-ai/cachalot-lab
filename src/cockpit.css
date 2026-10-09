@@ -135,6 +135,9 @@
 .cockpit-action:hover {
   filter: brightness(1.1);
 }
+:root[data-theme='surface'] .cockpit-action {
+  color: #fff;
+}
 .cockpit-action:active,
 .machine-doctor:active {
   transform: scale(0.97);
@@ -352,10 +355,11 @@
   min-height: 45px;
 }
 .throughput-foot {
-  display: flex;
-  align-items: center;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-items: start;
   flex: none;
-  gap: 18px;
+  gap: 10px;
   border-top: 1px solid var(--border-subtle);
   padding-top: 7px;
 }
@@ -373,18 +377,7 @@
     Menlo,
     monospace;
 }
-.panel-inline-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  margin-left: auto;
-  border: 0;
-  padding: 0;
-  color: var(--accent);
-  background: transparent;
-  font-size: 10px;
-  white-space: nowrap;
-}
+
 .host-panel .cockpit-panel-head {
   margin-bottom: 7px;
 }
@@ -513,7 +506,7 @@
 }
 
 .read-evidence-body {
-  padding-right: 8px;
+  padding-right: 2px;
 }
 
 .read-evidence[open] {
@@ -666,7 +659,7 @@
   font-size: 9px;
   letter-spacing: 0.02em;
 }
-@media (max-height: 780px) {
+@media (max-height: 640px) {
   .cockpit-shell .main-content {
     height: auto;
   }
@@ -744,4 +737,81 @@
 .keychain-controls input[type='checkbox'] {
   width: auto;
   margin-right: 8px;
+}
+
+/* Paired counters fit the wide evidence panel without hiding measurements. */
+.cache-panel {
+  container-type: inline-size;
+}
+.evidence-limits {
+  font-size: 10px;
+}
+.evidence-limits > summary {
+  padding: 6px 0;
+  color: var(--text-secondary);
+}
+@container (min-width: 500px) {
+  .read-evidence table,
+  .read-evidence tbody {
+    display: block;
+  }
+  .read-evidence tbody {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 20px;
+  }
+  .read-evidence tr {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    min-width: 0;
+    gap: 8px;
+    padding: 3px 0;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .read-evidence th,
+  .read-evidence td {
+    border: 0;
+    padding: 0;
+  }
+  .read-evidence td {
+    flex: none;
+  }
+  .read-evidence-body > p {
+    font-size: 10px;
+    line-height: 1.4;
+  }
+}
+
+@media (min-height: 641px) and (max-height: 780px) {
+  .cockpit-panel .cockpit-panel-head h2 {
+    margin-top: 4px;
+  }
+  .throughput-foot .small-stat span {
+    font-size: 9px;
+    line-height: 1.25;
+    letter-spacing: 0.1em;
+  }
+  .throughput-primary {
+    margin-top: 5px;
+  }
+}
+
+.cockpit-panel .cockpit-panel-head h2 {
+  margin: 4px 0 0;
+  font-size: 18px;
+}
+@container (min-width: 500px) {
+  .read-evidence {
+    font-size: 10px;
+  }
+  .read-evidence > summary {
+    padding: 6px 0;
+  }
+  .read-evidence-body > p {
+    margin-bottom: 6px;
+  }
+  .read-evidence table {
+    margin-bottom: 4px;
+  }
 }

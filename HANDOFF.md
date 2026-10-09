@@ -1,6 +1,95 @@
 # Handoff
 
-## Start here — Cachalot Lab 0.7.0 published, 2026-10-08
+## Start here — Cachalot Lab 0.7.1 release preparation, 2026-10-09
+
+Planned release: [v0.7.1](https://github.com/forera-ai/cachalot-lab/releases/tag/v0.7.1).
+This patch ships the panel layout and Surface contrast refinements described below.
+No public contract, app/data identity, runtime policy, or storage format breaks.
+All package/native manifests and the Cargo lock entry are 0.7.1. The release must
+be built, signed, notarized, packaged, published, and verified from the clean
+implementation commit before it is considered complete; the post-publication
+follow-up will record exact source, receipts, artifact hashes, CI, and installation.
+
+README now leads with ten fresh native 0.7.1 captures covering all seven panels,
+raw runtime evidence, and two Surface views. They show runtime-unavailable state,
+with preserved conversations/profiles/logs and scoped host readings. The original
+seven owner-provided 0.7.0 screenshots remain byte-identical as historical views.
+No screenshot pixels were edited. Capture provenance is in
+`assets/screenshots/v0.7.1/README.md`. The signed versioned capture build was
+installed and its full bundle matched the fresh build; this is pre-release evidence,
+not a claim that the final artifacts have already been verified.
+
+Runtime briefs still end at 0.62.20. Rechecked clean Cachalot **0.62.22**, commit
+`5faababa6bc098400147611d3ffd11cd00e3100d`; no later brief/source commit was
+found during release preparation. GLM’s shell-script budget 2 remains separate
+from Lab’s direct CLI empty-budget off default. Existing inference workflows and
+saved values are preserved. Prior local checks below cover connected native layout
+at normal size, both themes, and offline minimum browser layout. Exact minimum
+connected native layout, long native streaming/history, inference quality/speed,
+instrumentation overhead, and authenticated saved-key restart remain unverified.
+
+## Historical local panel refinement, 2026-10-09 (before 0.7.1)
+
+The owner’s seven original screenshots are copied byte-for-byte into
+`assets/screenshots/v0.7.0/` and shown in README with version and evidence-scope
+captions. They document the published 0.7.0 interface before this local refinement.
+The public 0.7.0 artifacts and historical release evidence below remain unchanged.
+
+Chat now fills its panel with an anchored composer and separate history/transcript
+scroll areas. Settings and Doctor use compact columns; API places connection setup
+beside client examples. Dive pairs its profile rail with details, collapses discovery
+and optional draft settings, and keeps explicit output-changing budget intent visible
+when tuning closes. Logs owns its output scroll area. Cockpit preserves trace space,
+pairs wide raw read/wait counters, and discloses interpretation limits on demand.
+Surface primary actions use white labels. Long histories, logs, expanded help, and
+complex forms retain scrolling where necessary; this pass does not remove evidence
+or change inference policy, process controls, credentials, or storage formats.
+
+Reviewed the new `2026-10-09-runtime-0.62.20.md` brief against clean Cachalot
+**0.62.22**, commit `5faababa6bc098400147611d3ffd11cd00e3100d`, source and
+changelog. Since 0.62.20, `serve-glm.sh` selects decode miss budget 2 when its
+variable is empty/unset. Lab launches the direct CLI, whose empty budget remains
+off, and removes inherited budget settings. Lab does not adopt the script default
+or rewrite profiles. Versions 0.62.19/21 add measurements; 0.62.22 adds metadata.
+No new HTTP/log format was found in this bounded review. Updated runtime-contract,
+launch help, README, architecture, product/plan, runtime-sync, and changelog records.
+
+Validation: types, lint, formatting, 47 frontend tests across 11 files, production
+Vite/Tauri build and strict Developer ID signature verification passed. The optional
+rust-objcopy/libLLVM stripping warning remains nonfatal. No Rust source changed.
+All seven default panels were visually inspected in the installed native app at
+1380 × 860 in Abyss/System-dark and Surface. Default panels fit without page
+scrolling; the ten runtime evidence counters are visible together at that size.
+The unsaved GLM draft retained its explicit budget warning with tuning closed and
+was canceled. Existing saved MiniMax conversation/source guard, profile, external
+GLM connection, and managed output remained visible.
+
+Offline browser preview checked all seven default panels at 1380 × 860 and
+1100 × 720: no outer content overflow or clipped Cockpit panels. This does not
+verify connected native layout at the exact minimum; native resize attempts did
+not establish that size. Long native chat history, live streaming, managed inference,
+quality/performance/overhead, and authenticated saved-key restart remain unverified.
+No model launch, stop, generation request, profile save/delete, or credential action
+was performed. Original System appearance and Silent running Off were restored.
+All five existing app-data files remained byte-identical.
+
+The latest local build is installed at `/Applications/Cachalot Lab.app`; all four
+bundle files match the fresh build and strict signature verification passes. Package
+and native manifests remain 0.7.0 for this local test build. It is **not notarized or
+published**, and no implementation commit/tag was pushed during this pass. A future
+publication must choose a new version and follow `docs/RELEASE.md` in full.
+Executable SHA-256: `9e34a9746868a24c848f4052f4441abe66874e1c2f027a51e270502f6fc6107a`.
+Recoverable previous public installation:
+`.release/local-panels-2026-10-09/previous-Cachalot Lab.app`.
+Local captures, build log, installation/data hashes, browser minimum measurements,
+and verification report are in `.release/local-panels-2026-10-09/`.
+
+Graph evidence used Verify tier for this bounded pass. Coverage reported partial
+`src/ChatScreen.test.tsx` lines 1–207; the full source was read before relying on
+its tests. No recorded gap on other checked material code paths is only a
+best-effort coverage signal, not proof of completeness.
+
+## Historical release — Cachalot Lab 0.7.0 published, 2026-10-08
 
 Published [v0.7.0](https://github.com/forera-ai/cachalot-lab/releases/tag/v0.7.0)
 from implementation commit `6d75c5437f4ae4094bf1966fd42c0483264813f1`

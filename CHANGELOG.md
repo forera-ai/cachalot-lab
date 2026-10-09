@@ -1,6 +1,15 @@
 # Changelog
 
-## [Unreleased]
+## [0.7.1] - 2026-10-09
+
+This patch release improves panel layout and readability without changing public contracts, launch defaults, or data formats.
+
+- Improve Surface primary-action contrast across panels.
+- Fit the shared shell to the window, with a full-panel Chat workspace, anchored composer, and independent transcript/history scrolling. Keep telemetry in the layout instead of covering content.
+- Compact Settings and Doctor into columns, place API setup beside examples, bound Logs output, and fit Cockpit’s default dashboard in the 1100 × 720 browser preview. Pair wide read/wait counters and disclose their interpretation on demand.
+- Rework Dive around profiles/details, collapsed discovery, and optional response/tuning groups. Preserve draft values and show explicit output-changing budget warnings even when tuning is closed.
+- Add ten fresh native 0.7.1 screenshots to README, including Surface views; preserve all seven owner-provided real-world 0.7.0 screenshots as historical evidence with accurate scope.
+- Review brief 0.62.20 against clean runtime 0.62.22 (`5faabab`); document GLM shell-script budget 2 without adopting it in Lab’s direct CLI or rewriting profiles.
 
 ## [0.7.0] - 2026-10-08
 

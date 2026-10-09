@@ -150,11 +150,14 @@ export function ConnectionPanel({ runtime }: { runtime: RuntimeConnection }) {
                 Forget saved key
               </button>
             )}
-            <p className="panel-intro">
-              A typed key overrides the saved key. Saved keys can reconnect
-              after restart. Forgetting a key leaves the active connection
-              unchanged.
-            </p>
+            <details className="credential-help">
+              <summary>How saved keys work</summary>
+              <p className="panel-intro">
+                A typed key overrides the saved key. Saved keys can reconnect
+                after restart. Forgetting a key leaves the active connection
+                unchanged.
+              </p>
+            </details>
             {keyError && (
               <p className="inline-error" role="alert">
                 {keyError}
@@ -236,7 +239,7 @@ export function ApiScreen({ runtime }: { runtime: RuntimeConnection }) {
   }
 
   return (
-    <div className="page detail-page">
+    <div className="page detail-page api-page">
       <div className="eyebrow">
         <span className="eyebrow-line" /> LAB / API
       </div>
@@ -246,62 +249,65 @@ export function ApiScreen({ runtime }: { runtime: RuntimeConnection }) {
           <p>Connect Lab and other clients to the local server.</p>
         </div>
       </div>
-      <ConnectionPanel runtime={runtime} />
-      <section className="info-panel api-panel">
-        <span className="section-kicker">OPENAI-COMPATIBLE</span>
-        <h2>Chat completions</h2>
-        <p className="panel-intro">
-          Copy an example for your client. Set CACHALOT_API_KEY in your shell
-          only if the server requires a key. Lab never inserts its in-memory key
-          into copied code.
-        </p>
-        <div
-          className="api-example-tabs"
-          role="tablist"
-          aria-label="API example language"
-        >
-          {(['curl', 'python', 'javascript'] as const).map((option) => (
-            <button
-              key={option}
-              id={`api-example-${option}`}
-              type="button"
-              role="tab"
-              aria-selected={language === option}
-              aria-controls="api-example-code"
-              onClick={() => {
-                setLanguage(option)
-                setCopyStatus('idle')
-              }}
-            >
-              {option === 'curl'
-                ? 'curl'
-                : option === 'python'
-                  ? 'Python'
-                  : 'JavaScript'}
-            </button>
-          ))}
-        </div>
-        <pre
-          id="api-example-code"
-          role="tabpanel"
-          aria-labelledby={`api-example-${language}`}
-        >
-          <code>{snippet}</code>
-        </pre>
-        <button
-          className="text-button"
-          type="button"
-          onClick={() => void copyExample()}
-        >
-          <Copy size={15} />{' '}
-          {copyStatus === 'copied' ? 'Copied' : 'Copy example'}
-        </button>
-        {copyStatus === 'error' && (
-          <p className="inline-error" role="alert">
-            Could not copy. Select the example above and copy it manually.
+      <div className="api-grid">
+        <ConnectionPanel runtime={runtime} />
+        <section className="info-panel api-panel">
+          <span className="section-kicker">OPENAI-COMPATIBLE</span>
+          <h2>Chat completions</h2>
+          <p className="panel-intro">
+            Copy an example for your client. Set CACHALOT_API_KEY in your shell
+            only if the server requires a key. Lab never inserts its in-memory
+            key into copied code.
           </p>
-        )}
-      </section>
+          <div
+            className="api-example-tabs"
+            role="tablist"
+            aria-label="API example language"
+          >
+            {(['curl', 'python', 'javascript'] as const).map((option) => (
+              <button
+                key={option}
+                id={`api-example-${option}`}
+                type="button"
+                role="tab"
+                aria-selected={language === option}
+                aria-controls="api-example-code"
+                onClick={() => {
+                  setLanguage(option)
+                  setCopyStatus('idle')
+                }}
+              >
+                {option === 'curl'
+                  ? 'curl'
+                  : option === 'python'
+                    ? 'Python'
+                    : 'JavaScript'}
+              </button>
+            ))}
+          </div>
+          <pre
+            id="api-example-code"
+            role="tabpanel"
+            tabIndex={0}
+            aria-labelledby={`api-example-${language}`}
+          >
+            <code>{snippet}</code>
+          </pre>
+          <button
+            className="text-button"
+            type="button"
+            onClick={() => void copyExample()}
+          >
+            <Copy size={15} />{' '}
+            {copyStatus === 'copied' ? 'Copied' : 'Copy example'}
+          </button>
+          {copyStatus === 'error' && (
+            <p className="inline-error" role="alert">
+              Could not copy. Select the example above and copy it manually.
+            </p>
+          )}
+        </section>
+      </div>
     </div>
   )
 }

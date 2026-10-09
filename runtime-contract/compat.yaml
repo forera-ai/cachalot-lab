@@ -1,10 +1,10 @@
-# Reviewed committed runtime: 0.62.18 at 2c319ec. The HTTP response does not expose
+# Reviewed committed runtime: 0.62.22 at 5faabab. The HTTP response does not expose
 # package version or active numerics mode, so external-server mode stays unknown.
 reviewed_runtime:
-  version: 0.62.18
-  commit: 2c319ec36c2930bc7b754ecc590a818364ca8f5d
+  version: 0.62.22
+  commit: 5faababa6bc098400147611d3ffd11cd00e3100d
 brief_inbox: docs/lab/briefs
-# Briefs reviewed through 0.62.14; later changes are measurements and metadata.
+# Briefs reviewed through 0.62.20; 0.62.21–22 are measurements and metadata.
 features:
   glm_decode_miss_budget: '>=0.62.14'
   glm_skipped_experts: '>=0.62.14'
@@ -37,6 +37,7 @@ features:
   deepseek_system_date_reuse: '>=0.60.0'
 launch_defaults:
   glm_direct_cli_decode_miss_budget: null
+  glm_serve_script_decode_miss_budget_since_0_62_20: 2
   glm_direct_cli_predict_topk: 5
   glm_serve_script_predict_topk_since_0_62_14: 0
   glm_serve_script_bank_since_0_61_9: conditional-owner-path-bank-manifest

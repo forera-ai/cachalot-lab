@@ -237,3 +237,16 @@ See [HANDOFF.md](../HANDOFF.md) and the published
 for exact hashes, Apple submission IDs, rollback paths and verification scope. Read-only
 external GLM observation is not managed budget inference or performance/quality validation;
 those checks and instrumentation overhead remain outstanding.
+
+## Runtime 0.62.20 brief — 2026-10-09
+
+Reviewed the new 0.62.20 brief against clean Cachalot **0.62.22**, commit
+`5faababa6bc098400147611d3ffd11cd00e3100d`, its changelog and the source diff from 0.62.18.
+The shipped behavior change is `serve-glm.sh` exporting `CACHALOT_GLM_DECODE_MISS_BUDGET=2` when unset or empty. This changes decode outputs; prefill stays unchanged. The direct CLI still disables the budget when unset, empty, off, exact or negative. Runtime 0.62.19/21 measurements and 0.62.22 explanation/metadata do not add HTTP fields or routes.
+
+Lab records the script-only default and updates Dive’s help. Managed launches continue
+to use the direct CLI with inherited controlled keys removed; empty budget remains off,
+and no saved profile is rewritten. Existing positive skipped-expert evidence already
+qualifies cache hit rate, while active numerics mode stays unreported. Prefetch remains
+5 for the direct CLI and 0 in the script. Source review does not validate the brief’s
+performance or quality measurements; no model launch or generation was performed.

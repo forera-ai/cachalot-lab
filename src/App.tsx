@@ -81,7 +81,7 @@ function Doctor({
     },
   ]
   return (
-    <div className="page detail-page">
+    <div className="page detail-page doctor-page">
       <div className="eyebrow">
         <span className="eyebrow-line" /> SYSTEM / DIAGNOSTICS
       </div>
@@ -91,30 +91,46 @@ function Doctor({
           <p>A clear view of this Mac before the first dive.</p>
         </div>
       </div>
-      <section className="info-panel diagnostic-panel">
-        <span className="section-kicker">HARDWARE</span>
-        <h2>Machine basics</h2>
-        <p className="panel-intro">
-          Read directly from macOS when running the native app.
-        </p>
-        {error && (
-          <p className="inline-error" role="alert">
-            {error}
+      <div className="doctor-grid">
+        <section className="info-panel diagnostic-panel">
+          <span className="section-kicker">HARDWARE</span>
+          <h2>Machine basics</h2>
+          <p className="panel-intro">
+            Read directly from macOS when running the native app.
           </p>
-        )}
-        {checks.map((check) => (
-          <div className="check-row" key={check.label}>
-            <span className={check.ok ? 'check-icon is-ok' : 'check-icon'}>
-              {check.ok ? <Check size={15} /> : '—'}
-            </span>
-            <span>{check.label}</span>
-            <strong>{check.value}</strong>
-          </div>
-        ))}
-        <p className="panel-footnote">
-          Managed runtime details and startup output appear in Dive and Logs.
-        </p>
-      </section>
+          {error && (
+            <p className="inline-error" role="alert">
+              {error}
+            </p>
+          )}
+          {checks.slice(0, 3).map((check) => (
+            <div className="check-row" key={check.label}>
+              <span className={check.ok ? 'check-icon is-ok' : 'check-icon'}>
+                {check.ok ? <Check size={15} /> : '—'}
+              </span>
+              <span>{check.label}</span>
+              <strong>{check.value}</strong>
+            </div>
+          ))}
+        </section>
+        <section className="info-panel diagnostic-panel">
+          <span className="section-kicker">RUNTIME</span>
+          <h2>Connection and process</h2>
+          <p className="panel-intro">A connected server can run outside Lab.</p>
+          {checks.slice(3).map((check) => (
+            <div className="check-row" key={check.label}>
+              <span className={check.ok ? 'check-icon is-ok' : 'check-icon'}>
+                {check.ok ? <Check size={15} /> : '—'}
+              </span>
+              <span>{check.label}</span>
+              <strong>{check.value}</strong>
+            </div>
+          ))}
+          <p className="panel-footnote">
+            Managed runtime details and startup output appear in Dive and Logs.
+          </p>
+        </section>
+      </div>
     </div>
   )
 }
@@ -150,7 +166,7 @@ function Settings() {
     },
   ]
   return (
-    <div className="page detail-page">
+    <div className="page detail-page settings-page">
       <div className="eyebrow">
         <span className="eyebrow-line" /> LAB / PREFERENCES
       </div>
@@ -160,59 +176,63 @@ function Settings() {
           <p>Shape the Lab around the way you work.</p>
         </div>
       </div>
-      <section className="info-panel settings-panel">
-        <span className="section-kicker">APPEARANCE</span>
-        <h2>Theme</h2>
-        <p className="panel-intro">
-          Choose the light of the room, or follow your Mac.
-        </p>
-        <div className="theme-choices">
-          {choices.map(({ id, label, description, icon: Icon }) => (
-            <button
-              className={`theme-choice ${preference === id ? 'is-active' : ''}`}
-              onClick={() => setPreference(id)}
-              key={id}
-              aria-pressed={preference === id}
-            >
-              <Icon size={20} />
-              <span>
-                <strong>{label}</strong>
-                <small>{description}</small>
-              </span>
-              {preference === id && <Check size={18} className="theme-check" />}
-            </button>
-          ))}
-        </div>
-      </section>
-      <section className="info-panel settings-panel">
-        <span className="section-kicker">MOTION</span>
-        <h2>Silent running</h2>
-        <p className="panel-intro" id="silent-running-description">
-          Pause live traces and remove interface transitions. Readings and
-          connection checks stay live; runtime generation continues as usual.
-        </p>
-        <button
-          className={`theme-choice ${silentRunning ? 'is-active' : ''}`}
-          role="switch"
-          aria-label="Silent running"
-          aria-describedby="silent-running-description"
-          aria-checked={silentRunning}
-          onClick={() => setSilentRunning(!silentRunning)}
-        >
-          <Moon size={20} aria-hidden="true" />
-          <span>
-            <strong>{silentRunning ? 'On' : 'Off'}</strong>
-            <small>
-              {silentRunning
-                ? 'Quiet interface, live readings'
-                : 'Live traces and transitions'}
-            </small>
-          </span>
-          {silentRunning && (
-            <Check size={18} className="theme-check" aria-hidden="true" />
-          )}
-        </button>
-      </section>
+      <div className="settings-grid">
+        <section className="info-panel settings-panel">
+          <span className="section-kicker">APPEARANCE</span>
+          <h2>Theme</h2>
+          <p className="panel-intro">
+            Choose the light of the room, or follow your Mac.
+          </p>
+          <div className="theme-choices">
+            {choices.map(({ id, label, description, icon: Icon }) => (
+              <button
+                className={`theme-choice ${preference === id ? 'is-active' : ''}`}
+                onClick={() => setPreference(id)}
+                key={id}
+                aria-pressed={preference === id}
+              >
+                <Icon size={20} />
+                <span>
+                  <strong>{label}</strong>
+                  <small>{description}</small>
+                </span>
+                {preference === id && (
+                  <Check size={18} className="theme-check" />
+                )}
+              </button>
+            ))}
+          </div>
+        </section>
+        <section className="info-panel settings-panel">
+          <span className="section-kicker">MOTION</span>
+          <h2>Silent running</h2>
+          <p className="panel-intro" id="silent-running-description">
+            Pause live traces and remove interface transitions. Readings and
+            connection checks stay live; runtime generation continues as usual.
+          </p>
+          <button
+            className={`theme-choice ${silentRunning ? 'is-active' : ''}`}
+            role="switch"
+            aria-label="Silent running"
+            aria-describedby="silent-running-description"
+            aria-checked={silentRunning}
+            onClick={() => setSilentRunning(!silentRunning)}
+          >
+            <Moon size={20} aria-hidden="true" />
+            <span>
+              <strong>{silentRunning ? 'On' : 'Off'}</strong>
+              <small>
+                {silentRunning
+                  ? 'Quiet interface, live readings'
+                  : 'Live traces and transitions'}
+              </small>
+            </span>
+            {silentRunning && (
+              <Check size={18} className="theme-check" aria-hidden="true" />
+            )}
+          </button>
+        </section>
+      </div>
       <p className="settings-note">
         Appearance preferences stay on this Mac. API keys stay in session memory
         unless explicitly saved in Keychain from API.
@@ -331,7 +351,7 @@ export default function App() {
         </div>
       </aside>
       <div
-        className={`main-shell ${runtime.snapshot.connected && screen !== 'cockpit' ? 'with-telemetry' : ''} ${screen === 'cockpit' ? 'cockpit-shell' : ''}`}
+        className={`main-shell ${screen}-shell ${runtime.snapshot.connected && screen !== 'cockpit' ? 'with-telemetry' : ''}`}
       >
         <header className="topbar" data-tauri-drag-region>
           <div className="breadcrumbs">
@@ -352,7 +372,7 @@ export default function App() {
           </button>
         </header>
         <main className="main-content" id="main-content">
-          <div hidden={screen !== 'chat'}>
+          <div className="chat-mount" hidden={screen !== 'chat'}>
             <ChatScreen runtime={runtime} />
           </div>
           {screen === 'cockpit' ? (
@@ -406,6 +426,7 @@ function NavButton({
     <button
       className={`nav-button ${current === item.id ? 'is-active' : ''}`}
       onClick={() => onSelect(item.id)}
+      aria-label={item.label}
       aria-current={current === item.id ? 'page' : undefined}
     >
       <Icon size={18} strokeWidth={1.8} />

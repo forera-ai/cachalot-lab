@@ -18,16 +18,100 @@ Copyright (c) 2026 forera.ai and contributors. Licensed under the [MIT License](
 
 The existing app launches or connects to local Cachalot, inspects live health and cache metrics, streams chat and reasoning, and provides API details. Token profiling, durable experiment comparisons, sweeps, energy analysis, and validated counterfactuals are planned capabilities, not features of the 0.7.0 binary. Connections remain limited to the same Mac.
 
+## The app in use — 0.7.1
+
+Fresh native captures show the refined panels at 1380 × 860 logical pixels, in
+System-dark/Abyss and Surface. The runtime was unavailable during these captures;
+saved conversations, profiles, and earlier managed logs remain readable. Host activity
+is whole-Mac context, not model-specific inference. Unavailable values remain —.
+These images document layout and observed state, not performance benchmarks.
+
+**Chat** fills the workspace, with history beside the transcript and an anchored composer.
+
+![Cachalot Lab 0.7.1 full-panel Chat with a preserved saved conversation](assets/screenshots/v0.7.1/chat.png)
+
+**Settings** places appearance and motion side by side, with every option visible.
+
+![Cachalot Lab 0.7.1 Settings with compact appearance and motion panels](assets/screenshots/v0.7.1/settings.png)
+
+<details>
+<summary>Cockpit, runtime evidence, Dive, API, Doctor, and Logs</summary>
+
+![Cockpit keeps whole-Mac telemetry available while runtime measurements are unavailable](assets/screenshots/v0.7.1/cockpit.png)
+
+![Paired runtime read and wait counters preserve unknowns while offline](assets/screenshots/v0.7.1/runtime-evidence.png)
+
+![Dive pairs saved profiles with details and optional discovery](assets/screenshots/v0.7.1/dive.png)
+
+![API connection setup beside client examples, with the unavailable server reported](assets/screenshots/v0.7.1/api.png)
+
+![Doctor separates machine basics from connection and managed-process checks](assets/screenshots/v0.7.1/doctor.png)
+
+![Logs contains scrolling inside the historical managed-runtime output](assets/screenshots/v0.7.1/logs.png)
+
+</details>
+
+<details>
+<summary>Surface appearance</summary>
+
+![Cachalot Lab 0.7.1 Chat in Surface appearance](assets/screenshots/v0.7.1/chat-surface.png)
+
+![Cachalot Lab 0.7.1 Settings in Surface appearance](assets/screenshots/v0.7.1/settings-surface.png)
+
+</details>
+
+<details>
+<summary>Original owner screenshots from 0.7.0</summary>
+
+### Historical owner captures — 0.7.0
+
+These owner-provided screenshots show the released macOS app connected to a real local
+GLM server. They capture this stage of development before the panel-layout improvements
+in the current local build. Values are observations from that session, not benchmark results.
+Unavailable readings remain —; whole-Mac and whole-drive activity are not inference-only
+measurements. The saved MiniMax chat/profile and connected GLM server are separate sources.
+
+![Cachalot Lab 0.7.0 Cockpit with physical-drive histories and Mac telemetry](assets/screenshots/v0.7.0/cockpit-drives.png)
+
+<details>
+<summary>Runtime evidence, Chat, Dive, API, and Doctor</summary>
+
+**Runtime telemetry** keeps expert reuse and runtime counters separate from physical-drive
+traffic. The expanded read/wait evidence reports cumulative counters with their original scope.
+
+![Cockpit Runtime view with expert and prefetch evidence](assets/screenshots/v0.7.0/cockpit-runtime.png)
+
+![Expanded cumulative runtime read and wait counters](assets/screenshots/v0.7.0/read-wait-evidence.png)
+
+**Chat** preserves each conversation's original endpoint and model. A saved MiniMax reply
+remains readable while GLM is connected; continuing it requires its original source.
+
+![Saved MiniMax conversation while connected to GLM](assets/screenshots/v0.7.0/chat.png)
+
+**Dive** separates saved launch intent from the externally running server and offers local
+model discovery. **API** connects clients to the local endpoint. **Doctor** distinguishes
+host readiness, connection health, and Lab-owned process state.
+
+![Dive with a saved MiniMax launch profile and local discovery](assets/screenshots/v0.7.0/dive.png)
+
+![API connection controls for the local GLM server](assets/screenshots/v0.7.0/api.png)
+
+![Doctor with hardware and runtime checks](assets/screenshots/v0.7.0/doctor.png)
+
+</details>
+
+</details>
+
 ## Download
 
-**Current release:** [Cachalot Lab 0.7.0](https://github.com/forera-ai/cachalot-lab/releases/tag/v0.7.0) for Apple Silicon, macOS 14 or newer. It adds skipped-expert evidence and an explicit GLM decode miss-budget control. Existing profiles, conversations, preferences, and credential namespaces are preserved.
+**Current release:** [Cachalot Lab 0.7.1](https://github.com/forera-ai/cachalot-lab/releases/tag/v0.7.1) for Apple Silicon, macOS 14 or newer. This patch improves panel layouts and Surface contrast, retaining skipped-expert evidence and explicit GLM decode miss-budget controls. Existing profiles, conversations, preferences, and credential namespaces are preserved.
 
-1. Download the signed and notarized [DMG](https://github.com/forera-ai/cachalot-lab/releases/download/v0.7.0/Cachalot-Lab-0.7.0-macOS-arm64.dmg).
+1. Download the signed and notarized [DMG](https://github.com/forera-ai/cachalot-lab/releases/download/v0.7.1/Cachalot-Lab-0.7.1-macOS-arm64.dmg).
 2. Open it and drag **Cachalot Lab** into **Applications**.
 3. Open Lab. It first tries an existing Cachalot server at `http://127.0.0.1:8011`.
 4. Use **Dive** to launch a local runtime, or enter another loopback port and optional API key in **API**.
 
-The release also includes a [ZIP](https://github.com/forera-ai/cachalot-lab/releases/download/v0.7.0/Cachalot-Lab-0.7.0-macOS-arm64.zip) and [SHA-256 checksums](https://github.com/forera-ai/cachalot-lab/releases/download/v0.7.0/SHA256SUMS). The [release notes](https://github.com/forera-ai/cachalot-lab/releases/tag/v0.7.0) state the exact scope and verification.
+The release also includes a [ZIP](https://github.com/forera-ai/cachalot-lab/releases/download/v0.7.1/Cachalot-Lab-0.7.1-macOS-arm64.zip) and [SHA-256 checksums](https://github.com/forera-ai/cachalot-lab/releases/download/v0.7.1/SHA256SUMS). The [release notes](https://github.com/forera-ai/cachalot-lab/releases/tag/v0.7.1) state the exact scope and verification.
 
 Lab does not install Cachalot, Python, or model weights. Prepare a model and environment using the [runtime documentation](https://github.com/forera-ai/cachalot). Dive needs the absolute path to a Python interpreter with Cachalot installed, the model directory, and any separate expert bank. You can also start the server yourself:
 
@@ -35,7 +119,7 @@ Lab does not install Cachalot, Python, or model weights. Prepare a model and env
 python -m cachalot.cli serve --model /path/to/your/model --port 8011
 ```
 
-## What 0.7.0 includes
+## What 0.7.1 includes
 
 0.7.0 adds skipped-expert evidence and explicit GLM decode miss-budget controls to the collapsed runtime read/wait evidence table introduced in 0.6.0. It retains the Cachalot Lab name. It retains physical-drive read/write telemetry, local model discovery, optional macOS Keychain credentials, and a refined Dive interface. It retains GLM/DeepSeek launch controls, runtime totals, Silent running, chat settings, and managed runtime capabilities.
 
@@ -53,6 +137,10 @@ Managed profiles can set the served model ID, default response length and temper
 MiniMax's decode and prefill miss substitution can change outputs. Dive provides explicit overrides; for an external server, the active numerics mode remains unreported because Cachalot does not expose it in `/v1/stats`. Runtime 0.46 added an incrementing-list loop guard; 0.47 set the MiniMax launch script's temperature default to 0.7. Lab launches the CLI directly, so an empty managed temperature still inherits the CLI's 0.6 default. The brief series through 0.61.1 and runtime source at 0.61.2 (`954dff83c54071e10aef649ae725dd0afd141528`) were reviewed for the 0.6.0 release. The latest native managed MiniMax smoke test used 0.50.1. See [runtime compatibility](docs/RUNTIME_SYNC.md).
 
 API keys stay in session memory unless explicitly saved in Keychain; stored secrets never return to JavaScript or copied API examples. Saved conversations and managed logs remain local; see [Privacy](PRIVACY.md). Automatic updates remain [planned](docs/PLAN.md); discovery and Keychain ship in 0.5.0. The [Abyss and Surface Dive mockups](design/mockups/managed-runtime.html) remain a design reference.
+
+## Panel layout in 0.7.1
+
+0.7.1 fills Chat’s panel with an anchored composer and independently scrolling history. Settings and Doctor use compact columns; API places setup beside examples; Logs keeps scrolling inside its output. Dive places profiles beside details, with discovery and optional settings expanded on demand. All seven default panels fit the normal native window in both themes; offline browser preview also fits 1100 × 720. Connected native layout at that exact minimum remains unverified. Expanded detail and long collections remain scrollable. The current gallery shows 0.7.1; original owner captures remain under their historical 0.7.0 label.
 
 ## Storage, discovery, and credentials
 
@@ -107,4 +195,4 @@ briefs still end at 0.61.1 and the supported Lab contract is unchanged.
 
 ## Runtime 0.62.14 compatibility (Lab 0.7.0)
 
-Briefs through 0.62.14 were reviewed against Cachalot 0.62.18 (`2c319ec36c2930bc7b754ecc590a818364ca8f5d`). Lab 0.7.0 adds skipped-expert evidence in Cockpit and an explicit GLM decode miss budget in Dive. Empty or -1 disables that budget; 0–288 caps non-resident reads per decode layer, changes outputs, and may lower quality. Settings apply on next launch; active server mode stays unknown. Missing counters remain unavailable, zero does not prove exact outputs, and positive totals qualify cache hit rate. Lab's direct CLI retains prefetch default 5; the runtime script now defaults to 0 and can auto-select an owner-specific bank. Lab does not silently adopt those script defaults. Routing-trace formats are documented; a viewer remains planned. These backward-compatible capabilities ship in 0.7.0; live miss-budget inference and output quality remain unverified. See [runtime sync](docs/RUNTIME_SYNC.md).
+Briefs through 0.62.20 were reviewed against Cachalot 0.62.22 (`5faababa6bc098400147611d3ffd11cd00e3100d`). Lab 0.7.0 adds skipped-expert evidence in Cockpit and an explicit GLM decode miss budget in Dive. Empty or -1 disables that budget; 0–288 caps non-resident reads per decode layer, changes outputs, and may lower quality. Settings apply on next launch; active server mode stays unknown. Missing counters remain unavailable, zero does not prove exact outputs, and positive totals qualify cache hit rate. Lab's direct CLI retains prefetch default 5; the runtime script now defaults to 0 and can auto-select an owner-specific bank. Since 0.62.20, the GLM shell script also defaults to decode miss budget 2, which changes outputs. Lab’s direct CLI empty budget remains off; Lab does not silently adopt those script defaults. Routing-trace formats are documented; a viewer remains planned. These backward-compatible capabilities ship in 0.7.0; live miss-budget inference and output quality remain unverified. See [runtime sync](docs/RUNTIME_SYNC.md).

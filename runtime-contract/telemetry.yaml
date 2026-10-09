@@ -1,7 +1,7 @@
 # Source-reviewed HTTP fields, not inferred from launch knobs or startup logs.
 reviewed_runtime:
-  version: 0.62.18
-  commit: 2c319ec36c2930bc7b754ecc590a818364ca8f5d
+  version: 0.62.22
+  commit: 5faababa6bc098400147611d3ffd11cd00e3100d
 endpoint: /v1/stats
 fields:
   decode_miss_budget:

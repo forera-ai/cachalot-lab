@@ -34,6 +34,7 @@ it('saves, reopens, and clears optional GLM controls when family changes', async
   await user.type(screen.getByLabelText('Python executable'), '/python')
   await user.type(screen.getByLabelText('Model directory'), '/model')
   await user.selectOptions(screen.getByLabelText('Model family'), 'glm')
+  await user.click(screen.getByText(/Runtime tuning/))
   const bank = screen.getByLabelText(/GLM expert bank directory/)
   const enabled = screen.getByLabelText(/GLM expert bank ·/)
   const topk = screen.getByLabelText(/GLM prefetch experts/)
@@ -49,6 +50,8 @@ it('saves, reopens, and clears optional GLM controls when family changes', async
   await user.type(limit, '3')
   await user.type(budget, '2')
   await user.selectOptions(scheduling, '-1')
+  await user.click(screen.getByText(/Runtime tuning/))
+  expect(screen.getByText(/Decode budget 2:/)).toBeVisible()
   await user.click(screen.getByRole('button', { name: 'Save profile' }))
   await waitFor(() =>
     expect(invoke).toHaveBeenCalledWith('save_profile', {
@@ -69,6 +72,7 @@ it('saves, reopens, and clears optional GLM controls when family changes', async
     screen.getByText(/GLM decode budget 2.*output-changing/),
   ).toBeInTheDocument()
   await user.click(screen.getByRole('button', { name: 'Edit' }))
+  await user.click(screen.getByText(/Runtime tuning/))
   expect(screen.getByLabelText(/GLM prefetch experts/)).toHaveValue(0)
   expect(screen.getByLabelText(/GLM decode miss budget/)).toHaveValue(2)
   expect(screen.getByLabelText(/GLM prefetch scheduling/)).toHaveValue('-1')
@@ -96,6 +100,7 @@ it('keeps omitted fields empty when editing an older GLM profile', async () => {
   const user = userEvent.setup()
   render(<DiveScreen managed={managed} runtime={runtime} />)
   await user.click(await screen.findByRole('button', { name: 'Edit' }))
+  await user.click(screen.getByText(/Runtime tuning/))
   expect(screen.getByLabelText(/GLM expert bank directory/)).toHaveValue('')
   expect(screen.getByLabelText(/GLM expert bank ·/)).toHaveValue('inherit')
   expect(screen.getByLabelText(/GLM prefetch experts/)).toHaveValue(null)
@@ -114,6 +119,7 @@ it('saves DeepSeek choices, preserves inherited defaults, and clears family-spec
   await user.type(screen.getByLabelText('Python executable'), '/python')
   await user.type(screen.getByLabelText('Model directory'), '/model')
   await user.selectOptions(screen.getByLabelText('Model family'), 'deepseek')
+  await user.click(screen.getByText(/Runtime tuning/))
   const drops = screen.getByLabelText(/Decode drops misses/)
   const dates = screen.getByLabelText(/System date reuse/)
   expect(drops).toHaveValue('inherit')
@@ -143,6 +149,7 @@ it('saves DeepSeek choices, preserves inherited defaults, and clears family-spec
   expect(profiles[0]?.tuning.deepseek_system_date_reuse).toBe(true)
   await user.click(screen.getByRole('button', { name: 'Edit' }))
   await user.selectOptions(screen.getByLabelText('Model family'), 'glm')
+  await user.click(screen.getByText(/Runtime tuning/))
   expect(screen.queryByLabelText(/Decode drops misses/)).not.toBeInTheDocument()
   await user.click(screen.getByRole('button', { name: 'Save profile' }))
   await waitFor(() => expect(profiles[0]?.family).toBe('glm'))
@@ -162,6 +169,7 @@ it('keeps older DeepSeek profiles on inherited CLI defaults', async () => {
   const user = userEvent.setup()
   render(<DiveScreen managed={managed} runtime={runtime} />)
   await user.click(await screen.findByRole('button', { name: 'Edit' }))
+  await user.click(screen.getByText(/Runtime tuning/))
   expect(screen.getByLabelText(/Decode drops misses/)).toHaveValue('inherit')
   expect(screen.getByLabelText(/System date reuse/)).toHaveValue('inherit')
 })
@@ -191,6 +199,9 @@ it('discovers a model into an unsaved draft without launching it', async () => {
   )
   const user = userEvent.setup()
   render(<DiveScreen managed={managed} runtime={runtime} />)
+  await user.click(
+    screen.getByText('Find a model folder', { selector: 'summary' }),
+  )
   await user.type(screen.getByLabelText('Search folder'), '/models')
   await user.click(screen.getByRole('button', { name: 'Scan folder' }))
   expect(

@@ -9,7 +9,7 @@
 }
 html {
   min-width: 800px;
-  min-height: 100%;
+  height: 100%;
   background: var(--bg-canvas);
 }
 body {
@@ -42,17 +42,18 @@ textarea:focus-visible {
 }
 .lab-shell {
   display: flex;
-  min-height: 100vh;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
 }
 .sidebar {
-  position: sticky;
-  top: 0;
   display: flex;
   flex-direction: column;
   flex: 0 0 var(--rail-width);
-  height: 100vh;
-  min-height: 720px;
-  padding: 72px 13px 20px;
+  height: 100%;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 52px 13px 16px;
   background: var(--bg-rail);
   border-right: 1px solid var(--border-subtle);
 }
@@ -60,7 +61,7 @@ textarea:focus-visible {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin: 0 10px 51px;
+  margin: 0 10px 28px;
 }
 .brand-mark {
   display: grid;
@@ -105,7 +106,7 @@ textarea:focus-visible {
   padding: 0 15px 12px;
 }
 .sidebar-section-label-lower {
-  margin-top: 35px;
+  margin-top: 22px;
 }
 .sidebar-nav {
   display: grid;
@@ -181,23 +182,23 @@ textarea:focus-visible {
   font-size: 9px;
 }
 .main-shell {
+  display: grid;
+  grid-template-rows: var(--topbar-height) minmax(0, 1fr) auto;
   min-width: 0;
+  min-height: 0;
   flex: 1;
 }
 .main-shell.with-telemetry {
-  padding-bottom: 76px;
+  padding-bottom: 0;
 }
 .telemetry-strip {
-  position: fixed;
-  right: 0;
-  bottom: 0;
-  left: var(--rail-width);
+  position: relative;
   z-index: 15;
   display: flex;
   align-items: center;
-  min-height: 66px;
+  min-height: 64px;
   gap: 25px;
-  padding: 10px 30px;
+  padding: 9px 24px;
   border-top: 1px solid var(--border-strong);
   background: var(--bg-rail);
   box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.12);
@@ -337,11 +338,14 @@ textarea:focus-visible {
   letter-spacing: 0.04em;
 }
 .main-content {
-  max-width: 1720px;
-  margin: 0 auto;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
 }
 .page {
-  padding: 38px 46px 64px;
+  padding: 20px 24px 24px;
 }
 .eyebrow {
   display: flex;
@@ -358,12 +362,12 @@ textarea:focus-visible {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: 14px 0 27px;
+  margin: 8px 0 20px;
   gap: 20px;
 }
 .page-heading h1 {
   margin: 0 0 5px;
-  font-size: clamp(32px, 3vw, 43px);
+  font-size: 30px;
   line-height: 1.15;
   letter-spacing: -0.045em;
   font-weight: 650;
@@ -746,28 +750,28 @@ textarea:focus-visible {
   font-size: 11px;
 }
 .detail-page {
-  max-width: 1020px;
+  width: 100%;
 }
 .diagnostic-panel,
 .settings-panel {
-  margin-top: 34px;
-  max-width: 690px;
-  padding: 31px;
+  min-width: 0;
+  margin: 0;
+  padding: 20px;
 }
 .diagnostic-panel h2,
 .settings-panel h2 {
-  font-size: 25px;
+  font-size: 22px;
 }
 .check-row {
   display: flex;
   align-items: center;
   gap: 13px;
-  min-height: 55px;
+  min-height: 48px;
   border-bottom: 1px solid var(--border-subtle);
   font-size: 13px;
 }
 .check-row:first-of-type {
-  margin-top: 24px;
+  margin-top: 18px;
   border-top: 1px solid var(--border-subtle);
 }
 .check-row strong {
@@ -804,14 +808,14 @@ textarea:focus-visible {
 }
 .theme-choices {
   display: grid;
-  gap: 9px;
-  margin-top: 24px;
+  gap: 8px;
+  margin-top: 16px;
 }
 .theme-choice {
   display: flex;
   align-items: center;
   gap: 15px;
-  padding: 15px;
+  padding: 12px;
   border: 1px solid var(--border-subtle);
   border-radius: 10px;
   background: var(--bg-inset);
@@ -875,13 +879,13 @@ textarea:focus-visible {
   line-height: 1.65;
 }
 .connection-panel {
-  max-width: 760px;
-  margin-top: 24px;
+  min-width: 0;
+  margin: 0;
 }
 .connection-form {
   display: grid;
-  gap: 9px;
-  margin-top: 24px;
+  gap: 8px;
+  margin-top: 18px;
 }
 .connection-form label {
   color: var(--text-secondary);
@@ -927,22 +931,22 @@ textarea:focus-visible {
 }
 /* Dive: consistent controls, contained paths, and explicit task hierarchy. */
 .managed-page {
-  max-width: 1120px;
+  width: 100%;
 }
 .managed-grid {
   display: grid;
-  grid-template-columns: minmax(210px, 0.65fr) minmax(0, 1.5fr);
-  gap: 20px;
+  grid-template-columns: minmax(240px, 0.6fr) minmax(0, 1.6fr);
+  gap: 16px;
   align-items: start;
 }
 .managed-page .info-panel {
-  padding: 24px;
+  padding: 20px;
   min-width: 0;
 }
 .managed-profile-list {
   display: grid;
   gap: 8px;
-  margin-top: 20px;
+  margin-top: 14px;
 }
 .managed-profile {
   display: grid;
@@ -995,8 +999,8 @@ textarea:focus-visible {
 .managed-form,
 .managed-fields {
   display: grid;
-  gap: 16px;
-  margin-top: 20px;
+  gap: 12px;
+  margin-top: 16px;
 }
 .managed-fields {
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1037,8 +1041,8 @@ textarea:focus-visible {
 }
 .managed-facts {
   display: grid;
-  gap: 14px;
-  margin: 24px 0;
+  gap: 12px;
+  margin: 20px 0;
 }
 .managed-facts > div {
   display: grid;
@@ -1152,18 +1156,9 @@ textarea:focus-visible {
 }
 .managed-preview,
 .managed-log {
+  min-height: 0;
+  margin: 16px 0 0;
   overflow: auto;
-  padding: 14px 16px;
-  border: 1px solid var(--border-subtle);
-  border-radius: 8px;
-  background: var(--bg-inset);
-  color: var(--text-secondary);
-  font:
-    11px/1.7 ui-monospace,
-    SFMono-Regular,
-    monospace;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
 }
 .managed-preview {
   margin: 0;
@@ -1171,7 +1166,7 @@ textarea:focus-visible {
   scrollbar-gutter: stable;
 }
 .managed-log-panel {
-  margin-top: 20px;
+  margin-top: 0;
 }
 .managed-log {
   min-height: 260px;
@@ -1239,7 +1234,7 @@ textarea:focus-visible {
 .discovered-model > button {
   flex-shrink: 0;
 }
-@media (max-width: 1000px) {
+@media (max-width: 800px) {
   .managed-grid {
     grid-template-columns: 1fr;
   }
@@ -1283,8 +1278,8 @@ textarea:focus-visible {
   text-align: right;
 }
 .api-panel {
-  max-width: 760px;
-  margin-top: 16px;
+  min-width: 0;
+  margin: 0;
 }
 .api-example-tabs {
   display: flex;
@@ -1317,9 +1312,11 @@ textarea:focus-visible {
   line-height: 1.65;
 }
 .chat-page {
-  min-height: calc(100vh - var(--topbar-height));
   display: flex;
   flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  padding: 0;
 }
 .chat-connection-note {
   display: flex;
@@ -1341,16 +1338,17 @@ textarea:focus-visible {
   display: grid;
   grid-template-columns: 220px minmax(0, 1fr);
   flex: 1;
-  min-height: 550px;
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--card-radius);
-  background: var(--bg-raised);
+  min-height: 0;
+  border-top: 1px solid var(--border-subtle);
   overflow: hidden;
 }
 .conversation-rail {
+  display: flex;
+  flex-direction: column;
   min-width: 0;
+  min-height: 0;
   border-right: 1px solid var(--border-subtle);
-  background: var(--bg-inset);
+  background: var(--bg-rail);
 }
 .conversation-rail-title {
   padding: 18px 14px 13px;
@@ -1368,8 +1366,9 @@ textarea:focus-visible {
 .conversation-list {
   display: flex;
   flex-direction: column;
+  flex: 1;
+  min-height: 0;
   gap: 4px;
-  max-height: calc(100vh - 350px);
   overflow-y: auto;
   padding: 0 8px 12px;
 }
@@ -1418,20 +1417,20 @@ textarea:focus-visible {
   color: var(--text-primary);
 }
 .chat-main {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
   min-width: 0;
+  min-height: 0;
 }
 .chat-messages {
-  flex: 1;
-  min-height: 360px;
-  max-height: calc(100vh - 400px);
+  min-height: 0;
   overflow-y: auto;
-  padding: 24px 34px;
+  overscroll-behavior: contain;
+  padding: 24px 32px;
 }
 .chat-welcome {
   max-width: 440px;
-  margin: 70px auto;
+  margin: clamp(20px, 8vh, 70px) auto;
   text-align: center;
 }
 .chat-welcome h2 {
@@ -1457,8 +1456,7 @@ textarea:focus-visible {
 .chat-message {
   max-width: 800px;
   margin: 0 auto 20px;
-  padding: 18px 20px;
-  border: 1px solid var(--border-subtle);
+  padding: 16px 20px;
   border-radius: 11px;
 }
 .chat-user {
@@ -1501,7 +1499,8 @@ textarea:focus-visible {
 }
 .chat-options {
   display: flex;
-  gap: 22px;
+  gap: 10px 20px;
+  flex-wrap: wrap;
   align-items: center;
   margin-bottom: 11px;
   color: var(--text-secondary);
@@ -1525,7 +1524,7 @@ textarea:focus-visible {
   flex: 1;
   resize: vertical;
   min-height: 70px;
-  max-height: 250px;
+  max-height: min(160px, 22vh);
   border: 1px solid var(--border-strong);
   border-radius: 9px;
   padding: 12px;
@@ -1742,6 +1741,272 @@ html[data-silent-running='true'] *::after {
   margin-top: 12px;
 }
 
-:root[data-theme='surface'] .managed-page .primary-button {
+:root[data-theme='surface'] .primary-button {
   color: #fff;
+}
+
+/* Panel layouts use available width; only long content owns a scroll area. */
+.chat-shell .main-content {
+  overflow: hidden;
+}
+.chat-mount {
+  height: 100%;
+  min-height: 0;
+}
+.chat-heading {
+  flex: none;
+  margin: 0;
+  padding: 16px 24px;
+}
+.chat-heading h1 {
+  font-size: 24px;
+}
+.chat-heading p {
+  font-size: 12px;
+}
+.chat-connection-note {
+  flex: none;
+  margin: 0 16px 12px;
+}
+.settings-grid,
+.doctor-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+.api-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 16px;
+  align-items: start;
+}
+.credential-help,
+.profile-options {
+  border-top: 1px solid var(--border-subtle);
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+.credential-help > summary,
+.profile-options > summary {
+  cursor: pointer;
+  color: var(--text-primary);
+  padding: 10px 0;
+  font-weight: 650;
+}
+.profile-options > summary span {
+  margin-left: 8px;
+  color: var(--text-tertiary);
+  font-weight: 400;
+}
+.profile-options .panel-intro {
+  margin-top: 12px;
+}
+.profile-options .managed-fields {
+  padding-top: 8px;
+}
+summary:focus-visible,
+pre:focus-visible,
+.chat-messages:focus-visible,
+.conversation-list:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: -2px;
+}
+.managed-sidebar {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+.managed-sidebar .model-discovery {
+  margin: 0;
+}
+.managed-sidebar .discovery-form {
+  grid-template-columns: minmax(0, 1fr);
+  margin-top: 12px;
+}
+.managed-sidebar .discovered-model {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+  padding: 12px 0;
+}
+.profile-editor > .managed-fields {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.profile-editor > h3 {
+  padding-top: 12px;
+}
+.profile-editor > .managed-actions {
+  margin-top: 4px;
+}
+.logs-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+.logs-page > .eyebrow,
+.logs-page > .page-heading {
+  flex: none;
+}
+.logs-page .managed-log-panel {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+.logs-page .managed-log {
+  flex: 1;
+  min-height: 0;
+  max-height: none;
+}
+.api-panel pre {
+  max-height: 340px;
+  overflow: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 1050px) {
+  .api-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .settings-grid,
+  .doctor-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .chat-options input[type='number'] {
+    width: 76px;
+  }
+  .chat-messages {
+    padding: 20px;
+  }
+}
+@media (max-width: 850px) {
+  .api-grid {
+    grid-template-columns: 1fr;
+  }
+  .profile-editor > .managed-fields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .profile-options > summary span {
+    display: block;
+    margin: 4px 0 0 16px;
+  }
+}
+@media (max-height: 700px) {
+  .sidebar-brand {
+    margin-bottom: 18px;
+  }
+  .sidebar-section-label-lower {
+    margin-top: 14px;
+  }
+  .chat-compose {
+    padding: 12px 18px;
+  }
+  .chat-input-row textarea {
+    min-height: 58px;
+  }
+}
+
+.discovery-disclosure {
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  background: var(--bg-raised);
+}
+.discovery-disclosure > summary {
+  padding: 16px 20px;
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 650;
+  cursor: pointer;
+}
+.discovery-disclosure > summary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -4px;
+}
+.managed-sidebar .discovery-disclosure .model-discovery {
+  border: 0;
+  border-radius: 0;
+  padding-top: 0;
+}
+.settings-panel > .theme-choice {
+  margin-top: 14px;
+}
+@media (min-height: 641px) and (max-height: 780px) {
+  .cockpit-page {
+    gap: 9px;
+    padding: 12px 20px;
+  }
+  .cockpit-header {
+    flex-basis: 66px;
+  }
+  .cockpit-readouts {
+    flex-basis: 84px;
+  }
+  .cockpit-grid {
+    gap: 9px;
+    grid-template-rows: minmax(0, 1fr) minmax(0, 1.08fr);
+  }
+  .cockpit-panel {
+    padding: 10px 13px;
+  }
+}
+
+.api-grid > .info-panel {
+  padding: 18px 20px;
+}
+.connection-form {
+  gap: 6px;
+  margin-top: 12px;
+}
+.keychain-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  margin: 6px 0;
+}
+.keychain-controls .text-button {
+  margin-top: 0;
+}
+.keychain-controls > label,
+.keychain-controls .credential-help,
+.keychain-controls .inline-error {
+  flex-basis: 100%;
+}
+.keychain-controls .credential-help {
+  padding-top: 6px;
+}
+.connection-actions {
+  margin-top: 4px;
+}
+.connection-facts {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 0.7fr);
+  gap: 12px;
+  margin-top: 14px;
+  padding-top: 12px;
+}
+.connection-facts > div {
+  flex-direction: column;
+  justify-content: start;
+  gap: 4px;
+  padding: 0;
+  border: 0;
+  font-size: 11px;
+}
+.connection-facts strong {
+  text-align: left;
+}
+
+.profile-editor {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.profile-editor > label:nth-of-type(3),
+.profile-editor > h3,
+.profile-editor > .managed-fields,
+.profile-editor > .profile-options,
+.profile-editor > .managed-notice,
+.profile-editor > .managed-actions {
+  grid-column: 1 / -1;
 }

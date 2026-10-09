@@ -53,8 +53,9 @@ This local test installation does not make an uncommitted build a release.
 
 ## Scope
 
-The [0.7.0 release](https://github.com/forera-ai/cachalot-lab/releases/tag/v0.7.0)
-adds skipped-expert evidence and an explicit GLM decode miss-budget control.
+The [0.7.1 release](https://github.com/forera-ai/cachalot-lab/releases/tag/v0.7.1)
+refines panel layout and Surface contrast. It retains skipped-expert evidence and
+an explicit GLM decode miss-budget control.
 It retains physical-drive telemetry, bounded local model discovery, optional
 Keychain credentials, Dive controls, chat settings, managed process ownership,
 and host telemetry. Live GLM/DeepSeek inference, saved-key restart, and performance

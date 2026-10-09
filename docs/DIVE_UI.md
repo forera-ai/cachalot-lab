@@ -1,5 +1,13 @@
 # Dive interface refinement
 
+## 0.7.1 layout — 2026-10-09
+
+Profiles and collapsed model discovery share the left rail; selected-profile details and actions use the remaining width. The overview fits the normal native window; the minimum 1100 × 720 layout is checked in browser preview. Basic launch fields use three columns where space permits; response/snapshot defaults and family tuning expand on demand. Values remain in the draft when groups close, and explicit output-changing GLM budget intent remains visible outside tuning. Discovery and runtime output expand explicitly; their long content may scroll. The native app minimum remains 1100 × 720; one-column browser fallback begins below 800 pixels. No storage, process ownership, launch defaults or inference policy changes.
+
+The source review is Cachalot 0.62.22 (`5faababa6bc098400147611d3ffd11cd00e3100d`), including brief 0.62.20. GLM’s shell script now selects budget 2; Lab’s direct CLI empty budget remains off. This layout ships in Lab 0.7.1. Historical 0.5.0 refinement and verification follow.
+
+## Historical 0.5.0 refinement
+
 The owner requested a complete refinement of Dive after reviewing screenshots with a vertically displaced Delete link and preview content touching the action row. This local pass preserves the existing Lab visual language and runtime/profile contracts.
 
 - Controls share a 40-pixel minimum height and 10-pixel action gaps. Delete profile uses the theme error color, a visible border/icon, and separation from launch/edit/preview actions. An inline confirmation explains exactly what is removed and provides Keep profile.

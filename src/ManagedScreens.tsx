@@ -231,37 +231,50 @@ export function DiveScreen({
         </p>
       )}
       <div className="managed-grid">
-        <section className="info-panel managed-profiles">
-          <span className="section-kicker">01 / SAVED PROFILES</span>
-          <h2>Your launch setups</h2>
-          <p className="panel-intro">Saved configurations for this Mac.</p>
-          {profiles.length === 0 && (
-            <p className="panel-intro">
-              No profiles yet. Create one to launch a local model.
-            </p>
-          )}
-          <div className="managed-profile-list">
-            {profiles.map((profile) => (
-              <button
-                key={profile.id}
-                type="button"
-                className={`managed-profile ${selectedId === profile.id ? 'is-selected' : ''}`}
-                aria-pressed={selectedId === profile.id}
-                disabled={busy}
-                onClick={() => {
-                  setSelectedId(profile.id)
-                  setDraft(null)
+        <aside className="managed-sidebar" aria-label="Profiles and discovery">
+          <section className="info-panel managed-profiles">
+            <span className="section-kicker">01 / SAVED PROFILES</span>
+            <h2>Your launch setups</h2>
+            <p className="panel-intro">Saved configurations for this Mac.</p>
+            {profiles.length === 0 && (
+              <p className="panel-intro">
+                No profiles yet. Create one to launch a local model.
+              </p>
+            )}
+            <div className="managed-profile-list">
+              {profiles.map((profile) => (
+                <button
+                  key={profile.id}
+                  type="button"
+                  className={`managed-profile ${selectedId === profile.id ? 'is-selected' : ''}`}
+                  aria-pressed={selectedId === profile.id}
+                  disabled={busy}
+                  onClick={() => {
+                    setSelectedId(profile.id)
+                    setDraft(null)
+                    clearPreview()
+                  }}
+                >
+                  <strong>{profile.name}</strong>
+                  <span>
+                    {profile.family} · port {profile.port}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </section>
+          {!draft && (
+            <details className="discovery-disclosure">
+              <summary>Find a model folder</summary>
+              <ModelDiscovery
+                onDraft={(profile) => {
                   clearPreview()
+                  setDraft(profile)
                 }}
-              >
-                <strong>{profile.name}</strong>
-                <span>
-                  {profile.family} · port {profile.port}
-                </span>
-              </button>
-            ))}
-          </div>
-        </section>
+              />
+            </details>
+          )}
+        </aside>
         <section
           className="info-panel managed-details"
           aria-label="Profile details"
@@ -370,329 +383,365 @@ export function DiveScreen({
                     max={64}
                     onChange={(io_workers) => update({ io_workers })}
                   />
-                  <label>
-                    Model ID · runtime default when empty
-                    <input
-                      value={draft.model_id ?? ''}
-                      placeholder="minimax-m3"
-                      onChange={(event) =>
-                        update({ model_id: event.target.value || null })
-                      }
-                    />
-                  </label>
-                  <OptionalNumber
-                    label="Default maximum output tokens · runtime default 1024"
-                    value={draft.default_max_tokens ?? null}
-                    min={1}
-                    max={1048576}
-                    onChange={(default_max_tokens) =>
-                      update({ default_max_tokens })
-                    }
-                  />
-                  <OptionalNumber
-                    label={
-                      draft.family === 'minimax'
-                        ? 'Default temperature · MiniMax script 0.7; empty uses CLI 0.6'
-                        : 'Default temperature · empty uses CLI 0.6'
-                    }
-                    value={draft.default_temperature ?? null}
-                    min={0}
-                    max={2}
-                    step={0.1}
-                    onChange={(default_temperature) =>
-                      update({ default_temperature })
-                    }
-                  />
-                  <label>
-                    Snapshot directory · optional
-                    <input
-                      value={draft.snapshot_dir ?? ''}
-                      placeholder="/path/to/prefix-snapshots"
-                      onChange={(event) =>
-                        update({ snapshot_dir: event.target.value || null })
-                      }
-                    />
-                  </label>
                 </div>
-                {draft.family === 'deepseek' && (
-                  <>
-                    <h3>DeepSeek runtime tuning</h3>
-                    <div className="managed-fields">
-                      <TriState
-                        label="Decode drops misses · Cachalot 0.57+ · CLI default Off"
-                        value={draft.tuning.deepseek_decode_drop_misses ?? null}
-                        onChange={(deepseek_decode_drop_misses) =>
-                          updateTuning({ deepseek_decode_drop_misses })
+                <details className="profile-options">
+                  <summary>Response and snapshot defaults</summary>
+                  <div className="managed-fields">
+                    <label>
+                      Model ID · runtime default when empty
+                      <input
+                        value={draft.model_id ?? ''}
+                        placeholder="minimax-m3"
+                        onChange={(event) =>
+                          update({ model_id: event.target.value || null })
                         }
                       />
-                      <TriState
-                        label="System date reuse · Cachalot 0.60+ · default On"
-                        value={draft.tuning.deepseek_system_date_reuse ?? null}
-                        onChange={(deepseek_system_date_reuse) =>
-                          updateTuning({ deepseek_system_date_reuse })
+                    </label>
+                    <OptionalNumber
+                      label="Default maximum output tokens · runtime default 1024"
+                      value={draft.default_max_tokens ?? null}
+                      min={1}
+                      max={1048576}
+                      onChange={(default_max_tokens) =>
+                        update({ default_max_tokens })
+                      }
+                    />
+                    <OptionalNumber
+                      label={
+                        draft.family === 'minimax'
+                          ? 'Default temperature · MiniMax script 0.7; empty uses CLI 0.6'
+                          : 'Default temperature · empty uses CLI 0.6'
+                      }
+                      value={draft.default_temperature ?? null}
+                      min={0}
+                      max={2}
+                      step={0.1}
+                      onChange={(default_temperature) =>
+                        update({ default_temperature })
+                      }
+                    />
+                    <label>
+                      Snapshot directory · optional
+                      <input
+                        value={draft.snapshot_dir ?? ''}
+                        placeholder="/path/to/prefix-snapshots"
+                        onChange={(event) =>
+                          update({ snapshot_dir: event.target.value || null })
                         }
                       />
-                    </div>
-                    <p className="panel-intro">
-                      Decode drops misses is faster but changes outputs and can
-                      lower quality. On drops every non-resident decode expert;
-                      Off selects exact decode. Cachalot 0.60 serve.sh defaults
-                      to On; Lab launches the CLI directly, which defaults to
-                      Off. Runtime default preserves that CLI behavior.
-                    </p>
-                    <p className="panel-intro">
-                      System date reuse can avoid refilling a saved system block
-                      on a new day. The model can see a date up to 7 days old in
-                      the leading system message. Off keeps the true date. A
-                      snapshot directory retains date reuse across restarts.
-                      Older runtimes ignore unsupported controls. Changes apply
-                      on the next launch.
-                    </p>
-                  </>
-                )}
-                {(draft.family === 'glm' || draft.family === 'minimax') && (
-                  <>
-                    <h3>Runtime tuning</h3>
-                    <div className="managed-fields">
-                      <OptionalNumber
-                        label="Loop guard repeats"
-                        value={draft.tuning.loop_guard_repeats}
-                        min={0}
-                        max={50}
-                        onChange={(loop_guard_repeats) =>
-                          updateTuning({ loop_guard_repeats })
-                        }
-                      />
-                      <OptionalNumber
-                        label="Incrementing-list guard · Cachalot 0.46+ · default 64; 0 off; 2–4096"
-                        value={draft.tuning.loop_guard_incrementing}
-                        min={0}
-                        max={4096}
-                        onChange={(loop_guard_incrementing) =>
-                          updateTuning({ loop_guard_incrementing })
-                        }
-                      />
-                      {draft.family === 'glm' && (
-                        <>
-                          <label>
-                            GLM expert bank directory · optional · Cachalot
-                            0.49+
-                            <input
-                              value={draft.tuning.glm_bank_path ?? ''}
-                              placeholder="/path/to/glm-bank"
-                              onChange={(event) =>
-                                updateTuning({
-                                  glm_bank_path: event.target.value || null,
-                                })
-                              }
-                            />
-                          </label>
+                    </label>
+                  </div>
+                </details>
+                {draft.family !== 'auto' && (
+                  <details className="profile-options" key={draft.family}>
+                    <summary>
+                      Runtime tuning <span>Family controls · next launch</span>
+                    </summary>
+                    {draft.family === 'deepseek' && (
+                      <>
+                        <div className="managed-fields">
                           <TriState
-                            label="GLM expert bank · 0.49+ default On when a bank is set"
-                            value={draft.tuning.glm_bank_enabled ?? null}
-                            onChange={(glm_bank_enabled) =>
-                              updateTuning({ glm_bank_enabled })
+                            label="Decode drops misses · Cachalot 0.57+ · CLI default Off"
+                            value={
+                              draft.tuning.deepseek_decode_drop_misses ?? null
+                            }
+                            onChange={(deepseek_decode_drop_misses) =>
+                              updateTuning({ deepseek_decode_drop_misses })
+                            }
+                          />
+                          <TriState
+                            label="System date reuse · Cachalot 0.60+ · default On"
+                            value={
+                              draft.tuning.deepseek_system_date_reuse ?? null
+                            }
+                            onChange={(deepseek_system_date_reuse) =>
+                              updateTuning({ deepseek_system_date_reuse })
+                            }
+                          />
+                        </div>
+                        <p className="panel-intro">
+                          Decode drops misses is faster but changes outputs and
+                          can lower quality. On drops every non-resident decode
+                          expert; Off selects exact decode. Cachalot 0.60
+                          serve.sh defaults to On; Lab launches the CLI
+                          directly, which defaults to Off. Runtime default
+                          preserves that CLI behavior.
+                        </p>
+                        <p className="panel-intro">
+                          System date reuse can avoid refilling a saved system
+                          block on a new day. The model can see a date up to 7
+                          days old in the leading system message. Off keeps the
+                          true date. A snapshot directory retains date reuse
+                          across restarts. Older runtimes ignore unsupported
+                          controls. Changes apply on the next launch.
+                        </p>
+                      </>
+                    )}
+                    {(draft.family === 'glm' || draft.family === 'minimax') && (
+                      <>
+                        <div className="managed-fields">
+                          <OptionalNumber
+                            label="Loop guard repeats"
+                            value={draft.tuning.loop_guard_repeats}
+                            min={0}
+                            max={50}
+                            onChange={(loop_guard_repeats) =>
+                              updateTuning({ loop_guard_repeats })
                             }
                           />
                           <OptionalNumber
-                            label="GLM decode miss budget · 0.62.14+; -1 off"
-                            value={draft.tuning.glm_decode_miss_budget ?? null}
-                            min={-1}
-                            max={288}
-                            onChange={(glm_decode_miss_budget) =>
-                              updateTuning({ glm_decode_miss_budget })
+                            label="Incrementing-list guard · Cachalot 0.46+ · default 64; 0 off; 2–4096"
+                            value={draft.tuning.loop_guard_incrementing}
+                            min={0}
+                            max={4096}
+                            onChange={(loop_guard_incrementing) =>
+                              updateTuning({ loop_guard_incrementing })
                             }
                           />
+                          {draft.family === 'glm' && (
+                            <>
+                              <label>
+                                GLM expert bank directory · optional · Cachalot
+                                0.49+
+                                <input
+                                  value={draft.tuning.glm_bank_path ?? ''}
+                                  placeholder="/path/to/glm-bank"
+                                  onChange={(event) =>
+                                    updateTuning({
+                                      glm_bank_path: event.target.value || null,
+                                    })
+                                  }
+                                />
+                              </label>
+                              <TriState
+                                label="GLM expert bank · 0.49+ default On when a bank is set"
+                                value={draft.tuning.glm_bank_enabled ?? null}
+                                onChange={(glm_bank_enabled) =>
+                                  updateTuning({ glm_bank_enabled })
+                                }
+                              />
+                              <OptionalNumber
+                                label="GLM decode miss budget · 0.62.14+; -1 off"
+                                value={
+                                  draft.tuning.glm_decode_miss_budget ?? null
+                                }
+                                min={-1}
+                                max={288}
+                                onChange={(glm_decode_miss_budget) =>
+                                  updateTuning({ glm_decode_miss_budget })
+                                }
+                              />
+                              <p className="panel-intro">
+                                Decode miss budget changes outputs and may lower
+                                quality. Nonnegative values cap non-resident
+                                expert reads per layer; 0 drops all misses.
+                                Empty or -1 disables this budget. Prefill is
+                                unchanged. Next launch only; older runtimes
+                                ignore this control.
+                              </p>
+                              <OptionalNumber
+                                label="GLM prefetch experts · CLI default 5; 0 off"
+                                value={draft.tuning.glm_predict_topk ?? null}
+                                min={0}
+                                max={288}
+                                onChange={(glm_predict_topk) =>
+                                  updateTuning({ glm_predict_topk })
+                                }
+                              />
+                              <OptionalNumber
+                                label="GLM prefetch read limit · 0.50+ default 0 (all predicted)"
+                                value={draft.tuning.glm_predict_limit ?? null}
+                                min={0}
+                                max={288}
+                                onChange={(glm_predict_limit) =>
+                                  updateTuning({ glm_predict_limit })
+                                }
+                              />
+                              <label>
+                                GLM prefetch scheduling · Cachalot 0.50+
+                                <select
+                                  value={
+                                    draft.tuning.glm_predict_after_demand ??
+                                    'inherit'
+                                  }
+                                  onChange={(event) =>
+                                    updateTuning({
+                                      glm_predict_after_demand: optionalNumber(
+                                        event.target.value === 'inherit'
+                                          ? ''
+                                          : event.target.value,
+                                      ),
+                                    })
+                                  }
+                                >
+                                  <option value="inherit">
+                                    Runtime default (after demand)
+                                  </option>
+                                  <option value="1">After demand reads</option>
+                                  <option value="0">
+                                    Alongside demand reads
+                                  </option>
+                                  <option value="-1">
+                                    Follow store policy
+                                  </option>
+                                </select>
+                              </label>
+                            </>
+                          )}
+                          {draft.family === 'minimax' && (
+                            <>
+                              <TriState
+                                label="Decode miss substitution"
+                                value={
+                                  draft.tuning.minimax_decode_miss_substitution
+                                }
+                                onChange={(minimax_decode_miss_substitution) =>
+                                  updateTuning({
+                                    minimax_decode_miss_substitution,
+                                  })
+                                }
+                              />
+                              <TriState
+                                label="Prefill miss substitution"
+                                value={
+                                  draft.tuning.minimax_prefill_miss_substitution
+                                }
+                                onChange={(minimax_prefill_miss_substitution) =>
+                                  updateTuning({
+                                    minimax_prefill_miss_substitution,
+                                  })
+                                }
+                              />
+                              <OptionalNumber
+                                label="Decode cache (GiB)"
+                                value={draft.tuning.minimax_decode_cache_gib}
+                                min={-1}
+                                max={8}
+                                step={0.1}
+                                onChange={(minimax_decode_cache_gib) =>
+                                  updateTuning({ minimax_decode_cache_gib })
+                                }
+                              />
+                              <TriState
+                                label="Persisted block retention"
+                                value={draft.tuning.minimax_spill_blocks}
+                                onChange={(minimax_spill_blocks) =>
+                                  updateTuning({ minimax_spill_blocks })
+                                }
+                              />
+                              <OptionalNumber
+                                label="Host quiet before cache growth (s) · 0.44+ default 60"
+                                value={draft.tuning.host_grow_quiet_s}
+                                min={0}
+                                max={3600}
+                                onChange={(host_grow_quiet_s) =>
+                                  updateTuning({ host_grow_quiet_s })
+                                }
+                              />
+                              <OptionalNumber
+                                label="Host pressure shrink interval (s) · 0.44+ default 10"
+                                value={draft.tuning.host_shrink_every_s}
+                                min={0}
+                                max={3600}
+                                onChange={(host_shrink_every_s) =>
+                                  updateTuning({ host_shrink_every_s })
+                                }
+                              />
+                              <TriState
+                                label="Adaptive mirror share · 0.45+ default On"
+                                value={draft.tuning.minimax_mirror_adapt}
+                                onChange={(minimax_mirror_adapt) =>
+                                  updateTuning({ minimax_mirror_adapt })
+                                }
+                              />
+                              <label>
+                                Expert bank directory
+                                <input
+                                  value={draft.tuning.minimax_bank_path ?? ''}
+                                  placeholder="/path/to/coded-bank"
+                                  onChange={(event) =>
+                                    updateTuning({
+                                      minimax_bank_path:
+                                        event.target.value || null,
+                                    })
+                                  }
+                                />
+                              </label>
+                              <label>
+                                Mirror bank directory
+                                <input
+                                  value={draft.tuning.minimax_mirror_path ?? ''}
+                                  placeholder="/Volumes/drive/path/to/coded-bank"
+                                  onChange={(event) =>
+                                    updateTuning({
+                                      minimax_mirror_path:
+                                        event.target.value || null,
+                                    })
+                                  }
+                                />
+                              </label>
+                              <OptionalNumber
+                                label="Mirror read fraction · runtime default 0.10"
+                                value={draft.tuning.minimax_mirror_fraction}
+                                min={0}
+                                max={0.9}
+                                step={0.01}
+                                onChange={(minimax_mirror_fraction) =>
+                                  updateTuning({ minimax_mirror_fraction })
+                                }
+                              />
+                            </>
+                          )}
+                        </div>
+                        {draft.family === 'glm' && (
                           <p className="panel-intro">
-                            Decode miss budget changes outputs and may lower
-                            quality. Nonnegative values cap non-resident expert
-                            reads per layer; 0 drops all misses. Empty or -1
-                            disables this budget. Prefill is unchanged. Next
-                            launch only; older runtimes ignore this control.
+                            Optional GLM overrides apply on the next launch.
+                            Empty fields use runtime defaults; older runtimes
+                            ignore these controls. A bank needs bank.json; Off
+                            retains its saved path but uses checkpoint experts.
+                            Bank reads and prefetch preserve model outputs. Lab
+                            uses the direct CLI: empty prefetch remains 5;
+                            serve-glm.sh defaults to 0 since 0.62.14. Empty
+                            decode budget stays off in Lab; serve-glm.sh
+                            defaults to 2 since 0.62.20 and changes outputs. Its
+                            automatic bank selection is not applied here.
                           </p>
-                          <OptionalNumber
-                            label="GLM prefetch experts · CLI default 5; 0 off"
-                            value={draft.tuning.glm_predict_topk ?? null}
-                            min={0}
-                            max={288}
-                            onChange={(glm_predict_topk) =>
-                              updateTuning({ glm_predict_topk })
-                            }
-                          />
-                          <OptionalNumber
-                            label="GLM prefetch read limit · 0.50+ default 0 (all predicted)"
-                            value={draft.tuning.glm_predict_limit ?? null}
-                            min={0}
-                            max={288}
-                            onChange={(glm_predict_limit) =>
-                              updateTuning({ glm_predict_limit })
-                            }
-                          />
-                          <label>
-                            GLM prefetch scheduling · Cachalot 0.50+
-                            <select
-                              value={
-                                draft.tuning.glm_predict_after_demand ??
-                                'inherit'
-                              }
-                              onChange={(event) =>
+                        )}
+                        {draft.family === 'minimax' && (
+                          <>
+                            <p className="panel-intro">
+                              Miss substitution changes model output and disk
+                              snapshot numerics. First request after switching
+                              may re-prefill a long system block. Off selects
+                              exact outputs on Cachalot 0.43 or newer.
+                            </p>
+                            <button
+                              className="text-button"
+                              type="button"
+                              onClick={() =>
                                 updateTuning({
-                                  glm_predict_after_demand: optionalNumber(
-                                    event.target.value === 'inherit'
-                                      ? ''
-                                      : event.target.value,
-                                  ),
+                                  minimax_decode_miss_substitution: false,
+                                  minimax_prefill_miss_substitution: false,
                                 })
                               }
                             >
-                              <option value="inherit">
-                                Runtime default (after demand)
-                              </option>
-                              <option value="1">After demand reads</option>
-                              <option value="0">Alongside demand reads</option>
-                              <option value="-1">Follow store policy</option>
-                            </select>
-                          </label>
-                        </>
-                      )}
-                      {draft.family === 'minimax' && (
-                        <>
-                          <TriState
-                            label="Decode miss substitution"
-                            value={
-                              draft.tuning.minimax_decode_miss_substitution
-                            }
-                            onChange={(minimax_decode_miss_substitution) =>
-                              updateTuning({ minimax_decode_miss_substitution })
-                            }
-                          />
-                          <TriState
-                            label="Prefill miss substitution"
-                            value={
-                              draft.tuning.minimax_prefill_miss_substitution
-                            }
-                            onChange={(minimax_prefill_miss_substitution) =>
-                              updateTuning({
-                                minimax_prefill_miss_substitution,
-                              })
-                            }
-                          />
-                          <OptionalNumber
-                            label="Decode cache (GiB)"
-                            value={draft.tuning.minimax_decode_cache_gib}
-                            min={-1}
-                            max={8}
-                            step={0.1}
-                            onChange={(minimax_decode_cache_gib) =>
-                              updateTuning({ minimax_decode_cache_gib })
-                            }
-                          />
-                          <TriState
-                            label="Persisted block retention"
-                            value={draft.tuning.minimax_spill_blocks}
-                            onChange={(minimax_spill_blocks) =>
-                              updateTuning({ minimax_spill_blocks })
-                            }
-                          />
-                          <OptionalNumber
-                            label="Host quiet before cache growth (s) · 0.44+ default 60"
-                            value={draft.tuning.host_grow_quiet_s}
-                            min={0}
-                            max={3600}
-                            onChange={(host_grow_quiet_s) =>
-                              updateTuning({ host_grow_quiet_s })
-                            }
-                          />
-                          <OptionalNumber
-                            label="Host pressure shrink interval (s) · 0.44+ default 10"
-                            value={draft.tuning.host_shrink_every_s}
-                            min={0}
-                            max={3600}
-                            onChange={(host_shrink_every_s) =>
-                              updateTuning({ host_shrink_every_s })
-                            }
-                          />
-                          <TriState
-                            label="Adaptive mirror share · 0.45+ default On"
-                            value={draft.tuning.minimax_mirror_adapt}
-                            onChange={(minimax_mirror_adapt) =>
-                              updateTuning({ minimax_mirror_adapt })
-                            }
-                          />
-                          <label>
-                            Expert bank directory
-                            <input
-                              value={draft.tuning.minimax_bank_path ?? ''}
-                              placeholder="/path/to/coded-bank"
-                              onChange={(event) =>
-                                updateTuning({
-                                  minimax_bank_path: event.target.value || null,
-                                })
-                              }
-                            />
-                          </label>
-                          <label>
-                            Mirror bank directory
-                            <input
-                              value={draft.tuning.minimax_mirror_path ?? ''}
-                              placeholder="/Volumes/drive/path/to/coded-bank"
-                              onChange={(event) =>
-                                updateTuning({
-                                  minimax_mirror_path:
-                                    event.target.value || null,
-                                })
-                              }
-                            />
-                          </label>
-                          <OptionalNumber
-                            label="Mirror read fraction · runtime default 0.10"
-                            value={draft.tuning.minimax_mirror_fraction}
-                            min={0}
-                            max={0.9}
-                            step={0.01}
-                            onChange={(minimax_mirror_fraction) =>
-                              updateTuning({ minimax_mirror_fraction })
-                            }
-                          />
-                        </>
-                      )}
-                    </div>
-                    {draft.family === 'glm' && (
-                      <p className="panel-intro">
-                        Optional GLM overrides apply on the next launch. Empty
-                        fields use runtime defaults; older runtimes ignore these
-                        controls. A bank needs bank.json; Off retains its saved
-                        path but uses checkpoint experts. Bank reads and
-                        prefetch preserve model outputs. Lab uses the direct
-                        CLI: empty prefetch remains 5; serve-glm.sh defaults to
-                        0 since 0.62.14. Its automatic bank selection is not
-                        applied here.
-                      </p>
-                    )}
-                    {draft.family === 'minimax' && (
-                      <>
-                        <p className="panel-intro">
-                          Miss substitution changes model output and disk
-                          snapshot numerics. First request after switching may
-                          re-prefill a long system block. Off selects exact
-                          outputs on Cachalot 0.43 or newer.
-                        </p>
-                        <button
-                          className="text-button"
-                          type="button"
-                          onClick={() =>
-                            updateTuning({
-                              minimax_decode_miss_substitution: false,
-                              minimax_prefill_miss_substitution: false,
-                            })
-                          }
-                        >
-                          Set exact outputs
-                        </button>
+                              Set exact outputs
+                            </button>
+                          </>
+                        )}
                       </>
                     )}
-                  </>
+                  </details>
                 )}
+                {draft.family === 'glm' &&
+                  draft.tuning.glm_decode_miss_budget != null &&
+                  draft.tuning.glm_decode_miss_budget >= 0 && (
+                    <p className="managed-notice">
+                      Decode budget {draft.tuning.glm_decode_miss_budget}:
+                      outputs change on the next launch; active server mode is
+                      unreported.
+                    </p>
+                  )}
                 <div className="managed-actions">
                   <button className="primary-button" disabled={busy}>
                     Save profile
@@ -906,14 +955,6 @@ export function DiveScreen({
           )}
         </section>
       </div>
-      {!draft && (
-        <ModelDiscovery
-          onDraft={(profile) => {
-            clearPreview()
-            setDraft(profile)
-          }}
-        />
-      )}
       <details className="managed-log-disclosure">
         <summary>
           Runtime output <span>Recent output from Lab-owned launches</span>
@@ -952,7 +993,11 @@ export function ManagedLog({ compact = false }: { compact?: boolean }) {
           {error}
         </p>
       )}
-      <pre className={`managed-log ${compact ? 'is-compact' : ''}`}>
+      <pre
+        className={`managed-log ${compact ? 'is-compact' : ''}`}
+        tabIndex={0}
+        aria-label="Managed runtime output"
+      >
         <code>{log || 'No managed runtime output yet.'}</code>
       </pre>
     </section>
@@ -961,7 +1006,7 @@ export function ManagedLog({ compact = false }: { compact?: boolean }) {
 
 export function LogsScreen() {
   return (
-    <div className="page detail-page managed-page">
+    <div className="page detail-page managed-page logs-page">
       <div className="eyebrow">
         <span className="eyebrow-line" /> SYSTEM / LOGS
       </div>

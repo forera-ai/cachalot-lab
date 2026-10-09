@@ -1,11 +1,11 @@
-# Verified against Cachalot 0.62.18 (2c319ec). Null overrides in Lab profiles
+# Verified against Cachalot 0.62.22 (5faabab). Null overrides in Lab profiles
 # inherit the runtime's version-specific default; zero has each knob's stated effect.
 knobs:
   - key: CACHALOT_GLM_DECODE_MISS_BUDGET
     kind: env
     families: [glm-5.3-flash]
     type: int-or-off
-    default: null
+    default: { direct_cli: null, serve_script_since_0_62_20: 2 }
     lab_range: [-1, 288]
     group: speed
     effect: changes-outputs

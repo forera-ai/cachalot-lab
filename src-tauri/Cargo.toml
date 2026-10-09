@@ -1,6 +1,6 @@
 [package]
 name = "cachalot-lab"
-version = "0.7.0"
+version = "0.7.1"
 description = "Mac desktop instrument panel for Cachalot"
 authors = ["Hamed Prooshani"]
 edition = "2021"

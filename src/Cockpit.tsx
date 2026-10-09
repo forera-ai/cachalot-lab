@@ -1,4 +1,4 @@
-import { ArrowRight, ChevronRight, Monitor, Radio } from 'lucide-react'
+import { ArrowRight, Monitor, Radio } from 'lucide-react'
 import { useId, useState } from 'react'
 
 import type { HostPoint } from './host'
@@ -41,9 +41,8 @@ function ReadEvidence({ runtime }: { runtime: RuntimeConnection }) {
       <summary>Read and wait evidence</summary>
       <div className="read-evidence-body">
         <p>
-          Measured runtime counters · /v1/stats · cumulative since server start.
-          Lookups and reads include prefill and decode. — means unreported,
-          invalid, or offline.
+          /v1/stats · measured totals since server start, prefill + decode. —
+          means unreported, invalid, or offline.
         </p>
         <table aria-label="Runtime read and wait totals">
           <tbody>
@@ -74,23 +73,26 @@ function ReadEvidence({ runtime }: { runtime: RuntimeConnection }) {
             })}
           </tbody>
         </table>
-        <p>
-          Skipped experts count dropped expert computations; zero does not prove
-          exact outputs or reveal the active budget. Read durations overlap;
-          summed time is not elapsed time. Busy time means at least one read in
-          flight. Decode wait is caller waiting, not a latency percentage or a
-          critical path.
-        </p>
-        <p>
-          Fast reads use a timing heuristic for page-cache hits. Accounted bytes
-          are runtime store counters, not physical-drive traffic. Emulated drive
-          bandwidth is not reported; these counters cannot identify a throttled
-          run.
-        </p>
-        <p>
-          Surface · Twilight · Midnight · Abyss are memory tiers. Per-tier
-          occupancy and SSD pressure are not reported by this runtime.
-        </p>
+        <details className="evidence-limits">
+          <summary>Interpretation and limits</summary>
+          <p>
+            Skipped experts count dropped expert computations; zero does not
+            prove exact outputs or reveal the active budget. Read durations
+            overlap; summed time is not elapsed time. Busy time means at least
+            one read in flight. Decode wait is caller waiting, not a latency
+            percentage or a critical path.
+          </p>
+          <p>
+            Fast reads use a timing heuristic for page-cache hits. Accounted
+            bytes are runtime store counters, not physical-drive traffic.
+            Emulated drive bandwidth is not reported; these counters cannot
+            identify a throttled run.
+          </p>
+          <p>
+            Surface · Twilight · Midnight · Abyss are memory tiers. Per-tier
+            occupancy and SSD pressure are not reported by this runtime.
+          </p>
+        </details>
       </div>
     </details>
   )
@@ -466,14 +468,6 @@ export function Cockpit({
                 value={runtimeTotal(runtime, 'images_served')}
               />
             </div>
-            {!snapshot.healthy && (
-              <button
-                className="panel-inline-link"
-                onClick={() => openScreen('api')}
-              >
-                Connect to begin trace <ChevronRight size={13} />
-              </button>
-            )}
           </div>
         </section>
 

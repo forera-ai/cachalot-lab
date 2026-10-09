@@ -361,10 +361,7 @@ export function ChatScreen({ runtime }: { runtime: RuntimeConnection }) {
 
   return (
     <div className="page chat-page">
-      <div className="eyebrow">
-        <span className="eyebrow-line" /> LAB / CHAT
-      </div>
-      <div className="page-heading">
+      <div className="page-heading chat-heading">
         <div>
           <h1>Chat</h1>
           <p>
@@ -395,7 +392,12 @@ export function ChatScreen({ runtime }: { runtime: RuntimeConnection }) {
           {conversations.length === 0 && (
             <p className="conversation-rail-empty">No saved chats yet.</p>
           )}
-          <div className="conversation-list">
+          <div
+            className="conversation-list"
+            tabIndex={0}
+            role="group"
+            aria-label="Conversation list"
+          >
             {conversations.map((conversation) => (
               <div
                 className={`conversation-entry ${selectedId === conversation.id ? 'is-selected' : ''}`}
@@ -427,7 +429,12 @@ export function ChatScreen({ runtime }: { runtime: RuntimeConnection }) {
           </div>
         </aside>
         <div className="chat-main">
-          <div className="chat-messages" role="log" aria-label="Conversation">
+          <div
+            className="chat-messages"
+            role="log"
+            aria-label="Conversation"
+            tabIndex={0}
+          >
             {messages.length === 0 && (
               <div className="chat-welcome">
                 <span className="section-kicker">LOCAL INFERENCE</span>
@@ -518,8 +525,11 @@ export function ChatScreen({ runtime }: { runtime: RuntimeConnection }) {
                 />
               </label>
               <label>
-                Temperature · server default when empty{' '}
+                Temperature{' '}
                 <input
+                  aria-label="Temperature · server default when empty"
+                  title="Empty uses the server default"
+                  placeholder="Default"
                   type="number"
                   min="0"
                   max="2"
