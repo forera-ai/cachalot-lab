@@ -1,6 +1,72 @@
 # Handoff
 
-## Start here — Cachalot Lab 0.7.1 release preparation, 2026-10-09
+## Start here — Cachalot Lab 0.7.1 published, 2026-10-09
+
+Published [v0.7.1](https://github.com/forera-ai/cachalot-lab/releases/tag/v0.7.1)
+from clean implementation commit `a2192612cf807d62950b10d4d48f79e18a3d8dcf`
+and its annotated tag. This backward-compatible patch ships compact panel layouts,
+full-panel Chat, optional details on demand, and improved Surface action contrast.
+All package/native manifests and Cargo.lock are 0.7.1. Stable app/data identities,
+profiles, conversations, credentials, process ownership, and inference policy remain
+compatible. This section is a documentation-only post-publication follow-up; the
+release source and tag stay fixed at the implementation commit above.
+
+The public release contains seven verified assets: DMG, ZIP, SHA256SUMS,
+SOURCE_COMMIT, app and DMG notarization receipts, and RELEASE-REPORT.md. Every
+downloaded asset matches its local SHA-256 and GitHub digest. GitHub confirms the
+release is public and latest. The published README and all 17 PNG Git blobs match
+the tag: ten new native 0.7.1 captures and seven byte-identical owner-provided 0.7.0
+historical images. New captures show the endpoint unavailable at capture time;
+the independently inspected final app later observed the returning external GLM.
+Capture provenance is in `assets/screenshots/v0.7.1/README.md`.
+
+The exact-source release build passed formatting, lint, types, 47 frontend tests,
+six Python mock tests, Rust formatting/clippy, 32 Rust tests (one existing real
+Keychain test ignored), production Vite and signed Tauri builds. The known optional
+rust-objcopy/libLLVM stripping warning was nonfatal. Developer ID signing,
+Hardened Runtime, secure timestamp, strict signatures, stapling, Gatekeeper app/DMG
+assessment, ZIP integrity, and final DMG checksums passed. Unpublished DMG layouts
+were discarded during Finder inspection; the unchanged notarized app was repackaged
+with corrected Finder metadata, visually inspected, and the final DMG was freshly
+signed and notarized. No discarded installer was published. Details are in the
+release's verification report.
+
+- App Apple submission: `75b56951-5dfb-4c76-80f1-dd95f6381952` — Accepted.
+- Final DMG Apple submission: `6e41d44b-f2e7-4630-836a-37a8e6d1b23b` — Accepted.
+- DMG SHA-256: `e473ea24771a8a730d1266fe3a5d84d0d916bc955a3175568b1a2dc49a2edbd8`.
+- ZIP SHA-256: `d57c8f26f1390ce7268d2e24b6ff6e17b83ceb4596519b9b0d8c2fab6c274c3c`.
+- Installed executable SHA-256: `9d94583dbde9803aac1b91290dfac93b2cf0c556a658cb69744069e6c4286573`.
+
+Exact-source GitHub CI passed on both [main](https://github.com/forera-ai/cachalot-lab/actions/runs/37934448141)
+and [v0.7.1](https://github.com/forera-ai/cachalot-lab/actions/runs/37934448098). The published README gallery was also inspected
+on GitHub: its new Chat and Settings images render correctly.
+
+Installed the app from the verified public DMG at `/Applications/Cachalot Lab.app`
+after publication. All five bundle files match the mounted public app, authoritative
+release app, and extracted ZIP. Strict signature, stapling, Gatekeeper, version,
+and native Chat/Settings inspection passed. The prior installation is recoverable
+at `.release/0.7.1/before-public-Cachalot Lab.app`; the original public 0.7.0 backup
+remains at `.release/local-panels-2026-10-09/previous-Cachalot Lab.app`.
+All five existing app-data files remained byte-identical. Original System appearance
+and Silent running Off were preserved. No model launch/stop, generation request,
+profile save/delete, credential action, or inference tuning was performed.
+
+All seven default panels in the exact-source release app were visually inspected
+at 1380 × 860 logical pixels in both themes and fit without page scrolling.
+Logs/history retain their own bounded scrolling; expanded details and long forms
+may scroll. Offline browser minimum checks at 1100 × 720 remain narrower evidence
+than connected native minimum layout. Exact minimum connected native layout,
+long native history/streaming, managed GLM/DeepSeek inference, output quality,
+sustained performance, instrumentation overhead, and authenticated saved-key restart
+remain unverified. No speed or quality benefit is claimed.
+
+Last reviewed runtime: clean Cachalot **0.62.22**, commit
+`5faababa6bc098400147611d3ffd11cd00e3100d`; briefs through 0.62.20. Lab uses the
+direct CLI, keeps an empty GLM decode miss budget off, and does not adopt the shell
+script's budget 2. Release receipts, hashes, public download/digest checks, native
+captures, installation/data records, and CI logs are in `.release/0.7.1/`.
+
+## Historical release preparation — Cachalot Lab 0.7.1, 2026-10-09
 
 Planned release: [v0.7.1](https://github.com/forera-ai/cachalot-lab/releases/tag/v0.7.1).
 This patch ships the panel layout and Surface contrast refinements described below.
