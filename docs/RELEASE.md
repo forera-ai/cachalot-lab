@@ -53,15 +53,15 @@ This local test installation does not make an uncommitted build a release.
 
 ## Scope
 
-The [0.7.1 release](https://github.com/forera-ai/cachalot-lab/releases/tag/v0.7.1)
-refines panel layout and Surface contrast. It retains skipped-expert evidence and
-an explicit GLM decode miss-budget control.
-It retains physical-drive telemetry, bounded local model discovery, optional
-Keychain credentials, Dive controls, chat settings, managed process ownership,
-and host telemetry. Live GLM/DeepSeek inference, saved-key restart, and performance
-measurements remain outstanding. The macOS artifact targets Apple Silicon on
-macOS 14 or newer. Python, Cachalot, checkpoints, and an update service are not
-included.
+The [0.8.0 release](https://github.com/forera-ai/cachalot-lab/releases/tag/v0.8.0)
+adds optional energy and sampled DeepSeek token evidence, saved request energy and
+explicit next-launch instrumentation controls. Instruments default off; energy
+requires Cachalot 0.63+, tracing requires DeepSeek 0.64+. Existing inference,
+profiles, credentials, data identities, panels and runtime controls remain compatible.
+Native fixture checks are synthetic; live model energy/quality/performance and Lab
+instrumentation overhead remain unmeasured. GPU timelines, critical-path proof,
+durable experiments and automatic updates remain planned. The macOS artifact targets
+Apple Silicon on macOS 14 or newer. Python, Cachalot and checkpoints are not included.
 
 ## One-time signing setup
 

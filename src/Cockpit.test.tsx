@@ -478,3 +478,18 @@ it('shows skipped experts as output-changing evidence and preserves unknowns', (
   rerender(view())
   expect(reading()).toHaveTextContent('—')
 })
+
+it('offers optional runtime energy and sampled token evidence', () => {
+  render(
+    <Cockpit
+      platform={platform}
+      platformError={null}
+      host={{ history: [], error: null }}
+      openScreen={vi.fn()}
+      runtime={connection()}
+    />,
+  )
+  fireEvent.click(screen.getByRole('button', { name: 'Runtime' }))
+  expect(screen.getByText('Energy evidence')).toBeInTheDocument()
+  expect(screen.getByText('Sampled token evidence')).toBeInTheDocument()
+})

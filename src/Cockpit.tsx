@@ -10,6 +10,7 @@ import {
   type RuntimePoint,
 } from './runtime'
 import './cockpit.css'
+import { RuntimeEvidence } from './RuntimeEvidence'
 import { useLabStore } from './store'
 
 type TrendDatum = { at: number; value: number | null }
@@ -678,7 +679,12 @@ export function Cockpit({
               <p>Runtime totals · — means unreported. Not a speedup measure.</p>
             </div>
           )}
-          {storageView === 'runtime' && <ReadEvidence runtime={runtime} />}
+          {storageView === 'runtime' && (
+            <>
+              <ReadEvidence runtime={runtime} />
+              <RuntimeEvidence runtime={runtime} />
+            </>
+          )}
           {storageView === 'drives' && (
             <div className="cache-footer">
               <p>

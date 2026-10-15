@@ -16,7 +16,7 @@ Copyright (c) 2026 forera.ai and contributors. Licensed under the [MIT License](
 
 **Cachalot Lab** is the new name of Cachalot Studio. Its governing goal is to make invisible inference behavior visible: explain time, concurrency, resource activity, data movement, and experimental tradeoffs. Cachalot remains the inference engine; Lab is the human-facing instrument panel. See [product direction](docs/PRODUCT_DIRECTION.md), [delivery roadmap](docs/PLAN.md), and [rename compatibility](docs/RENAME.md).
 
-The existing app launches or connects to local Cachalot, inspects live health and cache metrics, streams chat and reasoning, and provides API details. Token profiling, durable experiment comparisons, sweeps, energy analysis, and validated counterfactuals are planned capabilities, not features of the 0.7.0 binary. Connections remain limited to the same Mac.
+The existing app launches or connects to local Cachalot, inspects live health and cache metrics, streams chat and reasoning, and provides API details. Lab 0.8.0 adds optional runtime energy evidence, saved request energy, and sampled DeepSeek decode aggregates. Event timelines, durable experiment comparisons, sweeps, and validated counterfactuals remain planned. Connections remain limited to the same Mac.
 
 ## The app in use — 0.7.1
 
@@ -104,14 +104,14 @@ host readiness, connection health, and Lab-owned process state.
 
 ## Download
 
-**Current release:** [Cachalot Lab 0.7.1](https://github.com/forera-ai/cachalot-lab/releases/tag/v0.7.1) for Apple Silicon, macOS 14 or newer. This patch improves panel layouts and Surface contrast, retaining skipped-expert evidence and explicit GLM decode miss-budget controls. Existing profiles, conversations, preferences, and credential namespaces are preserved.
+**Current release:** [Cachalot Lab 0.8.0](https://github.com/forera-ai/cachalot-lab/releases/tag/v0.8.0) for Apple Silicon, macOS 14 or newer. This compatible minor release adopts energy and sampled token-trace contracts, retaining panel layouts, read/wait evidence, and explicit GLM controls. Existing profiles, conversations, preferences, and credential namespaces are preserved.
 
-1. Download the signed and notarized [DMG](https://github.com/forera-ai/cachalot-lab/releases/download/v0.7.1/Cachalot-Lab-0.7.1-macOS-arm64.dmg).
+1. Download the signed and notarized [DMG](https://github.com/forera-ai/cachalot-lab/releases/download/v0.8.0/Cachalot-Lab-0.8.0-macOS-arm64.dmg).
 2. Open it and drag **Cachalot Lab** into **Applications**.
 3. Open Lab. It first tries an existing Cachalot server at `http://127.0.0.1:8011`.
 4. Use **Dive** to launch a local runtime, or enter another loopback port and optional API key in **API**.
 
-The release also includes a [ZIP](https://github.com/forera-ai/cachalot-lab/releases/download/v0.7.1/Cachalot-Lab-0.7.1-macOS-arm64.zip) and [SHA-256 checksums](https://github.com/forera-ai/cachalot-lab/releases/download/v0.7.1/SHA256SUMS). The [release notes](https://github.com/forera-ai/cachalot-lab/releases/tag/v0.7.1) state the exact scope and verification.
+The release also includes a [ZIP](https://github.com/forera-ai/cachalot-lab/releases/download/v0.8.0/Cachalot-Lab-0.8.0-macOS-arm64.zip) and [SHA-256 checksums](https://github.com/forera-ai/cachalot-lab/releases/download/v0.8.0/SHA256SUMS). The [release notes](https://github.com/forera-ai/cachalot-lab/releases/tag/v0.8.0) state the exact scope and verification.
 
 Lab does not install Cachalot, Python, or model weights. Prepare a model and environment using the [runtime documentation](https://github.com/forera-ai/cachalot). Dive needs the absolute path to a Python interpreter with Cachalot installed, the model directory, and any separate expert bank. You can also start the server yourself:
 
@@ -119,7 +119,15 @@ Lab does not install Cachalot, Python, or model weights. Prepare a model and env
 python -m cachalot.cli serve --model /path/to/your/model --port 8011
 ```
 
-## What 0.7.1 includes
+## What 0.8.0 includes
+
+Cockpit's Runtime tab adds collapsed **Energy evidence** and **Sampled token evidence**. Energy shows whole-Mac SMC power and cumulative joules, sample age/interval, independent unavailable-source reasons, and separate IOReport SoC estimates. It does not subtract idle power or turn components into a full system breakdown. Chat keeps raw `usage.cachalot.energy` in existing saved usage and offers request/decode windows, mean watts, and decode joules/output token. Sampling error can dominate short requests.
+
+Dive's optional Instrumentation group enables energy (Cachalot 0.63+) and DeepSeek tracing (0.64+) explicitly on the next managed launch. Empty choices preserve off defaults; inherited instrumentation keys are removed. Energy interval supports 0.1–60 s; trace records one token in 1–65536 (empty uses 4). Controls do not prove active server state. No sudo sampler is launched.
+
+Trace means cover sampled decode since server start, not this chat. Router eval includes GPU work, waits overlap reads, crossing-boundary reads are omitted, and loss metadata remains visible. No GPU timeline or proven critical path is available. Later runtime measurements replace the brief's derived 0.14 ms estimate: one-in-four tracing averaged +0.274 ms/token (95% −0.065 to +0.645), not certified under its 0.5 ms upper-bound rule. Continuous recording measured +0.55 ms/token (95% +0.05 to +1.11). These describe specific runtime workloads; Lab and energy-meter overhead remain unmeasured. Live model validation remains outstanding; fixture checks are synthetic.
+
+## Preserved capabilities
 
 0.7.0 adds skipped-expert evidence and explicit GLM decode miss-budget controls to the collapsed runtime read/wait evidence table introduced in 0.6.0. It retains the Cachalot Lab name. It retains physical-drive read/write telemetry, local model discovery, optional macOS Keychain credentials, and a refined Dive interface. It retains GLM/DeepSeek launch controls, runtime totals, Silent running, chat settings, and managed runtime capabilities.
 
@@ -140,7 +148,7 @@ API keys stay in session memory unless explicitly saved in Keychain; stored secr
 
 ## Panel layout in 0.7.1
 
-0.7.1 fills Chat’s panel with an anchored composer and independently scrolling history. Settings and Doctor use compact columns; API places setup beside examples; Logs keeps scrolling inside its output. Dive places profiles beside details, with discovery and optional settings expanded on demand. All seven default panels fit the normal native window in both themes; offline browser preview also fits 1100 × 720. Connected native layout at that exact minimum remains unverified. Expanded detail and long collections remain scrollable. The current gallery shows 0.7.1; original owner captures remain under their historical 0.7.0 label.
+0.7.1 fills Chat’s panel with an anchored composer and independently scrolling history. Settings and Doctor use compact columns; API places setup beside examples; Logs keeps scrolling inside its output. Dive places profiles beside details, with discovery and optional settings expanded on demand. All seven default panels fit the normal native window in both themes; offline browser preview also fits 1100 × 720. Connected native layout at that exact minimum remains unverified. Expanded detail and long collections remain scrollable. The historical layout gallery shows 0.7.1; original owner captures remain under their historical 0.7.0 label.
 
 ## Storage, discovery, and credentials
 
@@ -196,3 +204,7 @@ briefs still end at 0.61.1 and the supported Lab contract is unchanged.
 ## Runtime 0.62.14 compatibility (Lab 0.7.0)
 
 Briefs through 0.62.20 were reviewed against Cachalot 0.62.22 (`5faababa6bc098400147611d3ffd11cd00e3100d`). Lab 0.7.0 adds skipped-expert evidence in Cockpit and an explicit GLM decode miss budget in Dive. Empty or -1 disables that budget; 0–288 caps non-resident reads per decode layer, changes outputs, and may lower quality. Settings apply on next launch; active server mode stays unknown. Missing counters remain unavailable, zero does not prove exact outputs, and positive totals qualify cache hit rate. Lab's direct CLI retains prefetch default 5; the runtime script now defaults to 0 and can auto-select an owner-specific bank. Since 0.62.20, the GLM shell script also defaults to decode miss budget 2, which changes outputs. Lab’s direct CLI empty budget remains off; Lab does not silently adopt those script defaults. Routing-trace formats are documented; a viewer remains planned. These backward-compatible capabilities ship in 0.7.0; live miss-budget inference and output quality remain unverified. See [runtime sync](docs/RUNTIME_SYNC.md).
+
+## Runtime 0.63/0.64 adoption (Lab 0.8.0)
+
+Reviewed both new briefs through 0.64.0 against clean Cachalot **0.64.17**, commit `cf328cc8cef9da37c4348054ddb0c4128e09c570`, including source and changelog corrections. Optional fields remain unavailable on older/offline/partial servers. Energy request reports need the meter enabled; trace means require DeepSeek with tracing enabled. No routing NPZ or raw event viewer is shipped. See [runtime sync](docs/RUNTIME_SYNC.md) and [energy/trace evidence](docs/ENERGY_TRACE.md).

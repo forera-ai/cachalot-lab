@@ -2010,3 +2010,26 @@ pre:focus-visible,
 .profile-editor > .managed-actions {
   grid-column: 1 / -1;
 }
+
+.request-energy table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+.request-energy th {
+  text-align: left;
+  font-weight: 400;
+}
+.request-energy td {
+  text-align: right;
+  white-space: nowrap;
+}
+.request-energy th,
+.request-energy td {
+  padding: 5px 6px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.request-energy p {
+  margin: 10px 0;
+}

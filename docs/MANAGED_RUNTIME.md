@@ -41,3 +41,9 @@ Preview opens a labeled executable/arguments/environment section with bounded sc
 ## GLM budget control (Lab 0.7.0)
 
 Cachalot 0.62.14 adds a GLM-only decode miss budget. Dive accepts an empty field (off), -1 (explicit off), or 0–288 (maximum non-resident expert reads per decode layer). A budget changes outputs and may lower quality; 0 drops all misses. Prefill is unchanged. The selected profile marks nonnegative values as output-changing next-launch settings; it does not assert active server mode. Older profiles omit the field, other families reject it, and inherited values are removed before explicit overrides. Save/reopen and family changes preserve the existing profile contract. Lab retains the direct CLI's prefetch default 5 and requires an explicit bank path; it does not apply serve-glm.sh's new default 0 or conditional bank selection.
+
+## Optional instrumentation (Lab 0.8.0)
+
+Dive adds a collapsed Instrumentation group for explicit next-launch energy collection (Cachalot 0.63+) and sampled DeepSeek tracing (0.64+). Nullable boolean controls emit 1/0 only for explicit On/Off, with interval settings of 0.1–60 seconds and one token in 1–65536. Empty settings use runtime defaults: off, 1 second, and one token in four. All four instrumentation environment keys are removed from inheritance first. Existing profile files use serde defaults with no storage version change.
+
+Energy applies to all families; trace controls require explicit DeepSeek. Family changes preserve energy settings and clear trace settings along with family tuning. Preview shows requested environment only, not proof of current server settings. No sudo sampler or runtime policy tuning is performed. Whole-system power, SoC estimates, sampling cost, uncertainty and unavailable behavior are explained in [ENERGY_TRACE.md](ENERGY_TRACE.md).

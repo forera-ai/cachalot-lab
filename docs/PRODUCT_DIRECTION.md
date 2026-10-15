@@ -124,3 +124,7 @@ The owner's original sections map to the governing policy here and delivery phas
 | 18–19            | Layered interface and visualization criteria; all phases        |
 | 20–21            | Overhead and raw evidence; Phases A–C and every new collector   |
 | 22–24            | Investigation surfaces, research cycle, and mission; all phases |
+
+## Implemented evidence slice — 0.8.0
+
+Optional runtime energy and sampled DeepSeek decode aggregates now have source-scoped, collapsed views and explicit next-launch collection controls. Request energy remains in saved usage. This advances evidence foundations and the independent energy lane; it does not deliver the flagship event timeline, proven critical path, durable run comparison or automatic tuning. Runtime 0.64.17 source and measurement corrections govern interpretation. See [energy/trace scope](ENERGY_TRACE.md).

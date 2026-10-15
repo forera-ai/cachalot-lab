@@ -1,7 +1,7 @@
 # Source-reviewed HTTP fields, not inferred from launch knobs or startup logs.
 reviewed_runtime:
-  version: 0.62.22
-  commit: 5faababa6bc098400147611d3ffd11cd00e3100d
+  version: 0.64.17
+  commit: cf328cc8cef9da37c4348054ddb0c4128e09c570
 endpoint: /v1/stats
 fields:
   decode_miss_budget:
@@ -108,3 +108,61 @@ read_wait_evidence:
   overhead: No inference-overhead measurement was performed; no overhead or performance claim is made.
   throttle: CACHALOT_READ_THROTTLE_GBPS is not reported over HTTP. Emulated drive bandwidth is unknown from stats and must not be inferred from a low rate.
   deferred: Per-token deltas need aligned windows and reset handling; decode wait share needs matching request decode durations. Busy-rate derivation needs confirmed byte/timing population alignment.
+
+energy:
+  since: 0.63.0
+  question: What whole-system power and integrated energy has the runtime meter observed?
+  fields:
+    [
+      enabled,
+      available,
+      sample_interval_seconds,
+      samples,
+      last_sample_age_seconds,
+      since,
+      system,
+      components,
+    ]
+  system: SMC PSTR whole-system watts and cumulative joules since meter creation; includes idle, other apps, display. Source and measured tag are runtime-reported.
+  components: IOReport cumulative cpu/gpu/ane/dram/dcs/amcc joules, displayed as SoC estimates even though the wire tag is measured. Never an additive breakdown of system energy.
+  availability: Each source requires available true; false reason is shown, never a zero. Lab suppresses energy if reported age exceeds 5 * interval + 1 seconds, matching runtime freshness. Missing/invalid numbers stay unavailable independently.
+  since_semantics: Epoch start of retained meter ring, not necessarily creation after ring rollover; cumulative joules do not reset at ring rollover. samples is retained count, capped by runtime history (default 7200).
+  request_usage: usage.cachalot.energy, including final streaming usage with choices empty. Whole request excludes queue; decode is its last decode_seconds. Decode may be null independently of request availability.
+  request_fields: seconds, system_joules, mean_system_watts, components_joules; decode also system_joules_per_token. No Lab division by unrelated cumulative token totals.
+  sampling: Linear interpolation; up to two intervals of tail extrapolation. 0.63.1 corrects component-tail extrapolation. Short/first requests have up to one interval error at each end; no idle subtraction.
+  storage: Current stats snapshot only. Raw request energy persists inside existing bounded conversation usage (20 MiB total, 200 conversations, 1000 messages each). No new durable telemetry history or export.
+  overhead: Existing stats poll only; no new native sampler. Runtime meter cost remains unmeasured; Lab rendering/transport/inference overhead unmeasured.
+
+token_trace:
+  since: 0.64.0
+  family: deepseek
+  question: Where does time go across positionally sampled decode tokens?
+  fields:
+    [
+      every,
+      sampled_tokens,
+      requests,
+      dropped_events,
+      exposed_read_share,
+      mean_per_sampled_token,
+    ]
+  means:
+    [
+      wall_ms,
+      sync_ms,
+      blocked_ms,
+      read_busy_ms,
+      hidden_read_ms,
+      reads,
+      bytes,
+      events,
+    ]
+  lifetime: Running means across sampled decode tokens since server start, drained at request completion; cancelled residuals cleared before next request. No request attribution or timeline endpoint.
+  sync_ms: Router mx.eval window includes queued GPU work; not pure synchronization, compute, or waiting. 0.64.8 withdraws the router-sync-bound interpretation.
+  blocked_ms: Main-thread expert-return call duration; exposed I/O, not proven critical path or guaranteed drive speedup.
+  read_busy_ms: Union of worker read intervals in token window. hidden_read_ms is outside blocked intervals; crossing-boundary reads omitted. Do not sum overlapping rows.
+  exposed_read_share: Runtime-derived sum(blocked_ms)/sum(read_busy_ms), null before reads. Approximate, not token latency fraction. Not clamped to fabricate a percentage.
+  fallback: Unknown fields stay unavailable, zero is preserved. Means and ratio unavailable before positive valid sampled_tokens. Dropped events displayed; missing loss metadata means completeness unverified.
+  overhead: Continuous +0.55 ms/token (95% +0.05 to +1.11), not certified against 1 ms stop rule. Later 1-in-4 average +0.274 ms/token (95% -0.065 to +0.645), not certified under 0.5 ms upper-bound rule. Workload-specific runtime measurements, not Lab overhead.
+  collection: Existing poll and current raw snapshot only; no per-token history, new request, native instrumentation, trace export, or automatic inference tuning.
+  deferred: Correlated event timeline, GPU completion, critical-path dependencies, durable run comparison and export.

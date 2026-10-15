@@ -1,4 +1,4 @@
-# Verified against Cachalot 0.62.22 (5faabab). Null overrides in Lab profiles
+# Verified against Cachalot 0.64.17 (cf328cc). Null overrides in Lab profiles
 # inherit the runtime's version-specific default; zero has each knob's stated effect.
 knobs:
   - key: CACHALOT_GLM_DECODE_MISS_BUDGET
@@ -351,3 +351,28 @@ knobs:
     restart_required: true
     stability: shipped
     summary: Maximum share of each expert read assigned to the mirror; requires a mirror path in Lab.
+
+# Lab strips inherited values for all four knobs before applying explicit profile choices.
+instrumentation:
+  energy_enabled:
+    env: CACHALOT_ENERGY
+    since: 0.63.0
+    families: [auto, deepseek, glm, minimax]
+    default: false
+    lab: Nullable boolean; null emits no value, explicit On is 1 and Off is 0. Does not start sudo or powermetrics.
+  energy_interval_seconds:
+    env: CACHALOT_ENERGY_INTERVAL
+    default: 1.0
+    lab_range: [0.1, 60.0]
+    summary: Optional finite seconds; inert while energy is off. Lab's bound is narrower than runtime's lower-clamped float input.
+  token_trace_enabled:
+    env: CACHALOT_TOKEN_TRACE
+    since: 0.64.0
+    families: [deepseek]
+    default: false
+    lab: Nullable boolean; explicit DeepSeek family required. Changing family clears trace settings, retains all-family energy choices. GLM and MiniMax ignore this runtime knob.
+  token_trace_every:
+    env: CACHALOT_TOKEN_TRACE_EVERY
+    default: 4
+    lab_range: [1, 65536]
+    summary: Positional decode sampling interval; 1 records continuously. Inert while tracing is off. Upper bound is a Lab validation limit.

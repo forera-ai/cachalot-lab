@@ -815,3 +815,23 @@
     margin-bottom: 4px;
   }
 }
+
+/* Instrument labels and epoch values need full-width rows at every panel size. */
+.read-evidence.instrument-evidence table {
+  display: table;
+  table-layout: fixed;
+}
+.read-evidence.instrument-evidence tbody {
+  display: table-row-group;
+}
+.read-evidence.instrument-evidence tr {
+  display: table-row;
+}
+.read-evidence.instrument-evidence th {
+  width: 66%;
+  overflow-wrap: anywhere;
+}
+.read-evidence.instrument-evidence td {
+  padding-right: 18px;
+  overflow-wrap: anywhere;
+}

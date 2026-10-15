@@ -1,0 +1,63 @@
+{
+  "energy": {
+    "enabled": true,
+    "available": true,
+    "sample_interval_seconds": 1.0,
+    "samples": 7,
+    "last_sample_age_seconds": 0.96,
+    "since": 1791713761.68,
+    "system": {
+      "available": true,
+      "watts": 36.7,
+      "joules": 314.4,
+      "source": "SMC PSTR \u00b7 synthetic fixture",
+      "tag": "measured",
+      "reason": null
+    },
+    "components": {
+      "available": false,
+      "joules": null,
+      "source": "IOReport Energy Model \u00b7 synthetic fixture",
+      "tag": "measured",
+      "reason": "Synthetic unavailable component counters"
+    }
+  },
+  "token_trace": {
+    "every": 4,
+    "sampled_tokens": 86,
+    "requests": 3,
+    "dropped_events": 0,
+    "exposed_read_share": 0.6,
+    "mean_per_sampled_token": {
+      "wall_ms": 153.2,
+      "sync_ms": 62.4,
+      "blocked_ms": 62.8,
+      "read_busy_ms": 104.4,
+      "hidden_read_ms": 43.1,
+      "reads": 66.3,
+      "bytes": 659000000,
+      "events": 294
+    }
+  },
+  "usage_energy": {
+    "available": true,
+    "tag": "measured",
+    "source": "SMC PSTR \u00b7 synthetic fixture",
+    "sample_interval_seconds": 1.0,
+    "request": {
+      "seconds": 2.854,
+      "system_joules": 135.19,
+      "mean_system_watts": 47.37,
+      "components_joules": null
+    },
+    "decode": {
+      "seconds": 0.888,
+      "system_joules": 50.42,
+      "mean_system_watts": 56.77,
+      "system_joules_per_token": 7.2026,
+      "components_joules": null
+    },
+    "components_available": false,
+    "components_source": "IOReport Energy Model \u00b7 synthetic fixture"
+  }
+}

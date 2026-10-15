@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.8.0] - 2026-10-15
+
+This backward-compatible minor release adds optional energy and sampled DeepSeek token evidence. Existing app/data identities, saved workflows, and inference defaults remain compatible.
+
+- Adopt runtime briefs 0.63.0 and 0.64.0 against clean 0.64.17 (`cf328cc`), including energy-tail and router-eval/overhead corrections.
+- Add collapsed Cockpit energy and sampled token tables, explicit scope/source/estimate labels, stale/unavailable handling, and event-loss disclosure.
+- Show saved chat request/decode energy with raw usage preservation; never infer decode energy from unrelated totals.
+- Add explicit next-launch energy and DeepSeek sampling controls, validated ranges, and inherited-environment removal. Instruments remain off by default.
+- Add synthetic HTTP/SSE contract fixtures and regression checks; exclude generated release artifacts from lint/format scope.
+- No GPU timeline, critical-path proof, automated tuning, energy/performance benefit, or certified Lab overhead is claimed.
+
 ## [0.7.1] - 2026-10-09
 
 This patch release improves panel layout and readability without changing public contracts, launch defaults, or data formats.

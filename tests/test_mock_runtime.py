@@ -104,6 +104,26 @@ class MockRuntimeTests(unittest.TestCase):
         self.assertEqual(stats["requests_served"], 1)
         self.assertGreater(stats["tokens_generated"], 0)
 
+    def test_optional_observability_and_final_stream_usage(self):
+        _, data = self.request("/v1/stats")
+        self.assertNotIn("energy", json.loads(data))
+        self.runtime.scenario = mock_server.Scenario(observability=True)
+        _, data = self.request("/v1/stats")
+        stats = json.loads(data)
+        self.assertEqual(stats["energy"]["system"]["watts"], 36.7)
+        self.assertIsNone(stats["energy"]["components"]["joules"])
+        self.assertEqual(stats["token_trace"]["every"], 4)
+        _, stream = self.request("/v1/chat/completions", {"stream": True, "stream_options": {"include_usage": True}})
+        chunks = [json.loads(line[6:]) for line in stream.splitlines() if line.startswith("data: {")]
+        self.assertEqual(chunks[-1]["choices"], [])
+        self.assertEqual(chunks[-1]["usage"]["cachalot"]["energy"]["decode"]["system_joules_per_token"], 7.2026)
+        _, data = self.request("/v1/chat/completions", {"stream": False})
+        self.assertEqual(json.loads(data)["usage"]["cachalot"]["energy"]["request"]["system_joules"], 135.19)
+        self.runtime.scenario = mock_server.Scenario(observability=True, missing_stats=True)
+        _, data = self.request("/v1/stats")
+        self.assertNotIn("energy", json.loads(data))
+        self.assertNotIn("token_trace", json.loads(data))
+
     def test_startup_delay(self):
         self.runtime.scenario = mock_server.Scenario(startup_delay=10)
         status, _ = self.request("/health")

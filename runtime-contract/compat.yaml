@@ -1,11 +1,14 @@
-# Reviewed committed runtime: 0.62.22 at 5faabab. The HTTP response does not expose
+# Reviewed committed runtime: 0.64.17 at cf328cc. The HTTP response does not expose
 # package version or active numerics mode, so external-server mode stays unknown.
 reviewed_runtime:
-  version: 0.62.22
-  commit: 5faababa6bc098400147611d3ffd11cd00e3100d
+  version: 0.64.17
+  commit: cf328cc8cef9da37c4348054ddb0c4128e09c570
 brief_inbox: docs/lab/briefs
-# Briefs reviewed through 0.62.20; 0.62.21–22 are measurements and metadata.
+# Briefs reviewed through 0.64.0; source/changelog corrections through 0.64.17.
 features:
+  energy_meter: '>=0.63.0'
+  energy_component_tail_fix: '>=0.63.1'
+  deepseek_sampled_token_trace: '>=0.64.0'
   glm_decode_miss_budget: '>=0.62.14'
   glm_skipped_experts: '>=0.62.14'
   glm_minimax_routing_trace: '>=0.62.0'
@@ -36,6 +39,10 @@ features:
   deepseek_disk_chunk_pins: '>=0.59.0'
   deepseek_system_date_reuse: '>=0.60.0'
 launch_defaults:
+  energy_enabled: false
+  energy_interval_seconds: 1.0
+  token_trace_enabled: false
+  token_trace_every: 4
   glm_direct_cli_decode_miss_budget: null
   glm_serve_script_decode_miss_budget_since_0_62_20: 2
   glm_direct_cli_predict_topk: 5

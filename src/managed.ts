@@ -4,6 +4,10 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { DEFAULT_RUNTIME_PORT, type RuntimeConnection } from './runtime'
 
 export type RuntimeTuning = {
+  energy_enabled: boolean | null
+  energy_interval_seconds: number | null
+  token_trace_enabled: boolean | null
+  token_trace_every: number | null
   deepseek_decode_drop_misses: boolean | null
   deepseek_system_date_reuse: boolean | null
   minimax_decode_miss_substitution: boolean | null
@@ -68,6 +72,10 @@ export function newProfile(): LaunchProfile {
     default_temperature: null,
     snapshot_dir: null,
     tuning: {
+      energy_enabled: null,
+      energy_interval_seconds: null,
+      token_trace_enabled: null,
+      token_trace_every: null,
       deepseek_decode_drop_misses: null,
       deepseek_system_date_reuse: null,
       minimax_decode_miss_substitution: null,

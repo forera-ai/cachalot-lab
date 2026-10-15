@@ -250,3 +250,13 @@ and no saved profile is rewritten. Existing positive skipped-expert evidence alr
 qualifies cache hit rate, while active numerics mode stays unreported. Prefetch remains
 5 for the direct CLI and 0 in the script. Source review does not validate the brief’s
 performance or quality measurements; no model launch or generation was performed.
+
+## Runtime 0.63.0 / 0.64.0 briefs — 2026-10-15, Lab 0.8.0
+
+Listed the inbox and read both new briefs since the 0.62.20 review. Compared clean Cachalot **0.64.17**, commit `cf328cc8cef9da37c4348054ddb0c4128e09c570`, source/changelog against the previously reviewed `5faabab`. New contracts are optional `stats.energy`, `usage.cachalot.energy`, energy log suffixes, and DeepSeek `stats.token_trace` plus four collection environment knobs. No additional brief after 0.64.0 was present at review.
+
+Adopted collapsed Cockpit evidence, saved chat energy details, next-launch instrumentation controls and synthetic HTTP/SSE fixtures. Missing/offline/stale/invalid readings stay unavailable; IOReport estimates stay separate from system total. Inherited knobs are removed; null profiles keep instruments off. No runtime policy is changed. Energy choices survive family changes; DeepSeek trace settings do not.
+
+Current source qualifies the briefs: energy `since` follows the retained ring start while joules stay cumulative; 0.63.1 fixes component tail extrapolation, verified in 0.63.2; energy-meter overhead remains unmeasured. 0.64.8 withdraws router-sync-bound claims; router eval includes GPU work. 0.64.9's measured sampled cost (+0.274 ms/token, 95% −0.065 to +0.645) replaces the brief's derived 0.14 ms and is not certified under 0.5 ms. Raw GET_END kept-expert payload changed in 0.64.13 without stats changes. Later benchmark findings remain workload-specific; no Lab policy adoption follows them.
+
+The contract and evidence limits are in [ENERGY_TRACE.md](ENERGY_TRACE.md). Regression checks and synthetic native checks do not validate live model energy, output quality, sustained performance or Lab overhead. Existing live-family and saved-key restart limitations remain open. No new durable trace history, event timeline, run comparison, GPU timeline or proven critical path is shipped.

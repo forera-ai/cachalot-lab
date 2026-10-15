@@ -344,7 +344,12 @@ export function DiveScreen({
                       onChange={(event) =>
                         update({
                           family: event.target.value as LaunchProfile['family'],
-                          tuning: newProfile().tuning,
+                          tuning: {
+                            ...newProfile().tuning,
+                            energy_enabled: draft.tuning.energy_enabled ?? null,
+                            energy_interval_seconds:
+                              draft.tuning.energy_interval_seconds ?? null,
+                          },
                           default_temperature:
                             event.target.value === 'minimax' &&
                             draft.default_temperature === null
@@ -431,6 +436,60 @@ export function DiveScreen({
                       />
                     </label>
                   </div>
+                </details>
+                <details className="profile-options">
+                  <summary>
+                    Instrumentation <span>Optional · next launch</span>
+                  </summary>
+                  <div className="managed-fields">
+                    <TriState
+                      label="Energy meter · Cachalot 0.63+ · default Off"
+                      value={draft.tuning.energy_enabled ?? null}
+                      onChange={(energy_enabled) =>
+                        updateTuning({ energy_enabled })
+                      }
+                    />
+                    <OptionalNumber
+                      label="Energy sample interval (s) · empty uses 1"
+                      value={draft.tuning.energy_interval_seconds ?? null}
+                      min={0.1}
+                      max={60}
+                      step={0.1}
+                      onChange={(energy_interval_seconds) =>
+                        updateTuning({ energy_interval_seconds })
+                      }
+                    />
+                    {draft.family === 'deepseek' && (
+                      <>
+                        <TriState
+                          label="Sampled token trace · DeepSeek 0.64+ · default Off"
+                          value={draft.tuning.token_trace_enabled ?? null}
+                          onChange={(token_trace_enabled) =>
+                            updateTuning({ token_trace_enabled })
+                          }
+                        />
+                        <OptionalNumber
+                          label="Record one decode token in N · empty uses 4"
+                          value={draft.tuning.token_trace_every ?? null}
+                          min={1}
+                          max={65536}
+                          onChange={(token_trace_every) =>
+                            updateTuning({ token_trace_every })
+                          }
+                        />
+                      </>
+                    )}
+                  </div>
+                  <p className="panel-intro">
+                    Explicit next-launch collection settings; not proof of
+                    active server instrumentation. Energy covers the whole Mac;
+                    no privileged sampler is started. Token tracing requires an
+                    explicit DeepSeek family. One-in-four tracing measured
+                    +0.274 ms/token (95% −0.065 to +0.645) on one runtime
+                    workload; not certified below 0.5 ms. Continuous recording
+                    (N=1) measured +0.55 ms/token (95% +0.05 to +1.11). Lab
+                    overhead remains unmeasured.
+                  </p>
                 </details>
                 {draft.family !== 'auto' && (
                   <details className="profile-options" key={draft.family}>

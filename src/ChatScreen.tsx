@@ -1,3 +1,4 @@
+import { RequestEnergy } from './RuntimeEvidence'
 import { invoke, isTauri } from '@tauri-apps/api/core'
 import { listen } from '@tauri-apps/api/event'
 import { MessageSquarePlus, Send, Square, Trash2 } from 'lucide-react'
@@ -473,6 +474,7 @@ export function ChatScreen({ runtime }: { runtime: RuntimeConnection }) {
                       ? 'Thinking…'
                       : '')}
                 </div>
+                {message.usage && <RequestEnergy usage={message.usage} />}
                 {message.usage && (
                   <div className="chat-usage">
                     {String(message.usage.completion_tokens ?? '—')} output

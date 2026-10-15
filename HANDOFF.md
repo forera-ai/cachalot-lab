@@ -1,5 +1,25 @@
 # Handoff
 
+## Release preparation — Cachalot Lab 0.8.0, 2026-10-15
+
+Planned release: [v0.8.0](https://github.com/forera-ai/cachalot-lab/releases/tag/v0.8.0). Minor version for new backward-compatible energy and sampled token evidence, saved request energy, and explicit instrumentation controls. Manifests and Cargo lock are 0.8.0. Publication requires fresh exact-commit signed/notarized artifacts and verification before pushing implementation.
+
+Last reviewed runtime: clean Cachalot **0.64.17**, commit `cf328cc8cef9da37c4348054ddb0c4128e09c570`; inbox briefs through **0.64.0**. Both new briefs (0.63.0 energy and 0.64.0 token trace) needed adoption. Compared source/changelog with prior reviewed `5faabab`, including corrected component tail, router-eval interpretation and measured sampled overhead. The brief's 0.14 ms derived overhead is superseded by +0.274 ms/token (95% −0.065 to +0.645), not certified under 0.5 ms. No policy tuning or runtime edit was made.
+
+Cockpit presents collapsed source-scoped tables; Chat retains raw request energy in existing saved usage and shows independent request/decode windows. Unknowns, valid zero, source unavailability, stale energy, absent decode and trace loss remain explicit. IOReport is styled as SoC estimates, never a full system breakdown. Sampled trace means are not request attribution, GPU timeline or critical-path proof. Dive controls are optional next-launch choices with default-off inheritance, validated intervals, and controlled environment removal. Existing data/store versions and inference workflows remain compatible. See [energy/trace scope](docs/ENERGY_TRACE.md), [runtime sync](docs/RUNTIME_SYNC.md) and [privacy](PRIVACY.md).
+
+Graph Verify tier used canonical Lab project and runtime project. Lab generation at initial coverage was 2026-10-09T13:14:20Z; runtime generation 2026-10-13T22:19:57Z. Material paths were metadata-matched, with the known ChatScreen.test.tsx parse gap (1–207) read directly. Source discovery fallback verified engine/CLI HTTP integration; best-effort coverage is not proof of completeness.
+
+Initial checks: intended Cockpit regression failed before implementation; 55 frontend tests, seven mock HTTP/SSE tests, and 33 Rust tests passed (one existing real Keychain test ignored). Rust clippy, TypeScript and ESLint passed. ESLint/Prettier now ignore generated .release artifacts; old local bridge dependencies had caused unrelated lint errors. Native install and exact-source publication evidence will follow below. Live model inference, output quality, energy-meter/Lab overhead, saved-key restart and detailed event timelines remain unverified.
+
+### Local verification before the 0.8.0 release commit
+
+Fresh Developer ID signed 0.8.0 builds were installed at `/Applications/Cachalot Lab.app` before each native check; all four bundle files matched the build and strict signature checks passed. Prior public app and app data are recoverable at `.release/local-0.8.0-2026-10-15/previous-Cachalot Lab.app` and `previous-app-data/`. The optional rust-objcopy/libLLVM warning remained nonfatal.
+
+Installed native inspection used loopback synthetic fixture port 18081, not a loaded model. Verified system power/energy/interval, unavailable component reason and six unknown component rows; sampled means, sampling count and zero-loss disclosure; streamed final usage; request/decode windows and J/token; saved report reopening after restart; existing MiniMax source guard; unsaved DeepSeek instrumentation defaults and draft cancellation; and request table readability in System-dark and Surface at the existing 1380 × 860 logical window. Initial inspection found long table labels/values clipped by paired columns/overlay scrollbar; full-width instrument rows with inset values fixed this in a rebuilt and reinstalled app. Exact minimum native layout and live model measurements remain unverified.
+
+Native JSON verified final SSE energy preserved exactly (7.2026 J/token raw) while UI rounds to three decimals; original conversation records stayed unchanged. The synthetic chat was archived under local evidence, then all five pre-test app-data files were restored byte-for-byte with Lab closed. Original System appearance, Silent running Off and endpoint/storage returned to their prior state. No real model was launched/stopped, no inference policy or credentials changed, and no profile was saved. Production diff and React review found no remaining material issue. Fresh frontend tests remained 55 passing; TypeScript, lint, Rust clippy and whitespace checks passed. Exact-commit release script will rerun required checks.
+
 ## Start here — Cachalot Lab 0.7.1 published, 2026-10-09
 
 Published [v0.7.1](https://github.com/forera-ai/cachalot-lab/releases/tag/v0.7.1)

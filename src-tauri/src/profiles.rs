@@ -12,7 +12,11 @@ const STORE_VERSION: u8 = 1;
 const MAX_STORE_BYTES: usize = 256 * 1024;
 const MAX_PROFILES: usize = 50;
 
-pub(crate) const CONTROLLED_ENV_KEYS: [&str; 24] = [
+pub(crate) const CONTROLLED_ENV_KEYS: [&str; 28] = [
+    "CACHALOT_ENERGY",
+    "CACHALOT_ENERGY_INTERVAL",
+    "CACHALOT_TOKEN_TRACE",
+    "CACHALOT_TOKEN_TRACE_EVERY",
     "CACHALOT_DECODE_MISS_BUDGET",
     "CACHALOT_SYSTEM_DATE_REUSE",
     "CACHALOT_SYSTEM_DATE_REUSE_DAYS",
@@ -54,6 +58,14 @@ pub enum ModelFamily {
 
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 pub struct RuntimeTuning {
+    #[serde(default)]
+    energy_enabled: Option<bool>,
+    #[serde(default)]
+    energy_interval_seconds: Option<f64>,
+    #[serde(default)]
+    token_trace_enabled: Option<bool>,
+    #[serde(default)]
+    token_trace_every: Option<u32>,
     #[serde(default)]
     deepseek_decode_drop_misses: Option<bool>,
     #[serde(default)]
@@ -301,6 +313,23 @@ fn validate(profile: &LaunchProfile) -> Result<(), String> {
         return Err("Snapshot directory must be an absolute path.".to_owned());
     }
     let tuning = &profile.tuning;
+    if tuning
+        .energy_interval_seconds
+        .is_some_and(|v| !v.is_finite() || !(0.1..=60.0).contains(&v))
+    {
+        return Err("Energy interval must be between 0.1 and 60 seconds.".to_owned());
+    }
+    if (tuning.token_trace_enabled.is_some() || tuning.token_trace_every.is_some())
+        && profile.family != ModelFamily::Deepseek
+    {
+        return Err("Token tracing requires an explicit DeepSeek profile family.".to_owned());
+    }
+    if tuning
+        .token_trace_every
+        .is_some_and(|v| !(1..=65536).contains(&v))
+    {
+        return Err("Token trace interval must be between 1 and 65536 decode tokens.".to_owned());
+    }
     if (tuning.deepseek_decode_drop_misses.is_some() || tuning.deepseek_system_date_reuse.is_some())
         && profile.family != ModelFamily::Deepseek
     {
@@ -444,6 +473,20 @@ pub(crate) fn compile(profile: &LaunchProfile) -> Result<LaunchCommand, String> 
     }
     let tuning = &profile.tuning;
     let mut environment = BTreeMap::new();
+    for (key, enabled) in [
+        ("CACHALOT_ENERGY", tuning.energy_enabled),
+        ("CACHALOT_TOKEN_TRACE", tuning.token_trace_enabled),
+    ] {
+        if let Some(enabled) = enabled {
+            environment.insert(key.to_owned(), if enabled { "1" } else { "0" }.to_owned());
+        }
+    }
+    if let Some(value) = tuning.energy_interval_seconds {
+        environment.insert("CACHALOT_ENERGY_INTERVAL".to_owned(), value.to_string());
+    }
+    if let Some(value) = tuning.token_trace_every {
+        environment.insert("CACHALOT_TOKEN_TRACE_EVERY".to_owned(), value.to_string());
+    }
     if let Some(enabled) = tuning.deepseek_decode_drop_misses {
         // -1 selects exact decode on 0.57+, including before the off spelling.
         environment.insert(
@@ -690,6 +733,63 @@ mod tests {
             snapshot_dir: None,
             tuning: RuntimeTuning::default(),
         }
+    }
+
+    #[test]
+    fn instrumentation_is_explicit_validated_and_backward_compatible() {
+        let old: LaunchProfile = serde_json::from_value(serde_json::json!({
+            "id": sample().id, "name": "Legacy", "python_executable": "/python", "model_path": "/model", "port": 8011
+        })).expect("old profile");
+        assert!(compile(&old).unwrap().environment.is_empty());
+        for key in [
+            "CACHALOT_ENERGY",
+            "CACHALOT_ENERGY_INTERVAL",
+            "CACHALOT_TOKEN_TRACE",
+            "CACHALOT_TOKEN_TRACE_EVERY",
+        ] {
+            assert!(CONTROLLED_ENV_KEYS.contains(&key));
+        }
+        let mut profile = sample();
+        profile.tuning.energy_enabled = Some(true);
+        profile.tuning.energy_interval_seconds = Some(0.5);
+        assert_eq!(
+            compile(&profile).unwrap().environment["CACHALOT_ENERGY"],
+            "1"
+        );
+        profile.tuning.token_trace_enabled = Some(true);
+        assert!(validate(&profile).is_err());
+        profile.family = ModelFamily::Deepseek;
+        profile.tuning.token_trace_every = Some(1);
+        let command = compile(&profile).unwrap();
+        assert_eq!(command.environment["CACHALOT_ENERGY_INTERVAL"], "0.5");
+        assert_eq!(command.environment["CACHALOT_TOKEN_TRACE"], "1");
+        assert_eq!(command.environment["CACHALOT_TOKEN_TRACE_EVERY"], "1");
+        profile.tuning.token_trace_every = Some(0);
+        assert!(validate(&profile).is_err());
+        profile.tuning.token_trace_every = Some(65537);
+        assert!(validate(&profile).is_err());
+        profile.tuning.token_trace_every = None;
+        for v in [0.0, 0.09, 60.1, f64::NAN, f64::INFINITY] {
+            profile.tuning.energy_interval_seconds = Some(v);
+            assert!(validate(&profile).is_err());
+        }
+        profile.tuning.energy_interval_seconds = None;
+        profile.tuning.energy_enabled = Some(false);
+        profile.tuning.token_trace_enabled = Some(false);
+        assert_eq!(
+            compile(&profile).unwrap().environment["CACHALOT_ENERGY"],
+            "0"
+        );
+        assert_eq!(
+            compile(&profile).unwrap().environment["CACHALOT_TOKEN_TRACE"],
+            "0"
+        );
+        let restored: LaunchProfile =
+            serde_json::from_slice(&serde_json::to_vec(&profile).unwrap()).unwrap();
+        assert_eq!(
+            compile(&restored).unwrap().environment,
+            compile(&profile).unwrap().environment
+        );
     }
 
     #[test]

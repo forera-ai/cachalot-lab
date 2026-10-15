@@ -61,3 +61,14 @@ patterns:
     families: [minimax-m3]
     regex: '^\[bank\] mirror share (?P<old>\d+\.\d+) -> (?P<new>\d+\.\d+) \(configured (?P<cap>\d+\.\d+)\)$'
     meaning: The adaptive mirror share changed by at least 0.03; emitted at most once a minute. Logs displays it raw; Cockpit does not yet parse or chart it.
+
+energy:
+  since: 0.63.0
+  pattern: '[request] ... J/tok=<decode system joules per output token> W=<decode mean system watts> finish=...'
+  unavailable: 'J/tok=n/a'
+  off: No energy text.
+  lab: Raw managed logs only; no log-derived metrics. Optional suffix before finish must not break log viewing.
+token_trace:
+  since: 0.64.0
+  startup: 'token trace on (CACHALOT_TOKEN_TRACE): one decode token in N is recorded ...'
+  limits: No per-request log field. GLM/MiniMax print unsupported notice and ignore knob.

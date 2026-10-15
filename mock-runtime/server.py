@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+from pathlib import Path
 import socketserver
 import threading
 import time
@@ -23,6 +24,7 @@ class Scenario:
     prefetch_stats: bool = False
     image_stats: bool = False
     read_stats: bool = False
+    observability: bool = False
 
 
 class MockRuntime(ThreadingHTTPServer):
@@ -106,6 +108,9 @@ class Handler(BaseHTTPRequestHandler):
                                   "expert_fast_reads": 20, "expert_read_seconds": 12.5,
                                   "expert_read_busy_seconds": 4.25,
                                   "decode_wait_seconds": 2.125, "decode_waited_misses": 30, "skipped_experts": 42})
+            if self.server.scenario.observability and not self.server.scenario.missing_stats:
+                fixture = json.loads(Path(__file__).with_name("observability.json").read_text())
+                stats.update({k: fixture[k] for k in ("energy", "token_trace")})
             self.json_response(200, stats)
             return
         self.json_response(404, {"error": {"message": "Not found"}})
@@ -146,6 +151,9 @@ class Handler(BaseHTTPRequestHandler):
         try:
             answer = "Cachalot mock is ready."
             tokens = answer.split(" ")
+            usage = {"prompt_tokens": 1, "completion_tokens": len(tokens), "total_tokens": len(tokens) + 1}
+            if self.server.scenario.observability:
+                usage["cachalot"] = {"energy": json.loads(Path(__file__).with_name("observability.json").read_text())["usage_energy"]}
             if request.get("stream"):
                 self.send_response(200)
                 self.send_header("Content-Type", "text/event-stream")
@@ -170,13 +178,15 @@ class Handler(BaseHTTPRequestHandler):
                         if index == 0 and self.server.scenario.crash_on_chat:
                             print("[mock] scripted crash mid-stream", flush=True)
                             os._exit(42)
+                    if request.get("stream_options", {}).get("include_usage"):
+                        self.wfile.write(f"data: {json.dumps({'choices': [], 'usage': usage})}\n\n".encode())
                     self.wfile.write(b"data: [DONE]\n\n")
                     self.wfile.flush()
                 except (BrokenPipeError, ConnectionResetError):
                     pass
             else:
                 time.sleep(self.server.scenario.prefill_delay)
-                self.json_response(200, {"id": "chatcmpl-mock", "object": "chat.completion", "model": "cachalot-mock", "choices": [{"index": 0, "message": {"role": "assistant", "content": answer}, "finish_reason": "stop"}], "usage": {"prompt_tokens": 1, "completion_tokens": len(tokens), "total_tokens": len(tokens) + 1}})
+                self.json_response(200, {"id": "chatcmpl-mock", "object": "chat.completion", "model": "cachalot-mock", "choices": [{"index": 0, "message": {"role": "assistant", "content": answer}, "finish_reason": "stop"}], "usage": usage})
             with self.server.counter_lock:
                 self.server.requests_served += 1
                 self.server.tokens_generated += len(tokens)
@@ -199,8 +209,9 @@ def main() -> None:
     parser.add_argument("--prefetch-stats", action="store_true", help="Expose fixed synthetic prefetch totals (120 reads, 80 used)")
     parser.add_argument("--image-stats", action="store_true", help="Expose a fixed synthetic image input total (7)")
     parser.add_argument("--read-stats", action="store_true", help="Expose fixed synthetic runtime read/wait counters")
+    parser.add_argument("--observability", action="store_true", help="Synthetic energy and token-trace contract fixtures; not measurements")
     args = parser.parse_args()
-    scenario = Scenario(args.startup_delay, args.prefill_delay, args.token_delay, args.api_key, args.missing_stats, args.crash_on_chat, args.prefetch_stats, args.image_stats, args.read_stats)
+    scenario = Scenario(args.startup_delay, args.prefill_delay, args.token_delay, args.api_key, args.missing_stats, args.crash_on_chat, args.prefetch_stats, args.image_stats, args.read_stats, args.observability)
     server = MockRuntime(("127.0.0.1", args.port), scenario)
     print("[startup] process up", flush=True)
     print(f"[startup] server listening on 127.0.0.1:{server.server_port}", flush=True)

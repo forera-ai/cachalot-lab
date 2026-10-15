@@ -44,3 +44,7 @@ Define collection-off, low-overhead, and detailed modes where appropriate; expli
 ## Acceptance before Lab adoption
 
 Verify runtime measurement semantics against source and live controlled runs, record the exact commit, and add fixtures for supported, older, missing, malformed, reset, cancelled, reordered, and dropped-event cases as applicable. Reconcile timestamps and token boundaries, validate parallel intervals without double-counting, audit exported raw evidence, and quantify mode overhead. Adopt only verified fields into supported contracts; leave remaining requirements marked proposed. Runtime instrumentation work belongs in Cachalot, not this documentation pass.
+
+## Partial delivery acknowledged in Lab 0.8.0
+
+Runtime briefs 0.63.0 and 0.64.0, reviewed against 0.64.17, provide optional system/request energy and sampled DeepSeek decode means. Lab adopts those aggregates and source/availability/loss labels. Request energy has windows; trace means do not have per-request identity, events, GPU completion or dependencies. These contracts partially address energy/profiling evidence and do not close the event timeline, durable run identity, active-configuration or critical-path requests above. Lab overhead and meter overhead remain unmeasured. See [telemetry](telemetry.yaml) for exact semantics and current corrections.

@@ -328,3 +328,37 @@ it('discards a late preview after selecting another profile', async () => {
     screen.queryByRole('region', { name: 'Launch preview' }),
   ).not.toBeInTheDocument()
 })
+
+it('saves explicit instrumentation, preserves energy across families, clears DeepSeek tracing', async () => {
+  const user = userEvent.setup()
+  render(<DiveScreen managed={managed} runtime={runtime} />)
+  await user.click(screen.getByRole('button', { name: 'New profile' }))
+  await user.type(screen.getByLabelText('Profile name'), 'Meter test')
+  await user.type(screen.getByLabelText('Python executable'), '/python')
+  await user.type(screen.getByLabelText('Model directory'), '/model')
+  await user.selectOptions(screen.getByLabelText('Model family'), 'deepseek')
+  await user.click(screen.getByText('Instrumentation'))
+  expect(screen.getByLabelText(/Energy meter/)).toHaveValue('inherit')
+  expect(screen.getByLabelText(/Sampled token trace/)).toHaveValue('inherit')
+  await user.selectOptions(screen.getByLabelText(/Energy meter/), 'true')
+  await user.selectOptions(screen.getByLabelText(/Sampled token trace/), 'true')
+  await user.type(screen.getByLabelText(/Record one decode token/), '1')
+  await user.click(screen.getByRole('button', { name: 'Save profile' }))
+  expect(profiles[0]?.tuning).toEqual(
+    expect.objectContaining({
+      energy_enabled: true,
+      token_trace_enabled: true,
+      token_trace_every: 1,
+    }),
+  )
+  await user.click(screen.getByRole('button', { name: 'Edit' }))
+  await user.selectOptions(screen.getByLabelText('Model family'), 'glm')
+  await user.click(screen.getByRole('button', { name: 'Save profile' }))
+  expect(profiles[0]?.tuning).toEqual(
+    expect.objectContaining({
+      energy_enabled: true,
+      token_trace_enabled: null,
+      token_trace_every: null,
+    }),
+  )
+})

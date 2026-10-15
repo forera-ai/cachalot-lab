@@ -8,7 +8,7 @@ Lab 0.7.0 provides local connection, streaming chat and saved conversations, per
 
 Lab 0.6.0 added a collapsed runtime read/wait evidence table and the compatible Lab rename. Lab 0.7.0 adds skipped-expert evidence and explicit GLM decode miss-budget intent with output warnings. Request-level attribution, percentages, and busy-rate derivations remain deferred.
 
-Runtime and host histories are currently bounded live traces, not a durable benchmark archive. Dedicated experiment records, token profiling, and historical benchmark comparison are planned. The reviewed runtime remains Cachalot 0.62.22 at `5faababa6bc098400147611d3ffd11cd00e3100d`, briefs through 0.62.20; source review does not equal live model validation.
+Runtime and host histories are currently bounded live traces, not a durable benchmark archive. Dedicated experiment records, token profiling, and historical benchmark comparison are planned. The reviewed runtime remains Cachalot 0.64.17 at `cf328cc8cef9da37c4348054ddb0c4128e09c570`, briefs through 0.64.0; source review does not equal live model validation.
 
 The main path now prioritizes trustworthy evidence, reproducible comparisons, and explanatory profiling. The former assignments of 0.6.0 to updates, 0.7.0 to menu bar/onboarding, and 1.0.0 to a release candidate are superseded. Those capabilities remain backlog items; choose actual versions when a verified slice ships under [the release gate](RELEASE.md). No dates or binary version changes are implied by this planning pass.
 
@@ -64,6 +64,8 @@ The main path now prioritizes trustworthy evidence, reproducible comparisons, an
 
 ## Phase F — Energy and efficiency
 
+0.8.0 ships the independent evidence slice: current/cumulative whole-system energy, saved request/decode usage, source/availability/estimate labels and explicit collection controls. Baseline subtraction, durable comparisons, derived efficiency curves, and overhead certification remain planned.
+
 **Question:** What energy/performance tradeoff does this configuration make?
 
 **Lab deliverables:** current/average power, integrated energy, joules/token and tokens/joule, comparisons, and source/attribution labels.
@@ -90,6 +92,6 @@ Signed Lab/runtime updates with rollback, menu-bar integration, onboarding, chat
 
 ## Next implementation slice
 
-Start with Phase A's metric/provenance inventory and Phase B's run-manifest design. Resolve counter lifetimes, request identity and active configuration with Cachalot before promising request-level comparisons. Track remaining GLM/DeepSeek and saved-key validation alongside this work. Token tracing, energy sources, and validated models remain separate dependencies; this mission adoption does not implement them.
+Start with Phase A's metric/provenance inventory and Phase B's run-manifest design. Resolve counter lifetimes, request identity and active configuration with Cachalot before promising request-level comparisons. Track remaining GLM/DeepSeek and saved-key validation alongside this work. Lab 0.8.0 adopts optional whole-system/request energy and sampled DeepSeek decode aggregates with source labels and explicit collection controls. Detailed token timelines, durable run comparisons and validated models remain separate dependencies; aggregate stats do not satisfy Phase C.
 
 Each slice must state its engineering question, evidence contract, fallback, preservation/migration needs, raw export/retention plan, verification, and overhead budget where relevant. Follow runtime brief review before development, fresh local build/install before native UI testing, and exact-source signed/notarized publication for every pushed implementation. Documentation-only direction changes do not require a binary release.

@@ -16,7 +16,12 @@ const eventBus = vi.hoisted(() => ({
   handler: null as
     | null
     | ((event: {
-        payload: { chat_id: number; kind: 'delta' | 'done'; content?: string }
+        payload: {
+          chat_id: number
+          kind: 'delta' | 'done'
+          content?: string
+          usage?: Record<string, unknown>
+        }
       }) => void),
 }))
 
@@ -122,10 +127,29 @@ describe('saved conversations', () => {
       eventBus.handler?.({
         payload: { chat_id: 7, kind: 'delta', content: 'Mock reply' },
       })
+      eventBus.handler?.({
+        payload: {
+          chat_id: 7,
+          kind: 'delta',
+          usage: {
+            completion_tokens: 4,
+            cachalot: {
+              energy: {
+                available: true,
+                request: { system_joules: 135.19 },
+                decode: { system_joules_per_token: 7.2026 },
+              },
+            },
+          },
+        },
+      })
       eventBus.handler?.({ payload: { chat_id: 7, kind: 'done' } })
     })
 
     expect(await screen.findByText('Mock reply')).toBeInTheDocument()
+    expect(
+      screen.getByText('Request energy · whole system'),
+    ).toBeInTheDocument()
     await waitFor(
       () =>
         expect(persistence.save).toHaveBeenCalledWith(
@@ -138,7 +162,11 @@ describe('saved conversations', () => {
                 role: 'assistant',
                 content: 'Mock reply',
                 reasoning: '',
-                usage: undefined,
+                usage: expect.objectContaining({
+                  cachalot: expect.objectContaining({
+                    energy: expect.objectContaining({ available: true }),
+                  }),
+                }),
               },
             ],
           }),

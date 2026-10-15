@@ -515,7 +515,11 @@ mod tests {
         assert_eq!(event.reasoning.as_deref(), Some("Think"));
         assert!(event.usage.is_some());
         assert!(parse_stream_line(3, ": keep-alive").is_none());
-        let final_usage = r#"data: {"choices":[],"usage":{"completion_tokens":4}}"#;
-        assert!(parse_stream_line(3, final_usage).unwrap().usage.is_some());
+        let final_usage = r#"data: {"choices":[],"usage":{"completion_tokens":4,"cachalot":{"energy":{"available":true,"decode":{"system_joules_per_token":7.2026}}}}}"#;
+        let usage = parse_stream_line(3, final_usage).unwrap().usage.unwrap();
+        assert_eq!(
+            usage["cachalot"]["energy"]["decode"]["system_joules_per_token"],
+            7.2026
+        );
     }
 }
