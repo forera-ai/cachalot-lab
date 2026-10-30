@@ -1,5 +1,46 @@
 # Handoff
 
+## Release preparation — Cachalot Lab 0.9.0, 2026-10-30
+
+User authorized brief adoption and the complete release round. Latest published
+Lab is 0.8.0; 0.9.0 is a compatible minor release for explicit DeepSeek encoder-only
+prefill. Last reviewed runtime: clean Cachalot **0.69.7**, commit
+`bd9bb457b1ef1346b7f71983c85051cea266ab1e`; all briefs through **0.69.0** reviewed.
+New 0.67/0.69 briefs required the default-off launch control and separate auxiliary
+contract; 0.65/0.66 review and all pre-existing documentation edits are preserved.
+Runtime 0.68 MLX/snapshot numerics changes are recorded without Lab migrations.
+
+Control is nullable, explicit DeepSeek only, compiled as 1/0 after inherited-key
+removal, cleared on family switch, with visible output/quality warnings. Older
+profiles retain Off. Auxiliary CLI remains outside serving; no automatic routing,
+compression, auxiliary launch or benchmark viewer is shipped. Active mode, live
+quality/performance and instrumentation overhead remain unverified. Existing
+live-family and authenticated saved-key restart limitations remain open.
+
+Frontend regression failed on the missing control before implementation. Focused
+UI/Rust checks cover choices, reopening, legacy omission, family switching and
+family rejection. Fresh full gates, signed local installation/native inspection,
+exact-commit signing/notarization, publication, CI and public installation evidence
+will be recorded before completion. See [runtime sync](docs/RUNTIME_SYNC.md).
+
+Local verification: 55 frontend tests, 34 Rust tests (one existing isolated
+Keychain test ignored), seven mock HTTP/SSE tests, TypeScript, lint, Prettier,
+Rust formatting/clippy and fresh Developer ID signed app build passed. Production
+code review and React review found no material issue. Installed all four bundle
+files match the build; strict signatures pass. Previous app/data and installation
+hashes are recoverable at `.release/local-0.9.0-2026-10-30/`.
+
+Native 0.9.0 inspection verified default-off inherited setting, explicit On/Off,
+reopened saved On, visible output/quality warnings outside collapsed tuning and
+on saved profiles, and exact environment previews 1/0. Layout inspected in the
+standard window/System-dark theme; expanded forms scroll normally. Synthetic
+profile was archived and original profiles restored with Lab closed; all five
+app-data files are byte-identical to the backup. No runtime launch/stop, inference,
+credential action or preference change was performed. Exact minimum layout,
+Surface theme and live model quality/performance were not newly validated.
+
+Documentation review, 2026-10-17: reviewed new runtime 0.65.0 and 0.66.0 briefs against Cachalot source/changelog at commit `9623e8000bd10d77ea6624047f72c5c06e43fd29` (0.66.8). The runtime checkout has uncommitted documentation/version edits reporting 0.66.9. The FP8 decode switch now defaults on, but Lab does not expose that switch; this sponsorship acknowledgement and future import possibility change no Lab app behavior or compatibility contract.
+
 ## Start here — Cachalot Lab 0.8.0 published, 2026-10-15
 
 Published [v0.8.0](https://github.com/forera-ai/cachalot-lab/releases/tag/v0.8.0) from clean implementation commit `c79299b5dd7d047d827db528908e8312092d77f1` and its annotated tag. Minor version for backward-compatible optional runtime energy, sampled DeepSeek decode aggregates, saved request energy and explicit next-launch instrumentation controls. This is a documentation-only post-publication follow-up; the source commit and tag remain fixed. Instruments remain off by default; existing inference policy, identities, storage versions and saved workflows remain compatible.

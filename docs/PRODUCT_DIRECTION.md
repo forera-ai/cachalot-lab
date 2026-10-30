@@ -16,7 +16,7 @@ Do not rewrite Lab to satisfy this direction. Preserve streaming chat, reasoning
 
 The checked-out 0.5.0 foundation is Tauri 2, React 19, and TypeScript. Rust owns loopback HTTP, secrets, native sampling, local persistence, and the managed child. React presents state and bounded live histories. Runtime and host histories currently retain about two minutes in memory; saved conversations are durable conversation records, not reproducible experiment records. The production navigation contains Cockpit, Chat, Dive, API, Doctor, Logs, and Settings. A dedicated benchmark archive and experiment comparison workflow are future work, not an existing capability to replace.
 
-Whole-Mac and whole-drive observations are valuable context. They must retain their scope and must not become model-specific measurements through relabeling. The current source review remains Cachalot 0.62.22, commit `5faababa6bc098400147611d3ffd11cd00e3100d`, with briefs through 0.62.20. See [runtime sync](RUNTIME_SYNC.md) for tested versus source-reviewed paths.
+Whole-Mac and whole-drive observations are valuable context. They must retain their scope and must not become model-specific measurements through relabeling. The current source review remains Cachalot 0.69.7, commit `bd9bb457b1ef1346b7f71983c85051cea266ab1e`, with briefs through 0.69.0. See [runtime sync](RUNTIME_SYNC.md) for tested versus source-reviewed paths.
 
 ## Ownership
 
@@ -128,3 +128,5 @@ The owner's original sections map to the governing policy here and delivery phas
 ## Implemented evidence slice — 0.8.0
 
 Optional runtime energy and sampled DeepSeek decode aggregates now have source-scoped, collapsed views and explicit next-launch collection controls. Request energy remains in saved usage. This advances evidence foundations and the independent energy lane; it does not deliver the flagship event timeline, proven critical path, durable run comparison or automatic tuning. Runtime 0.64.17 source and measurement corrections govern interpretation. See [energy/trace scope](ENERGY_TRACE.md).
+
+Lab 0.9.0 adds explicit default-off DeepSeek encoder-only prefill as requested launch intent with output and quality warnings. The separate auxiliary engine is not in serving; auxiliary availability, benchmark comparison, routing, and compression are not shipped Lab capabilities. See [runtime sync](RUNTIME_SYNC.md).

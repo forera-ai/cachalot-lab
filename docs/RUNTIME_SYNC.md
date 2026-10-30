@@ -260,3 +260,55 @@ Adopted collapsed Cockpit evidence, saved chat energy details, next-launch instr
 Current source qualifies the briefs: energy `since` follows the retained ring start while joules stay cumulative; 0.63.1 fixes component tail extrapolation, verified in 0.63.2; energy-meter overhead remains unmeasured. 0.64.8 withdraws router-sync-bound claims; router eval includes GPU work. 0.64.9's measured sampled cost (+0.274 ms/token, 95% −0.065 to +0.645) replaces the brief's derived 0.14 ms and is not certified under 0.5 ms. Raw GET_END kept-expert payload changed in 0.64.13 without stats changes. Later benchmark findings remain workload-specific; no Lab policy adoption follows them.
 
 The contract and evidence limits are in [ENERGY_TRACE.md](ENERGY_TRACE.md). Regression checks and synthetic native checks do not validate live model energy, output quality, sustained performance or Lab overhead. Existing live-family and saved-key restart limitations remain open. No new durable trace history, event timeline, run comparison, GPU timeline or proven critical path is shipped.
+
+## Runtime 0.65–0.69 briefs — Lab 0.9.0, 2026-10-30
+
+Listed the complete brief inbox. Existing local documentation had reviewed
+0.65.0/0.66.0; new briefs are 0.67.0 (2026-10-21) and 0.69.0 (2026-10-29).
+Read both against clean Cachalot **0.69.7**, commit
+`bd9bb457b1ef1346b7f71983c85051cea266ab1e`, source and changelog, including the
+source diff from prior reviewed `9623e80`. No runtime file was edited.
+
+The DeepSeek encoder-only setting is adopted as explicit default-off next-launch
+intent. Only exact environment value 1 enables it. `generation.prepare_prompt`
+requires multiple text prefill calls and a runtime with `finish_decoder`;
+requested boundaries and prompt end finish the decoder over up to 2,541 rows.
+Intermediate unpinned/in-block snapshots are not retained. Regrouped MoE rounding
+changes outputs; the brief says not yet quality-gated. No numerics tag change was
+introduced by 0.67 itself. Lab's nullable profile compiles 1/0 only for explicit
+choices after removing the inherited key; older profiles inherit Off. Other
+families reject the field and family switching clears it. Warnings remain
+visible outside collapsed tuning and before launch. Requested intent does not
+establish active server mode. No new endpoint, stat or log parser is required.
+
+0.68 separately requires MLX 0.32.4, changes quantized rounding, and bumps
+DeepSeek and GLM/MiniMax snapshot numerics identities. A first request after
+upgrading can re-prefill once per model. Runtime owns compatibility; Lab keeps
+saved profiles, conversations, identities and snapshot files intact. The prior
+FP8 switch defaults On since 0.66; it remains a documented, unexposed runtime
+optimization. Lab does not override its default or advertise microbenchmark gains.
+
+0.69 adds a standalone auxiliary engine and CLI, not a serving integration.
+`auxiliary/config.py`, `provider.py`, `cli.py`, and root CLI dispatch confirm
+configuration and explicit command opt-in; serving does not consume the new
+keys. `runtime-contract/auxiliary.yaml` records every knob, capability probe,
+benchmark provenance and unit distinctions. Lab does not add auxiliary controls
+to serve profiles, launch the provider, route requests or compress prompts.
+Compression measured as a loss, routing not validated for use. A benchmark
+import/view remains planned after the Phase B provenance/storage contract.
+Later 0.69.2–7 results correct contention and power interpretations and close
+research levers; none add a Lab HTTP contract. Runtime measurements are not Lab
+performance evidence and no throughput or energy gain is advertised here.
+
+Engineering question: which output-changing prefill setting did the user request
+for the next managed launch? Evidence is saved configuration and fixed environment
+preview, with unknown active mode preserved. No new collector, HTTP request,
+history, export, storage format, or runtime instrumentation is introduced. Live
+quality/performance and Lab overhead remain unverified. Existing live-family and
+saved-key restart limitations remain open.
+
+Graph Verify evidence used canonical Lab generation `2026-10-15T09:12:27Z` and
+runtime generation `2026-10-30T14:57:06Z`. Material source metadata matched with
+no recorded gaps; excluded auxiliary bytecode and docs Finder metadata are not
+source. Exact snippets, callers, source/config reads and literal source diffs
+supplemented graph evidence. Coverage is best-effort, not completeness proof.

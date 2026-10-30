@@ -12,7 +12,7 @@ const STORE_VERSION: u8 = 1;
 const MAX_STORE_BYTES: usize = 256 * 1024;
 const MAX_PROFILES: usize = 50;
 
-pub(crate) const CONTROLLED_ENV_KEYS: [&str; 28] = [
+pub(crate) const CONTROLLED_ENV_KEYS: [&str; 29] = [
     "CACHALOT_ENERGY",
     "CACHALOT_ENERGY_INTERVAL",
     "CACHALOT_TOKEN_TRACE",
@@ -20,6 +20,7 @@ pub(crate) const CONTROLLED_ENV_KEYS: [&str; 28] = [
     "CACHALOT_DECODE_MISS_BUDGET",
     "CACHALOT_SYSTEM_DATE_REUSE",
     "CACHALOT_SYSTEM_DATE_REUSE_DAYS",
+    "CACHALOT_PREFILL_ENCODER_ONLY",
     "CACHALOT_MINIMAX_MISS_DROP",
     "CACHALOT_MINIMAX_MISS_SUB",
     "CACHALOT_MINIMAX_MISS_DROP_ARMED",
@@ -70,6 +71,8 @@ pub struct RuntimeTuning {
     deepseek_decode_drop_misses: Option<bool>,
     #[serde(default)]
     deepseek_system_date_reuse: Option<bool>,
+    #[serde(default)]
+    deepseek_prefill_encoder_only: Option<bool>,
     // None inherits the installed runtime's default. Some(false) explicitly
     // selects the exact path, including on runtime >= 0.43.0.
     #[serde(default)]
@@ -330,7 +333,9 @@ fn validate(profile: &LaunchProfile) -> Result<(), String> {
     {
         return Err("Token trace interval must be between 1 and 65536 decode tokens.".to_owned());
     }
-    if (tuning.deepseek_decode_drop_misses.is_some() || tuning.deepseek_system_date_reuse.is_some())
+    if (tuning.deepseek_decode_drop_misses.is_some()
+        || tuning.deepseek_system_date_reuse.is_some()
+        || tuning.deepseek_prefill_encoder_only.is_some())
         && profile.family != ModelFamily::Deepseek
     {
         return Err("DeepSeek tuning requires a DeepSeek profile family.".to_owned());
@@ -476,6 +481,10 @@ pub(crate) fn compile(profile: &LaunchProfile) -> Result<LaunchCommand, String> 
     for (key, enabled) in [
         ("CACHALOT_ENERGY", tuning.energy_enabled),
         ("CACHALOT_TOKEN_TRACE", tuning.token_trace_enabled),
+        (
+            "CACHALOT_PREFILL_ENCODER_ONLY",
+            tuning.deepseek_prefill_encoder_only,
+        ),
     ] {
         if let Some(enabled) = enabled {
             environment.insert(key.to_owned(), if enabled { "1" } else { "0" }.to_owned());
@@ -947,6 +956,46 @@ mod tests {
         assert_eq!(command.environment["CACHALOT_MIRROR_FRACTION"], "0.13");
         profile.tuning.minimax_bank_path = None;
         assert!(validate(&profile).is_err());
+    }
+
+    #[test]
+    fn encoder_only_prefill_is_explicit_and_deepseek_only() {
+        let mut value = serde_json::to_value(sample()).expect("profile JSON");
+        value["family"] = serde_json::json!("deepseek");
+        for (choice, expected) in [(true, "1"), (false, "0")] {
+            value["tuning"]["deepseek_prefill_encoder_only"] = serde_json::json!(choice);
+            let profile: LaunchProfile = serde_json::from_value(value.clone()).expect("profile");
+            let command = compile(&profile).expect("explicit prefill choice");
+            assert_eq!(
+                command
+                    .environment
+                    .get("CACHALOT_PREFILL_ENCODER_ONLY")
+                    .map(String::as_str),
+                Some(expected)
+            );
+            let loaded = serde_json::from_slice(&serde_json::to_vec(&profile).expect("encode"))
+                .expect("decode");
+            assert_eq!(
+                compile(&loaded).expect("restored").environment,
+                command.environment
+            );
+            for family in ["auto", "glm", "minimax"] {
+                let mut other = value.clone();
+                other["family"] = serde_json::json!(family);
+                assert!(compile(&serde_json::from_value(other).expect("other family")).is_err());
+            }
+        }
+        value["tuning"]
+            .as_object_mut()
+            .unwrap()
+            .remove("deepseek_prefill_encoder_only");
+        assert!(
+            !compile(&serde_json::from_value(value).expect("older profile"))
+                .expect("legacy")
+                .environment
+                .contains_key("CACHALOT_PREFILL_ENCODER_ONLY")
+        );
+        assert!(CONTROLLED_ENV_KEYS.contains(&"CACHALOT_PREFILL_ENCODER_ONLY"));
     }
 
     #[test]

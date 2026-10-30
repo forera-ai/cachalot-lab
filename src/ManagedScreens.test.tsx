@@ -122,6 +122,11 @@ it('saves DeepSeek choices, preserves inherited defaults, and clears family-spec
   await user.click(screen.getByText(/Runtime tuning/))
   const drops = screen.getByLabelText(/Decode drops misses/)
   const dates = screen.getByLabelText(/System date reuse/)
+  const encoder = screen.getByLabelText(/Encoder-only prefill/)
+  expect(encoder).toHaveValue('inherit')
+  expect(
+    screen.getByText(/output-changing, not yet quality-gated/),
+  ).toBeVisible()
   expect(drops).toHaveValue('inherit')
   expect(dates).toHaveValue('inherit')
   expect(
@@ -129,14 +134,32 @@ it('saves DeepSeek choices, preserves inherited defaults, and clears family-spec
   ).toBeInTheDocument()
   await user.selectOptions(drops, 'true')
   await user.selectOptions(dates, 'false')
+  await user.selectOptions(encoder, 'true')
+  await user.click(screen.getByText(/Runtime tuning/))
+  expect(
+    screen.getByText(/Encoder-only prefill: output-changing/),
+  ).toBeVisible()
   await user.click(screen.getByRole('button', { name: 'Save profile' }))
   await waitFor(() =>
     expect(profiles[0]?.tuning.deepseek_decode_drop_misses).toBe(true),
   )
   expect(profiles[0]?.tuning.deepseek_system_date_reuse).toBe(false)
+  expect(profiles[0]?.tuning).toHaveProperty(
+    'deepseek_prefill_encoder_only',
+    true,
+  )
+  expect(
+    screen.getByText(/Encoder-only prefill · output-changing/),
+  ).toBeVisible()
   await user.click(screen.getByRole('button', { name: 'Edit' }))
+  await user.click(screen.getByText(/Runtime tuning/))
   expect(screen.getByLabelText(/Decode drops misses/)).toHaveValue('true')
   expect(screen.getByLabelText(/System date reuse/)).toHaveValue('false')
+  expect(screen.getByLabelText(/Encoder-only prefill/)).toHaveValue('true')
+  await user.selectOptions(
+    screen.getByLabelText(/Encoder-only prefill/),
+    'false',
+  )
   await user.selectOptions(
     screen.getByLabelText(/Decode drops misses/),
     'false',
@@ -147,6 +170,10 @@ it('saves DeepSeek choices, preserves inherited defaults, and clears family-spec
     expect(profiles[0]?.tuning.deepseek_decode_drop_misses).toBe(false),
   )
   expect(profiles[0]?.tuning.deepseek_system_date_reuse).toBe(true)
+  expect(profiles[0]?.tuning).toHaveProperty(
+    'deepseek_prefill_encoder_only',
+    false,
+  )
   await user.click(screen.getByRole('button', { name: 'Edit' }))
   await user.selectOptions(screen.getByLabelText('Model family'), 'glm')
   await user.click(screen.getByText(/Runtime tuning/))
@@ -155,6 +182,10 @@ it('saves DeepSeek choices, preserves inherited defaults, and clears family-spec
   await waitFor(() => expect(profiles[0]?.family).toBe('glm'))
   expect(profiles[0]?.tuning.deepseek_decode_drop_misses).toBeNull()
   expect(profiles[0]?.tuning.deepseek_system_date_reuse).toBeNull()
+  expect(profiles[0]?.tuning).toHaveProperty(
+    'deepseek_prefill_encoder_only',
+    null,
+  )
 })
 
 it('keeps older DeepSeek profiles on inherited CLI defaults', async () => {
@@ -165,6 +196,8 @@ it('keeps older DeepSeek profiles on inherited CLI defaults', async () => {
     .deepseek_decode_drop_misses
   delete (profile.tuning as unknown as Record<string, unknown>)
     .deepseek_system_date_reuse
+  delete (profile.tuning as unknown as Record<string, unknown>)
+    .deepseek_prefill_encoder_only
   profiles = [profile]
   const user = userEvent.setup()
   render(<DiveScreen managed={managed} runtime={runtime} />)
@@ -172,6 +205,7 @@ it('keeps older DeepSeek profiles on inherited CLI defaults', async () => {
   await user.click(screen.getByText(/Runtime tuning/))
   expect(screen.getByLabelText(/Decode drops misses/)).toHaveValue('inherit')
   expect(screen.getByLabelText(/System date reuse/)).toHaveValue('inherit')
+  expect(screen.getByLabelText(/Encoder-only prefill/)).toHaveValue('inherit')
 })
 
 it('discovers a model into an unsaved draft without launching it', async () => {

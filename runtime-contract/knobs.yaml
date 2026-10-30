@@ -1,6 +1,29 @@
-# Verified against Cachalot 0.64.17 (cf328cc). Null overrides in Lab profiles
+# Verified against Cachalot 0.69.7 (bd9bb45). Null overrides in Lab profiles
 # inherit the runtime's version-specific default; zero has each knob's stated effect.
 knobs:
+  - key: CACHALOT_PREFILL_ENCODER_ONLY
+    kind: env
+    families: [deepseek-v4.1-flash]
+    type: bool
+    default: false
+    group: prefill
+    effect: changes-outputs
+    restart_required: true
+    stability: experimental-not-quality-gated
+    since: 0.67.0
+    lab: Nullable DeepSeek-only switch. On writes 1, Off writes 0, null omits after inherited key removal. Older profiles retain the default Off path; family changes clear it. Active mode is unreported.
+    summary: Only exact value 1 enables multi-call text prefill with deferred decoder work at requested snapshot boundaries and prompt end (last up to 2541 rows). Rounding and retained snapshot boundaries change. Single-call and image prompts stay on standard path; unsupported runtimes ignore the key. No speed or quality benefit is promised.
+  - key: CACHALOT_FP8_GEMV_DECODE
+    kind: env
+    families: [deepseek-v4.1-flash]
+    type: bool
+    default: { since_0_65_0: false, since_0_66_0: true }
+    group: decode
+    effect: bit-identical
+    restart_required: true
+    since: 0.65.0
+    lab: Contract only; not exposed or removed by Lab. Runtime owns the version-specific default.
+    summary: Arithmetic FP8 byte decoding replaces lookup-table decoding; 0 restores the table. Microbenchmark figures do not establish server speed gains.
   - key: CACHALOT_GLM_DECODE_MISS_BUDGET
     kind: env
     families: [glm-5.3-flash]

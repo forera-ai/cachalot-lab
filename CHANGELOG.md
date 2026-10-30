@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.9.0] - 2026-10-30
+
+This backward-compatible minor release adds an explicit DeepSeek launch capability. Existing profiles, data identities, credentials, inference defaults, and storage versions remain compatible.
+
+- Adopt runtime 0.67.0 and 0.69.0 briefs against clean 0.69.7 (`bd9bb45`); retain the prior 0.65/0.66 review and research sponsorship acknowledgement.
+- Add nullable DeepSeek-only Encoder-only prefill (0.67+), default Off, with output-changing and not-yet-quality-gated warnings in the editor and saved profile.
+- Validate family ownership, compile explicit 1/0 overrides, remove inherited values, and preserve older omitted fields and family-switch clearing.
+- Record auxiliary CLI/configuration and benchmark provenance as a separate, default-off contract; no serving integration, automatic routing, prompt compression, or benchmark viewer is shipped.
+- Record runtime 0.68 MLX 0.32.4 and snapshot-numerics changes; runtime owns any one-time re-prefill. No speed or quality benefit is claimed.
+
 ## [0.8.0] - 2026-10-15
 
 This backward-compatible minor release adds optional energy and sampled DeepSeek token evidence. Existing app/data identities, saved workflows, and inference defaults remain compatible.

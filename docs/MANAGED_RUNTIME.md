@@ -47,3 +47,11 @@ Cachalot 0.62.14 adds a GLM-only decode miss budget. Dive accepts an empty field
 Dive adds a collapsed Instrumentation group for explicit next-launch energy collection (Cachalot 0.63+) and sampled DeepSeek tracing (0.64+). Nullable boolean controls emit 1/0 only for explicit On/Off, with interval settings of 0.1–60 seconds and one token in 1–65536. Empty settings use runtime defaults: off, 1 second, and one token in four. All four instrumentation environment keys are removed from inheritance first. Existing profile files use serde defaults with no storage version change.
 
 Energy applies to all families; trace controls require explicit DeepSeek. Family changes preserve energy settings and clear trace settings along with family tuning. Preview shows requested environment only, not proof of current server settings. No sudo sampler or runtime policy tuning is performed. Whole-system power, SoC estimates, sampling cost, uncertainty and unavailable behavior are explained in [ENERGY_TRACE.md](ENERGY_TRACE.md).
+
+## Encoder-only prefill (Lab 0.9.0, Cachalot 0.67+)
+
+DeepSeek-only Encoder-only prefill is nullable: Runtime default omits the key and keeps Off, On writes `CACHALOT_PREFILL_ENCODER_ONLY=1`, Off writes 0. The supervisor removes inherited values first. Older profiles remain omitted and valid; family changes clear the field; Rust rejects it on other families. Unsupported older runtimes ignore the key. The control applies only on next launch and cannot establish external active settings.
+
+On multi-call text prompts it defers decoder work to requested snapshot boundaries and the prompt end, over up to the last 2,541 rows. Rounding and retained snapshot boundaries change. The UI warns that it is output-changing, not yet quality-gated, including when tuning is collapsed and before starting a saved profile. No speed or quality improvement is promised. Single-call and image prompts retain the standard path. Runtime 0.68 separately requires MLX 0.32.4 and changes snapshot numerics tags; the first request can re-prefill once per model. Lab does not delete snapshots or migrate model data.
+
+The auxiliary Apple on-device model in Cachalot 0.69 is outside serving. Lab adds no auxiliary launch controls or process, prompt compression, automatic routing, or benchmark viewer. See [runtime sync](RUNTIME_SYNC.md).

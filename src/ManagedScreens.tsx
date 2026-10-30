@@ -509,6 +509,15 @@ export function DiveScreen({
                             }
                           />
                           <TriState
+                            label="Encoder-only prefill · Cachalot 0.67+ · default Off"
+                            value={
+                              draft.tuning.deepseek_prefill_encoder_only ?? null
+                            }
+                            onChange={(deepseek_prefill_encoder_only) =>
+                              updateTuning({ deepseek_prefill_encoder_only })
+                            }
+                          />
+                          <TriState
                             label="System date reuse · Cachalot 0.60+ · default On"
                             value={
                               draft.tuning.deepseek_system_date_reuse ?? null
@@ -525,6 +534,15 @@ export function DiveScreen({
                           serve.sh defaults to On; Lab launches the CLI
                           directly, which defaults to Off. Runtime default
                           preserves that CLI behavior.
+                        </p>
+                        <p className="panel-intro">
+                          Encoder-only prefill is output-changing, not yet
+                          quality-gated. On defers decoder work for multi-call
+                          text prompts to requested snapshot boundaries and the
+                          prompt end, changing rounding and which snapshots are
+                          retained. Off or Runtime default keeps the standard
+                          path. Older runtimes ignore this control. Active mode
+                          is not reported by the server.
                         </p>
                         <p className="panel-intro">
                           System date reuse can avoid refilling a saved system
@@ -801,6 +819,13 @@ export function DiveScreen({
                       unreported.
                     </p>
                   )}
+                {draft.family === 'deepseek' &&
+                  draft.tuning.deepseek_prefill_encoder_only === true && (
+                    <p className="managed-notice">
+                      Encoder-only prefill: output-changing next-launch setting,
+                      not yet quality-gated; active server mode is unreported.
+                    </p>
+                  )}
                 <div className="managed-actions">
                   <button className="primary-button" disabled={busy}>
                     Save profile
@@ -861,6 +886,13 @@ export function DiveScreen({
                     GLM decode budget {selected.tuning.glm_decode_miss_budget} ·
                     output-changing next-launch setting; active server mode is
                     unreported.
+                  </p>
+                )}
+              {selected.family === 'deepseek' &&
+                selected.tuning.deepseek_prefill_encoder_only === true && (
+                  <p className="panel-intro">
+                    Encoder-only prefill · output-changing next-launch setting,
+                    not yet quality-gated; active server mode is unreported.
                   </p>
                 )}
               <div className="managed-actions">

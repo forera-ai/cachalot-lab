@@ -10,6 +10,7 @@ export type RuntimeTuning = {
   token_trace_every: number | null
   deepseek_decode_drop_misses: boolean | null
   deepseek_system_date_reuse: boolean | null
+  deepseek_prefill_encoder_only: boolean | null
   minimax_decode_miss_substitution: boolean | null
   minimax_prefill_miss_substitution: boolean | null
   loop_guard_repeats: number | null
@@ -78,6 +79,7 @@ export function newProfile(): LaunchProfile {
       token_trace_every: null,
       deepseek_decode_drop_misses: null,
       deepseek_system_date_reuse: null,
+      deepseek_prefill_encoder_only: null,
       minimax_decode_miss_substitution: null,
       minimax_prefill_miss_substitution: null,
       loop_guard_repeats: null,

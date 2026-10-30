@@ -8,7 +8,7 @@ Lab 0.7.0 provides local connection, streaming chat and saved conversations, per
 
 Lab 0.6.0 added a collapsed runtime read/wait evidence table and the compatible Lab rename. Lab 0.7.0 adds skipped-expert evidence and explicit GLM decode miss-budget intent with output warnings. Request-level attribution, percentages, and busy-rate derivations remain deferred.
 
-Runtime and host histories are currently bounded live traces, not a durable benchmark archive. Dedicated experiment records, token profiling, and historical benchmark comparison are planned. The reviewed runtime remains Cachalot 0.64.17 at `cf328cc8cef9da37c4348054ddb0c4128e09c570`, briefs through 0.64.0; source review does not equal live model validation.
+Runtime and host histories are currently bounded live traces, not a durable benchmark archive. Dedicated experiment records, token profiling, and historical benchmark comparison are planned. The reviewed runtime remains Cachalot 0.69.7 at `bd9bb457b1ef1346b7f71983c85051cea266ab1e`, briefs through 0.69.0; source review does not equal live model validation.
 
 The main path now prioritizes trustworthy evidence, reproducible comparisons, and explanatory profiling. The former assignments of 0.6.0 to updates, 0.7.0 to menu bar/onboarding, and 1.0.0 to a release candidate are superseded. Those capabilities remain backlog items; choose actual versions when a verified slice ships under [the release gate](RELEASE.md). No dates or binary version changes are implied by this planning pass.
 
@@ -90,8 +90,14 @@ All phases retain layered Runtime/Performance/Profiler/Research disclosure, acce
 
 Signed Lab/runtime updates with rollback, menu-bar integration, onboarding, chat edit/retry/search, and media attachments remain worthwhile secondary work. Media requires explicit runtime capability and bounded storage/transport; image totals cannot advertise capability. Prioritize these when they support safe ordinary use or evidence workflows, without displacing the governing research objective by default. A 1.0 milestone requires explicit reviewed product and compatibility criteria, not completion of every speculative research feature.
 
+A future possibility, after Phase B's manifest and import work, is to import and compare architecture-neutral benchmark manifests and results from separate CUDA experiments. That would require provenance, units, workload comparability, bounded local storage, and privacy review. It is not a shipped Lab capability.
+
 ## Next implementation slice
 
 Start with Phase A's metric/provenance inventory and Phase B's run-manifest design. Resolve counter lifetimes, request identity and active configuration with Cachalot before promising request-level comparisons. Track remaining GLM/DeepSeek and saved-key validation alongside this work. Lab 0.8.0 adopts optional whole-system/request energy and sampled DeepSeek decode aggregates with source labels and explicit collection controls. Detailed token timelines, durable run comparisons and validated models remain separate dependencies; aggregate stats do not satisfy Phase C.
 
 Each slice must state its engineering question, evidence contract, fallback, preservation/migration needs, raw export/retention plan, verification, and overhead budget where relevant. Follow runtime brief review before development, fresh local build/install before native UI testing, and exact-source signed/notarized publication for every pushed implementation. Documentation-only direction changes do not require a binary release.
+
+## Runtime adoption — Lab 0.9.0
+
+DeepSeek encoder-only prefill is an explicit default-off next-launch setting with output/quality warnings; active mode remains unreported. Auxiliary CLI availability, routing, compression, and benchmark import remain separate planned workflows after Phase B provenance and import contracts. They are not serving controls. Existing runtime energy/trace views continue unchanged. Runtime 0.68 owns MLX/snapshot-numerics transitions; Lab preserves saved data and snapshots.
