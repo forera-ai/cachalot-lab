@@ -1,5 +1,59 @@
 # Handoff
 
+## Start here — Cachalot Lab 0.9.0 published, 2026-10-30
+
+Published [v0.9.0](https://github.com/forera-ai/cachalot-lab/releases/tag/v0.9.0)
+from implementation commit `595ea017d3b484b6313750ea9986ae1cf47cca8d` and matching
+annotated tag. Version 0.9.0 is a compatible minor release for explicit default-off
+DeepSeek encoder-only prefill; auxiliary CLI/configuration and benchmark contracts
+remain separate from serving. This receipt follow-up changes documentation only;
+release source and tag remain fixed. Last reviewed runtime remains clean Cachalot
+**0.69.7**, `bd9bb457b1ef1346b7f71983c85051cea266ab1e`, briefs through **0.69.0**.
+
+Fresh exact-source gates passed Prettier, lint, types, 55 frontend tests, seven
+mock HTTP/SSE tests, Rust formatting/clippy, 34 Rust tests (one existing isolated
+Keychain test ignored), production build and Developer ID signed Tauri build.
+Apple app/DMG notarization, stapling, strict signatures, Hardened Runtime, secure
+timestamp, Gatekeeper, ZIP extraction and DMG integrity passed.
+
+- App Apple submission: `d8b5a4be-2d56-4f5d-af86-53809146c6ea` — Accepted.
+- DMG Apple submission: `2a73f8aa-4576-4c70-9436-bf2a71d52f9e` — Accepted.
+- ZIP SHA-256: `9c81bbb84a2a3dab5056bef9d313f678b189d1a121e66c411c4e87d1058175a7`.
+- DMG SHA-256: `90ae0e48a19c29e904298b82505efb7c5789a9fe42dd226ba526e0c976f95367`.
+- Installed executable SHA-256: `f9a89baba11fd1c0e690ce8a549cb5854901a18df9e64cfa92cfb240c6533e1d`.
+
+All seven published assets downloaded and matched local SHA-256 and GitHub asset
+digests; an unauthenticated API read confirms v0.9.0 is public latest. Installed
+`/Applications/Cachalot Lab.app` from the downloaded public DMG; all five bundle
+files match the mounted installer, extracted ZIP and authoritative notarized app.
+Native launch confirmed 0.9.0, original MiniMax profile, and an unsaved DeepSeek
+draft's inherited/default-Off control and output/quality warnings. Draft cancelled;
+app left on Cockpit. All five original app-data files remain byte-identical.
+No model launch/stop, generation, credential action or preference change occurred.
+
+Installer layout reuses the verified 0.8.0 Finder metadata/background with only
+the freshly notarized exact-source app replacing its payload and a renamed volume;
+the resulting DMG was freshly signed/notarized. Source release scripts remain
+unchanged. Custom mountpoint initially failed; default system mounting succeeded.
+Final native inspection was briefly blocked by the locked Mac, then completed
+after the owner unlocked it. App and Applications alias align with the background.
+Existing Finder geometry/sidebar required hiding the toolbar for canvas inspection;
+show-hidden-files exposes background/filesystem metadata, and the background's
+hidden flag is correct. No global hidden-files preference was changed.
+
+Exact-source GitHub CI passed on both [main](https://github.com/forera-ai/cachalot-lab/actions/runs/41090474769)
+and [v0.9.0](https://github.com/forera-ai/cachalot-lab/actions/runs/41090474617), including native app builds. All release gates are complete.
+
+Previous public app/data remain recoverable at
+`.release/local-0.9.0-2026-10-30/`; immediate pre-public installation is preserved
+at `.release/0.9.0/before-public-Cachalot Lab.app`. Local release logs, hashes,
+receipts, downloads and installation records are in `.release/0.9.0/`, with the
+packaging orchestration log in `.release/work-0.9.0/`. See the release's
+[verification report](https://github.com/forera-ai/cachalot-lab/releases/download/v0.9.0/RELEASE-REPORT.md).
+Live model quality/performance, Lab overhead, authenticated saved-key restart,
+exact minimum native layout and new Surface-theme inspection remain unverified;
+these are not release performance or quality claims.
+
 ## Release preparation — Cachalot Lab 0.9.0, 2026-10-30
 
 User authorized brief adoption and the complete release round. Latest published
