@@ -16,7 +16,7 @@ Do not rewrite Lab to satisfy this direction. Preserve streaming chat, reasoning
 
 The checked-out 0.5.0 foundation is Tauri 2, React 19, and TypeScript. Rust owns loopback HTTP, secrets, native sampling, local persistence, and the managed child. React presents state and bounded live histories. Runtime and host histories currently retain about two minutes in memory; saved conversations are durable conversation records, not reproducible experiment records. The production navigation contains Cockpit, Chat, Dive, API, Doctor, Logs, and Settings. A dedicated benchmark archive and experiment comparison workflow are future work, not an existing capability to replace.
 
-Whole-Mac and whole-drive observations are valuable context. They must retain their scope and must not become model-specific measurements through relabeling. The current source review remains Cachalot 0.72.1, commit `c2589255cace1075f36feb6f8788e4706d564cfa`, with briefs through 0.72.1. See [runtime sync](RUNTIME_SYNC.md) for tested versus source-reviewed paths.
+Whole-Mac and whole-drive observations are valuable context. They must retain their scope and must not become model-specific measurements through relabeling. The current source review remains Cachalot 0.72.3, commit `77aee2e1a63fd7f29c0968a5a5c66601459d65d3`, with briefs through 0.72.2. See [runtime sync](RUNTIME_SYNC.md) for tested versus source-reviewed paths.
 
 ## Ownership
 
@@ -132,3 +132,5 @@ Optional runtime energy and sampled DeepSeek decode aggregates now have source-s
 Lab 0.9.0 adds explicit default-off DeepSeek encoder-only prefill as requested launch intent with output and quality warnings. The separate auxiliary engine is not in serving; auxiliary availability, benchmark comparison, routing, and compression are not shipped Lab capabilities. See [runtime sync](RUNTIME_SYNC.md).
 
 Lab 0.10.0 adds explicit default-off attention-output FP8 reference parity and owned-startup checkpoint/bank evidence. CLI and script DI-1 defaults are distinguished; no automatic policy or universal quality/performance claim is added.
+
+Lab 0.11.0 adds bounded explicit failed-request log inspection with collapsed traceback excerpts and corrects DI-1 snapshot/quality evidence using runtime 0.72.2/0.72.3. Request-correlated structured events and detailed timelines remain separate contracts.

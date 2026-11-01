@@ -1,11 +1,14 @@
-# Reviewed committed runtime: 0.72.1 at c258925. The HTTP response does not expose
+# Reviewed committed runtime: 0.72.3 at 77aee2e. The HTTP response does not expose
 # package version or active numerics mode, so external-server mode stays unknown.
 reviewed_runtime:
-  version: 0.72.1
-  commit: c2589255cace1075f36feb6f8788e4706d564cfa
+  version: 0.72.3
+  commit: 77aee2e1a63fd7f29c0968a5a5c66601459d65d3
 brief_inbox: docs/lab/briefs
-# Briefs reviewed through 0.72.1; source/changelog corrections through 0.72.1.
+# Briefs reviewed through 0.72.2; source/changelog corrections through 0.72.3.
 features:
+  failed_stream_request_log: '>=0.72.2'
+  deepseek_di1_stale_slot_snapshot_fix: '>=0.72.2'
+  deepseek_fixed_di1_quality_rerun: '>=0.72.3'
   deepseek_attention_output_fp8: '>=0.71.0'
   deepseek_script_checkpoint_selection: '>=0.71.2'
   deepseek_di1_snapshot_identity: '>=0.72.0'

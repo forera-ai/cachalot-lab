@@ -2033,3 +2033,38 @@ pre:focus-visible,
 .request-energy p {
   margin: 10px 0;
 }
+
+/* Failures are views over the same bounded managed-log excerpt. */
+.managed-failures {
+  flex: none;
+  max-height: 220px;
+  overflow: auto;
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px solid var(--state-error);
+  border-radius: 10px;
+  scrollbar-gutter: stable;
+}
+.managed-failures.is-compact {
+  max-height: 150px;
+}
+.managed-failures h3,
+.managed-failures p {
+  margin: 0 0 8px;
+  overflow-wrap: anywhere;
+}
+.managed-failures h3,
+.managed-failures strong {
+  color: var(--state-error);
+}
+.managed-failures article + article {
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 12px;
+  margin-top: 12px;
+}
+.managed-failures pre {
+  max-height: 140px;
+  overflow: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}

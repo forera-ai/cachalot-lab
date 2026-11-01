@@ -1,5 +1,53 @@
 # Handoff
 
+## Release preparation — Cachalot Lab 0.11.0, 2026-11-01
+
+User authorized 0.72.2 brief implementation and complete release round. Latest
+published Lab is 0.10.0; 0.11.0 is a compatible minor release for new explicit
+failed-request log inspection. Planned release:
+https://github.com/forera-ai/cachalot-lab/releases/tag/v0.11.0.
+
+Last reviewed runtime: clean **0.72.3**, `77aee2e1a63fd7f29c0968a5a5c66601459d65d3`,
+briefs through **0.72.2**. The only post-brief commit adds measured fixed-runtime
+DI-1 gate results, documentation/version updates; no extra serving/default change.
+
+Acceptance: every complete failure marker in the bounded recent managed log shows
+type/message and collapsed traceback excerpt in Logs/Dive; raw text remains
+unchanged; missing/partial/legacy/interleaved evidence creates no inferred failure
+or request ID. Visible line numbers are relative to excerpt, not server history.
+DI-1 warnings distinguish stale-slot older gates from fixed 0.72.3 scoped evidence,
+and explain -di1.1 cold-prefill transition without deleting snapshots or changing
+settings. Storage identities, credentials, profiles and existing SSE behavior stay
+compatible.
+
+Regression failed on missing failure cards and stale quality copy before edits.
+Focused parser/UI tests cover exceptions, ValueError without traceback, boundaries,
+partial/legacy output, safe text rendering, collapse and polling replacement.
+Graph MCP tools absent; CLI list_projects still refuses an incompatible active
+generation. Targeted source fallback used for ManagedLog, styles, runtime failed
+stream logger, snapshot identity and fixed-gate manifests/report. No graph coverage
+or complete runtime validation claim. Code Work and Production Code Review apply.
+
+Fresh full gates, recoverable build/install/native inspection, exact-source
+notarization, publication/hash/CI checks and public-DMG installation remain required
+before completion. No live-model quality/performance or Lab overhead certification.
+
+Local gates: 63 frontend, eight mock HTTP/SSE and 36 Rust tests pass (one existing
+isolated Keychain test ignored), plus Prettier/lint/types/Rust fmt/clippy and
+Developer ID signed production app build. Initial strict TypeScript check exposed
+unchecked parser indices; explicit guards fixed it and full gates pass.
+Production Code Review found no material issue after correction.
+
+Installed local app matches all four fresh bundle files; prior app/data and native
+report recoverable under `.release/local-0.11.0-2026-11-01/`. Native Logs/Dive
+synthetic failure cards, default collapse/expand, ValueError/no trace, raw output,
+DI-1 editor/saved warnings and snapshot guidance passed in System-dark standard
+window. All five original app-data files restored byte-identical; no credential,
+preference or real-model action. External DeepSeek server remained active and
+untouched. Surface/minimum-size, live quality/performance/overhead and saved-key
+restart remain unverified. Known optional rust-objcopy/libLLVM stripping warning
+does not prevent signed build/signature verification.
+
 ## Start here — Cachalot Lab 0.10.0 published, 2026-11-01
 
 Published [v0.10.0](https://github.com/forera-ai/cachalot-lab/releases/tag/v0.10.0)

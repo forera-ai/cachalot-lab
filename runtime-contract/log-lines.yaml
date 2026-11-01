@@ -1,4 +1,12 @@
 patterns:
+  - id: failed_stream_request
+    since: 0.72.2
+    regex: '^\[request failed\] (?P<type>[A-Za-z_][\w.]*): ?(?P<message>.*)$'
+    source: stderr
+    meaning: Explicit failed streaming request; no normal [request] completion line follows for that request. Lab renders each complete marker in the current bounded log excerpt, without inventing IDs or a cumulative count.
+    traceback: Python header then indented frames; may end in the matching exception summary. Lab keeps a collapsed excerpt, stops at unrelated non-indented output and preserves all raw lines separately. ValueError normally has no traceback. Partial or interleaved details may be incomplete.
+    client: Unchanged SSE error.message then [DONE]; traceback stays server-side.
+    older_logs: Missing marker/completion is not proof of failure. Orphaned or incomplete markers stay raw output only.
   - id: deepseek_checkpoint
     since: 0.72.1
     regex: '^cachalot [0-9.]+: loading (?P<path>/.+)$'

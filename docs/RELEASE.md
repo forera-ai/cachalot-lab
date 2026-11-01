@@ -53,15 +53,15 @@ This local test installation does not make an uncommitted build a release.
 
 ## Scope
 
-The [0.10.0 release](https://github.com/forera-ai/cachalot-lab/releases/tag/v0.10.0)
-adds explicit default-off DeepSeek attention-output FP8 reference parity and
-process-scoped checkpoint/bank/DI-1 startup evidence. Direct CLI defaults and saved
-data remain compatible. Scripts differ: serve.sh 0.72+ defaults DI-1 On. FP8
-snapshots are not mode-keyed; separate snapshot directories are recommended.
-No universal quality/speed or Lab overhead benefit is certified. Live model and
-authenticated saved-key restart checks remain unverified. Artifacts target Apple
-Silicon, macOS 14+; Python, Cachalot and checkpoints are not bundled. Runtime 0.68+
-requires MLX 0.32.4. Detailed wired-history and failed-request instrumentation remain planned.
+The [0.11.0 release](https://github.com/forera-ai/cachalot-lab/releases/tag/v0.11.0)
+adds explicit failed-request cards with collapsed traceback excerpts in Logs and
+Dive. It corrects DI-1 evidence: older quality gates ran with stale slots; the
+fixed 0.72.3 1017 gate was within noise, a scoped result. Runtime 0.72.2 changes
+DI-1 snapshot identity to 0.68.0-di1.1 and can require one cold prefill; full-prefill
+0.68.0 is unchanged. Saved data and launch defaults remain compatible. No model
+quality/performance, Lab overhead or authenticated saved-key restart is certified.
+Apple Silicon, macOS 14+; Python/runtime/checkpoints not bundled. Runtime 0.68+
+needs MLX 0.32.4. Detailed wired-history and structured failure IDs remain planned.
 
 ## One-time signing setup
 

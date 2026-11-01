@@ -127,9 +127,7 @@ it('saves DeepSeek choices, preserves inherited defaults, and clears family-spec
   expect(encoder).toHaveValue('inherit')
   expect(parity).toHaveValue('inherit')
   expect(
-    screen.getByText(
-      /output-changing; runtime gate found differences within noise/,
-    ),
+    screen.getByText(/0.71.0–0.72.1 quality gates ran with stale expert slots/),
   ).toBeVisible()
   expect(drops).toHaveValue('inherit')
   expect(dates).toHaveValue('inherit')

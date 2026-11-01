@@ -1,4 +1,6 @@
 import http.client
+import contextlib
+import io
 import importlib.util
 import json
 import sys
@@ -91,6 +93,24 @@ class MockRuntimeTests(unittest.TestCase):
                     self.assertEqual(actual[key], value)
                 else:
                     self.assertNotIn(key, actual)
+
+    def test_failed_stream_log_and_unchanged_client_error(self):
+        for kind, name, message in [("key", "KeyError", "'w1.weight'"),
+                                    ("value", "ValueError", "invalid synthetic prompt")]:
+            with self.subTest(kind=kind):
+                self.runtime.scenario = mock_server.Scenario(stream_failure=kind)
+                stderr, stdout = io.StringIO(), io.StringIO()
+                with contextlib.redirect_stderr(stderr), contextlib.redirect_stdout(stdout):
+                    status, stream = self.request("/v1/chat/completions", {"stream": True})
+                self.assertEqual(status, 200)
+                self.assertIn(f"[request failed] {name}: {message}", stderr.getvalue())
+                self.assertEqual("Traceback (most recent call last):" in stderr.getvalue(), kind == "key")
+                self.assertNotIn("[request]", stdout.getvalue())
+                chunks = [json.loads(line[6:]) for line in stream.splitlines() if line.startswith("data: {")]
+                self.assertEqual(chunks, [{"error": {"message": message}}])
+                self.assertIn("data: [DONE]", stream)
+                self.assertNotIn("Traceback", stream)
+                self.assertEqual(self.runtime.requests_served, 0)
 
     def test_stream_and_counters(self):
         status, stream = self.request(

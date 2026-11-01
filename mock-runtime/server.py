@@ -5,6 +5,8 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import sys
+import traceback
 from pathlib import Path
 import socketserver
 import threading
@@ -25,6 +27,7 @@ class Scenario:
     image_stats: bool = False
     read_stats: bool = False
     observability: bool = False
+    stream_failure: str = ""
 
 
 class MockRuntime(ThreadingHTTPServer):
@@ -162,6 +165,18 @@ class Handler(BaseHTTPRequestHandler):
                 self.end_headers()
                 self.close_connection = True
                 try:
+                    if self.server.scenario.stream_failure:
+                        try:
+                            if self.server.scenario.stream_failure == "value":
+                                raise ValueError("invalid synthetic prompt")
+                            raise KeyError("w1.weight")
+                        except (ValueError, KeyError) as exc:
+                            print(f"[request failed] {type(exc).__name__}: {exc}", file=sys.stderr, flush=True)
+                            if not isinstance(exc, ValueError):
+                                traceback.print_exception(exc, file=sys.stderr)
+                            self.wfile.write(f"data: {json.dumps({'error': {'message': str(exc)}})}\n\ndata: [DONE]\n\n".encode())
+                            self.wfile.flush()
+                        return
                     remaining = self.server.scenario.prefill_delay
                     while remaining > 0:
                         pause = min(0.5, remaining)
@@ -201,6 +216,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--port", type=int, default=8011)
     parser.add_argument("--startup-delay", type=float, default=0)
+    parser.add_argument("--stream-failure", choices=("key", "value"), default="")
     parser.add_argument("--prefill-delay", type=float, default=0)
     parser.add_argument("--token-delay", type=float, default=0)
     parser.add_argument("--api-key", default="")
@@ -211,7 +227,7 @@ def main() -> None:
     parser.add_argument("--read-stats", action="store_true", help="Expose fixed synthetic runtime read/wait counters")
     parser.add_argument("--observability", action="store_true", help="Synthetic energy and token-trace contract fixtures; not measurements")
     args = parser.parse_args()
-    scenario = Scenario(args.startup_delay, args.prefill_delay, args.token_delay, args.api_key, args.missing_stats, args.crash_on_chat, args.prefetch_stats, args.image_stats, args.read_stats, args.observability)
+    scenario = Scenario(args.startup_delay, args.prefill_delay, args.token_delay, args.api_key, args.missing_stats, args.crash_on_chat, args.prefetch_stats, args.image_stats, args.read_stats, args.observability, args.stream_failure)
     server = MockRuntime(("127.0.0.1", args.port), scenario)
     print("[startup] process up", flush=True)
     print(f"[startup] server listening on 127.0.0.1:{server.server_port}", flush=True)

@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.11.0] - 2026-11-01
+
+Compatible minor release for explicit failed-request inspection. Existing data formats, runtime defaults, controls and raw logs remain compatible.
+
+- Adopt runtime brief 0.72.2 against clean 0.72.3 (`77aee2e`), including its fixed-runtime quality rerun.
+- Show each complete `[request failed] Type: message` marker in Logs and Dive runtime output, with collapsed traceback excerpts and original raw output. No request IDs, inferred failures or cumulative counts are invented.
+- Bound failure rendering to the existing latest 64 KiB log excerpt; preserve unknown/partial/older logs and stop traceback attribution at unrelated non-indented output.
+- Correct DI-1 quality evidence: 0.71.0–0.72.1 gates ran with stale slots; the fixed 0.72.3 1017 gate was within noise, a scoped result rather than a universal quality guarantee.
+- Explain DI-1 snapshot key `0.68.0-di1.1` since 0.72.2 and expected one-time cold prefill; full-prefill `0.68.0` remains valid. Lab does not delete snapshots or silently change settings.
+
 ## [0.10.0] - 2026-11-01
 
 Compatible minor release for a new explicit DeepSeek numerics control and observed managed-startup evidence. Existing profile/data versions and direct CLI defaults remain unchanged.

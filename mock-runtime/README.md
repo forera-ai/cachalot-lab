@@ -28,3 +28,10 @@ reads 80, fast reads 20, summed time 12.500 s, busy time 4.250 s, decode wait
 2.125 s, and waited misses 30. They are omitted by default and with
 `--missing-stats`. This fixture exercises display and compatibility, not
 runtime performance or physical-drive measurements.
+
+`--stream-failure key` simulates runtime 0.72.2's failed stream: stderr receives
+`[request failed] KeyError: 'w1.weight'` and a Python traceback, while the client
+receives only SSE error.message then [DONE]. `--stream-failure value` emits a
+ValueError marker without traceback. Failed streams do not increment completed
+request/token counters or print a normal [request] completion. These synthetic
+exceptions exercise Logs/Dive failure inspection; no model is loaded.

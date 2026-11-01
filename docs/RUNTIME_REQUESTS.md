@@ -44,3 +44,5 @@ GLM 0.62.14 adds `skipped_experts` but does not report its active miss budget. P
 ## 0.72.1 identity and failures
 
 Request structured per-server checkpoint/bank identity, active DI-1/FP8 settings, timestamped wired-governor history, and failed-request/traceback events with request IDs. The same DeepSeek HTTP model ID serves original and 1017 checkpoints. Startup evidence covers only Lab-owned processes; missing completion lines cannot identify failed requests or establish causal wired-pressure failures. Keep FP8 snapshot-numerics identity explicit before shared-snapshot comparisons.
+
+Runtime 0.72.2 partially satisfies failure visibility with stderr markers and Python tracebacks; Lab 0.11.0 presents those bounded excerpts. Structured request IDs, timestamps, failure/finish association and external-server identity remain requested. No absence-based failure inference is supported.

@@ -10,6 +10,7 @@ import {
 import { Eye, Pencil, Play, Plus, Square, Trash2 } from 'lucide-react'
 
 import { ModelDiscovery } from './ModelDiscovery'
+import { parseLoggedFailures } from './managedLog'
 import { DEFAULT_RUNTIME_PORT, type RuntimeConnection } from './runtime'
 
 type LaunchCommand = {
@@ -547,14 +548,19 @@ export function DiveScreen({
                           defaults to Off.
                         </p>
                         <p className="panel-intro">
-                          Encoder-only prefill is output-changing; runtime gate
-                          found differences within noise. Applies to multi-call
+                          Encoder-only prefill changes outputs. 0.71.0–0.72.1
+                          quality gates ran with stale expert slots; the 0.72.3
+                          fixed-runtime gate on 1017 was within noise, not a
+                          universal quality guarantee. Applies to multi-call
                           DeepSeek text prefills. CLI and chat.sh default Off;
                           serve.sh 0.72+ defaults On. Runtime default in Lab
-                          keeps CLI Off. Since 0.72, snapshots are keyed on this
-                          mode; switching can require one cold prefill. Active
-                          mode is shown only when its startup line is observed
-                          for this Lab-owned process.
+                          keeps CLI Off. Runtime 0.72.2 changes DI-1 snapshot
+                          keys to 0.68.0-di1.1; the first request after updating
+                          can cold-prefill saved system blocks once.
+                          Full-prefill snapshots (0.68.0) remain valid. Lab does
+                          not delete snapshots. Active mode is shown only when
+                          its startup line is observed for this Lab-owned
+                          process.
                         </p>
                         <p className="panel-intro">
                           Attention output FP8 changes outputs for reference
@@ -843,8 +849,9 @@ export function DiveScreen({
                   draft.tuning.deepseek_prefill_encoder_only === true && (
                     <p className="managed-notice">
                       Encoder-only prefill: output-changing next-launch setting,
-                      runtime gate within noise; requested setting, not proof of
-                      active mode.
+                      older gates affected by stale slots; fixed 0.72.3 gate
+                      within noise. Runtime 0.72.2 can cold-prefill saved blocks
+                      once. Requested setting, not proof of active mode.
                     </p>
                   )}
                 {draft.family === 'deepseek' &&
@@ -921,8 +928,9 @@ export function DiveScreen({
                 selected.tuning.deepseek_prefill_encoder_only === true && (
                   <p className="panel-intro">
                     Encoder-only prefill · output-changing next-launch setting,
-                    runtime gate within noise; requested setting, not proof of
-                    active mode.
+                    older gates affected by stale slots; fixed 0.72.3 gate
+                    within noise. Runtime 0.72.2 can cold-prefill saved blocks
+                    once. Requested setting, not proof of active mode.
                   </p>
                 )}
               {selected.family === 'deepseek' &&
@@ -1137,17 +1145,49 @@ export function ManagedLog({ compact = false }: { compact?: boolean }) {
     const timer = window.setInterval(() => void refresh(), 2000)
     return () => window.clearInterval(timer)
   }, [refresh])
+  const failures = parseLoggedFailures(log)
   return (
     <section className="info-panel managed-log-panel">
       <span className="section-kicker">MANAGED RUNTIME LOG</span>
       <h2>{compact ? 'Recent output' : 'Logs'}</h2>
       <p className="panel-intro">
         Local launch output. Latest 64 KiB shown; a new launch starts a new log.
+        Failure markers require Cachalot 0.72.2+. Missing completion lines do
+        not prove failure. Tracebacks are excerpts without request IDs; raw
+        output remains below.
       </p>
       {error && (
         <p className="inline-error" role="alert">
           {error}
         </p>
+      )}
+      {failures.length > 0 && (
+        <section
+          className={`managed-failures ${compact ? 'is-compact' : ''}`}
+          aria-label="Logged request failures"
+        >
+          <h3>Failed requests · visible log excerpt</h3>
+          {failures.map((failure) => (
+            <article
+              key={`${failure.line}:${failure.type}:${failure.message}`}
+              aria-label={`Failed request at visible line ${failure.line}`}
+            >
+              <p>
+                <strong>Failed request · line {failure.line}</strong>
+                <br />
+                {failure.type}: {failure.message}
+              </p>
+              {failure.traceback && (
+                <details>
+                  <summary>Traceback excerpt</summary>
+                  <pre tabIndex={0} aria-label="Traceback excerpt">
+                    <code>{failure.traceback}</code>
+                  </pre>
+                </details>
+              )}
+            </article>
+          ))}
+        </section>
       )}
       <pre
         className={`managed-log ${compact ? 'is-compact' : ''}`}

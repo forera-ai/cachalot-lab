@@ -1,4 +1,4 @@
-# Verified against Cachalot 0.72.1 (c258925). Null overrides in Lab profiles
+# Verified against Cachalot 0.72.3 (77aee2e). Null overrides in Lab profiles
 # inherit the runtime's version-specific default; zero has each knob's stated effect.
 knobs:
   - key: CACHALOT_ATTN_ACT_QUANT_O
@@ -21,10 +21,10 @@ knobs:
     group: prefill
     effect: changes-outputs
     restart_required: true
-    stability: output-changing-runtime-gate-within-noise
+    stability: output-changing-scoped-fixed-runtime-gate
     since: 0.67.0
     lab: Nullable DeepSeek-only switch. On writes 1, Off writes 0, null omits after inherited key removal. Older profiles retain the default Off path; family changes clear it. Active On mode is shown only from the current owned process startup line; missing line stays unknown.
-    summary: Only exact value 1 enables multi-call text prefill with deferred decoder work at requested snapshot boundaries and prompt end (last up to 2541 rows). Rounding and retained snapshot boundaries change. Single-call and image prompts stay on standard path; unsupported runtimes ignore the key. Since 0.72.0 snapshot tags are 0.68.0-di1 when on and 0.68.0 when off; switching may cold-prefill once. No Lab speed or quality benefit is promised.
+    summary: Only exact value 1 enables multi-call text prefill with deferred decoder work at requested snapshot boundaries and prompt end (last up to 2541 rows). Rounding and retained snapshot boundaries change. Single-call and image prompts stay on standard path; unsupported runtimes ignore the key. Since 0.72.2 snapshot tags are 0.68.0-di1.1 when on and 0.68.0 when off; old -di1 snapshots used stale expert slots and are not reused. Updating can cold-prefill once. DI-1 quality gates from 0.71.0 through 0.72.1 ran with this bug; fixed 0.72.3 gate on 1017 was within noise, not a universal guarantee. No Lab speed or quality benefit is promised.
   - key: CACHALOT_FP8_GEMV_DECODE
     kind: env
     families: [deepseek-v4.1-flash]

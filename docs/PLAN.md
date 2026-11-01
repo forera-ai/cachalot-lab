@@ -8,7 +8,7 @@ Lab 0.7.0 provides local connection, streaming chat and saved conversations, per
 
 Lab 0.6.0 added a collapsed runtime read/wait evidence table and the compatible Lab rename. Lab 0.7.0 adds skipped-expert evidence and explicit GLM decode miss-budget intent with output warnings. Request-level attribution, percentages, and busy-rate derivations remain deferred.
 
-Runtime and host histories are currently bounded live traces, not a durable benchmark archive. Dedicated experiment records, token profiling, and historical benchmark comparison are planned. The reviewed runtime remains Cachalot 0.72.1 at `c2589255cace1075f36feb6f8788e4706d564cfa`, briefs through 0.72.1; source review does not equal live model validation.
+Runtime and host histories are currently bounded live traces, not a durable benchmark archive. Dedicated experiment records, token profiling, and historical benchmark comparison are planned. The reviewed runtime remains Cachalot 0.72.3 at `77aee2e1a63fd7f29c0968a5a5c66601459d65d3`, briefs through 0.72.2; source review does not equal live model validation.
 
 The main path now prioritizes trustworthy evidence, reproducible comparisons, and explanatory profiling. The former assignments of 0.6.0 to updates, 0.7.0 to menu bar/onboarding, and 1.0.0 to a release candidate are superseded. Those capabilities remain backlog items; choose actual versions when a verified slice ships under [the release gate](RELEASE.md). No dates or binary version changes are implied by this planning pass.
 
@@ -103,3 +103,5 @@ Each slice must state its engineering question, evidence contract, fallback, pre
 DeepSeek encoder-only prefill is an explicit default-off next-launch setting with output/quality warnings; external active mode remains unreported. Auxiliary CLI availability, routing, compression, and benchmark import remain separate planned workflows after Phase B provenance and import contracts. They are not serving controls. Existing runtime energy/trace views continue unchanged. Runtime 0.68 owns MLX/snapshot-numerics transitions; Lab preserves saved data and snapshots.
 
 Lab 0.10.0 adds explicit FP8 reference-parity intent and bounded owned-startup identity/DI-1 evidence. Detailed wired-history visualization and server failure instrumentation remain future contract work.
+
+Lab 0.11.0 adds bounded explicit failed-request log inspection with collapsed traceback excerpts and corrects DI-1 snapshot/quality evidence using runtime 0.72.2/0.72.3. Request-correlated structured events and detailed timelines remain separate contracts.
