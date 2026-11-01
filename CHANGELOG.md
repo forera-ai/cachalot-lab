@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.10.0] - 2026-11-01
+
+Compatible minor release for a new explicit DeepSeek numerics control and observed managed-startup evidence. Existing profile/data versions and direct CLI defaults remain unchanged.
+
+- Review briefs 0.71.0, 0.72.0 and 0.72.1 against clean runtime 0.72.1 (`c258925`), including intervening source/changelog changes.
+- Add default-off attention-output FP8 reference-parity control (0.71+), family validation, inherited-key removal, save/reopen compatibility and snapshot-isolation warnings.
+- Distinguish CLI/chat DI-1 Off from serve.sh 0.72+ On; document mode-keyed snapshots and bounded runtime quality evidence.
+- Show observed checkpoint/bank basenames and announced DI-1 On only for the current Lab-owned process, using the first 64 KiB of startup output. Missing evidence remains unknown; external model IDs cannot distinguish checkpoint revisions.
+- Qualify budget-0 tool-argument risks and the single 1017 replay speed result. No automatic tuning, failed-request inference, wired-memory causal chart, or general performance/quality guarantee is added.
+
 ## [0.9.0] - 2026-10-30
 
 This backward-compatible minor release adds an explicit DeepSeek launch capability. Existing profiles, data identities, credentials, inference defaults, and storage versions remain compatible.

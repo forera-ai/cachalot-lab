@@ -53,15 +53,15 @@ This local test installation does not make an uncommitted build a release.
 
 ## Scope
 
-The [0.9.0 release](https://github.com/forera-ai/cachalot-lab/releases/tag/v0.9.0)
-adds explicit default-off DeepSeek encoder-only prefill (Cachalot 0.67+) with
-output/quality warnings. It retains energy (0.63+), sampled tracing (DeepSeek
-0.64+), and existing workflows. Auxiliary CLI and benchmark contracts are recorded
-without serving integration. No performance, quality benefit or Lab overhead is
-certified. Live model and authenticated saved-key restart checks remain unverified.
-GPU timelines, durable experiments and automatic updates remain planned. Artifacts
-target Apple Silicon, macOS 14 or newer; Python, Cachalot and checkpoints are not
-included. Runtime 0.68+ requires MLX 0.32.4 and may re-prefill snapshots once per model.
+The [0.10.0 release](https://github.com/forera-ai/cachalot-lab/releases/tag/v0.10.0)
+adds explicit default-off DeepSeek attention-output FP8 reference parity and
+process-scoped checkpoint/bank/DI-1 startup evidence. Direct CLI defaults and saved
+data remain compatible. Scripts differ: serve.sh 0.72+ defaults DI-1 On. FP8
+snapshots are not mode-keyed; separate snapshot directories are recommended.
+No universal quality/speed or Lab overhead benefit is certified. Live model and
+authenticated saved-key restart checks remain unverified. Artifacts target Apple
+Silicon, macOS 14+; Python, Cachalot and checkpoints are not bundled. Runtime 0.68+
+requires MLX 0.32.4. Detailed wired-history and failed-request instrumentation remain planned.
 
 ## One-time signing setup
 

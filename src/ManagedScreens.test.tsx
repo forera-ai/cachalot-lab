@@ -123,9 +123,13 @@ it('saves DeepSeek choices, preserves inherited defaults, and clears family-spec
   const drops = screen.getByLabelText(/Decode drops misses/)
   const dates = screen.getByLabelText(/System date reuse/)
   const encoder = screen.getByLabelText(/Encoder-only prefill/)
+  const parity = screen.getByLabelText(/Attention output FP8/)
   expect(encoder).toHaveValue('inherit')
+  expect(parity).toHaveValue('inherit')
   expect(
-    screen.getByText(/output-changing, not yet quality-gated/),
+    screen.getByText(
+      /output-changing; runtime gate found differences within noise/,
+    ),
   ).toBeVisible()
   expect(drops).toHaveValue('inherit')
   expect(dates).toHaveValue('inherit')
@@ -135,6 +139,7 @@ it('saves DeepSeek choices, preserves inherited defaults, and clears family-spec
   await user.selectOptions(drops, 'true')
   await user.selectOptions(dates, 'false')
   await user.selectOptions(encoder, 'true')
+  await user.selectOptions(parity, 'true')
   await user.click(screen.getByText(/Runtime tuning/))
   expect(
     screen.getByText(/Encoder-only prefill: output-changing/),
@@ -144,6 +149,7 @@ it('saves DeepSeek choices, preserves inherited defaults, and clears family-spec
     expect(profiles[0]?.tuning.deepseek_decode_drop_misses).toBe(true),
   )
   expect(profiles[0]?.tuning.deepseek_system_date_reuse).toBe(false)
+  expect(profiles[0]?.tuning.deepseek_attn_act_quant_o).toBe(true)
   expect(profiles[0]?.tuning).toHaveProperty(
     'deepseek_prefill_encoder_only',
     true,
@@ -156,6 +162,11 @@ it('saves DeepSeek choices, preserves inherited defaults, and clears family-spec
   expect(screen.getByLabelText(/Decode drops misses/)).toHaveValue('true')
   expect(screen.getByLabelText(/System date reuse/)).toHaveValue('false')
   expect(screen.getByLabelText(/Encoder-only prefill/)).toHaveValue('true')
+  expect(screen.getByLabelText(/Attention output FP8/)).toHaveValue('true')
+  await user.selectOptions(
+    screen.getByLabelText(/Attention output FP8/),
+    'false',
+  )
   await user.selectOptions(
     screen.getByLabelText(/Encoder-only prefill/),
     'false',
@@ -170,6 +181,7 @@ it('saves DeepSeek choices, preserves inherited defaults, and clears family-spec
     expect(profiles[0]?.tuning.deepseek_decode_drop_misses).toBe(false),
   )
   expect(profiles[0]?.tuning.deepseek_system_date_reuse).toBe(true)
+  expect(profiles[0]?.tuning.deepseek_attn_act_quant_o).toBe(false)
   expect(profiles[0]?.tuning).toHaveProperty(
     'deepseek_prefill_encoder_only',
     false,
@@ -182,6 +194,7 @@ it('saves DeepSeek choices, preserves inherited defaults, and clears family-spec
   await waitFor(() => expect(profiles[0]?.family).toBe('glm'))
   expect(profiles[0]?.tuning.deepseek_decode_drop_misses).toBeNull()
   expect(profiles[0]?.tuning.deepseek_system_date_reuse).toBeNull()
+  expect(profiles[0]?.tuning.deepseek_attn_act_quant_o).toBeNull()
   expect(profiles[0]?.tuning).toHaveProperty(
     'deepseek_prefill_encoder_only',
     null,
@@ -198,11 +211,14 @@ it('keeps older DeepSeek profiles on inherited CLI defaults', async () => {
     .deepseek_system_date_reuse
   delete (profile.tuning as unknown as Record<string, unknown>)
     .deepseek_prefill_encoder_only
+  delete (profile.tuning as unknown as Record<string, unknown>)
+    .deepseek_attn_act_quant_o
   profiles = [profile]
   const user = userEvent.setup()
   render(<DiveScreen managed={managed} runtime={runtime} />)
   await user.click(await screen.findByRole('button', { name: 'Edit' }))
   await user.click(screen.getByText(/Runtime tuning/))
+  expect(screen.getByLabelText(/Attention output FP8/)).toHaveValue('inherit')
   expect(screen.getByLabelText(/Decode drops misses/)).toHaveValue('inherit')
   expect(screen.getByLabelText(/System date reuse/)).toHaveValue('inherit')
   expect(screen.getByLabelText(/Encoder-only prefill/)).toHaveValue('inherit')
@@ -395,4 +411,68 @@ it('saves explicit instrumentation, preserves energy across families, clears Dee
       token_trace_every: null,
     }),
   )
+})
+
+it('shows observed startup only for the running owned profile and keeps missing modes unknown', async () => {
+  const profile = {
+    ...newProfile(),
+    name: 'Owned DeepSeek',
+    family: 'deepseek' as const,
+  }
+  profiles = [profile]
+  const status = {
+    running: true,
+    ready: true,
+    profile_id: profile.id,
+    endpoint: 'http://127.0.0.1:8011',
+    pid: 43,
+    last_exit_code: null,
+    startup: {
+      checkpoint: 'DeepSeek-V4.1-Flash-1017',
+      expert_bank: 'DeepSeek-V4.1-Flash-1017-q2g128',
+      encoder_only_prefill: true as boolean | null,
+    },
+  }
+  const { rerender } = render(
+    <DiveScreen managed={{ ...managed, status }} runtime={runtime} />,
+  )
+  expect(
+    await screen.findByRole('region', { name: 'Observed managed startup' }),
+  ).toHaveTextContent('DeepSeek-V4.1-Flash-1017')
+  expect(
+    screen.getByRole('region', { name: 'Observed managed startup' }),
+  ).toHaveTextContent('On · startup line observed')
+  rerender(
+    <DiveScreen
+      managed={{
+        ...managed,
+        status: {
+          ...status,
+          startup: { ...status.startup, encoder_only_prefill: null },
+        },
+      }}
+      runtime={runtime}
+    />,
+  )
+  expect(
+    screen.getByRole('region', { name: 'Observed managed startup' }),
+  ).toHaveTextContent('absence does not prove Off')
+  rerender(
+    <DiveScreen
+      managed={{ ...managed, status: { ...status, profile_id: 'another' } }}
+      runtime={runtime}
+    />,
+  )
+  expect(
+    screen.queryByRole('region', { name: 'Observed managed startup' }),
+  ).not.toBeInTheDocument()
+  rerender(
+    <DiveScreen
+      managed={{ ...managed, status: { ...status, running: false } }}
+      runtime={runtime}
+    />,
+  )
+  expect(
+    screen.queryByRole('region', { name: 'Observed managed startup' }),
+  ).not.toBeInTheDocument()
 })

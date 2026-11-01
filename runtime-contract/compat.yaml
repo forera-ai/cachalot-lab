@@ -1,11 +1,14 @@
-# Reviewed committed runtime: 0.69.7 at bd9bb45. The HTTP response does not expose
+# Reviewed committed runtime: 0.72.1 at c258925. The HTTP response does not expose
 # package version or active numerics mode, so external-server mode stays unknown.
 reviewed_runtime:
-  version: 0.69.7
-  commit: bd9bb457b1ef1346b7f71983c85051cea266ab1e
+  version: 0.72.1
+  commit: c2589255cace1075f36feb6f8788e4706d564cfa
 brief_inbox: docs/lab/briefs
-# Briefs reviewed through 0.69.0; source/changelog corrections through 0.69.7.
+# Briefs reviewed through 0.72.1; source/changelog corrections through 0.72.1.
 features:
+  deepseek_attention_output_fp8: '>=0.71.0'
+  deepseek_script_checkpoint_selection: '>=0.71.2'
+  deepseek_di1_snapshot_identity: '>=0.72.0'
   deepseek_encoder_only_prefill: '>=0.67.0'
   standalone_auxiliary_cli: '>=0.69.0'
   mlx_0_32_4_snapshot_numerics: '>=0.68.0'
@@ -42,7 +45,10 @@ features:
   deepseek_disk_chunk_pins: '>=0.59.0'
   deepseek_system_date_reuse: '>=0.60.0'
 launch_defaults:
-  deepseek_prefill_encoder_only: false
+  deepseek_direct_cli_prefill_encoder_only: false
+  deepseek_chat_script_prefill_encoder_only: false
+  deepseek_serve_script_prefill_encoder_only_since_0_72_0: true
+  deepseek_attn_act_quant_o: false
   auxiliary_enabled: false
   energy_enabled: false
   energy_interval_seconds: 1.0

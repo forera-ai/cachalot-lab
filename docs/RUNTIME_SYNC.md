@@ -312,3 +312,15 @@ runtime generation `2026-10-30T14:57:06Z`. Material source metadata matched with
 no recorded gaps; excluded auxiliary bytecode and docs Finder metadata are not
 source. Exact snippets, callers, source/config reads and literal source diffs
 supplemented graph evidence. Coverage is best-effort, not completeness proof.
+
+## Runtime adoption — Lab 0.10.0, 2026-11-01
+
+Reviewed all new briefs (0.71.0, 0.72.0, 0.72.1) and intervening changelog/source against clean runtime 0.72.1, `c2589255cace1075f36feb6f8788e4706d564cfa`. 0.70's auxiliary approval gate failed and remains outside serving; Lab adds no approval offload. 0.71.1/0.71.3 are scoped measurements, not default changes. 0.71.2 script checkpoint/bank/hotlist selection does not apply to Lab's direct CLI or rewrite saved paths.
+
+The new nullable DeepSeek attention-output FP8 control (0.71+) defaults Off and strips inherited values before explicit 1/0 compilation. It changes outputs; the runtime's bounded gate was quality-neutral, not a universal guarantee. Snapshot tags do not include it: use a separate snapshot directory when changing the setting. Older profiles remain valid and family changes clear it.
+
+DI-1 remains Off for Lab's direct CLI and chat.sh; serve.sh 0.72+ defaults On. Runtime's long-context gate found differences within noise. Since 0.72, DI-1 snapshot tags are 0.68.0-di1 versus 0.68.0; switching can require one cold prefill without deleting old snapshots. Lab shows On only when the DI-1 startup line is observed; absence remains unknown.
+
+Engineering question: which checkpoint/bank did this owned process announce? Dive reads basenames from complete lines within the first 64 KiB of that process's log, bounded per status poll; it does not substitute saved intent or the shared HTTP model ID. Evidence is process-scoped, unavailable after stop and for external servers, and raw Logs remains accessible. No new durable evidence store or collector is added; polling overhead is not certified. Original/1017 machine paths in the brief are observations, not portable launch defaults.
+
+Budget 0 drops non-resident experts and can garble integer tool arguments. The 10.82 versus 8.57 tok/s result is scoped to the brief's 1017 replay, not a general prediction; Hermes repaired observed failures, which Lab does not guarantee. Wired-fit lines remain raw evidence, not a latency/causality plot: no structured timestamped per-process history contract exists. A missing [request] line cannot prove failure; client exceptions remain the available failure evidence. Structured failed-request/traceback and external checkpoint identity contracts remain requested. No automatic policy change, request completion inference or performance certification ships.

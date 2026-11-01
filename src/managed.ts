@@ -11,6 +11,7 @@ export type RuntimeTuning = {
   deepseek_decode_drop_misses: boolean | null
   deepseek_system_date_reuse: boolean | null
   deepseek_prefill_encoder_only: boolean | null
+  deepseek_attn_act_quant_o: boolean | null
   minimax_decode_miss_substitution: boolean | null
   minimax_prefill_miss_substitution: boolean | null
   loop_guard_repeats: number | null
@@ -55,6 +56,11 @@ export type ManagedStatus = {
   endpoint: string | null
   pid: number | null
   last_exit_code: number | null
+  startup?: {
+    checkpoint: string | null
+    expert_bank: string | null
+    encoder_only_prefill: boolean | null
+  } | null
 }
 
 export function newProfile(): LaunchProfile {
@@ -80,6 +86,7 @@ export function newProfile(): LaunchProfile {
       deepseek_decode_drop_misses: null,
       deepseek_system_date_reuse: null,
       deepseek_prefill_encoder_only: null,
+      deepseek_attn_act_quant_o: null,
       minimax_decode_miss_substitution: null,
       minimax_prefill_miss_substitution: null,
       loop_guard_repeats: null,

@@ -40,3 +40,7 @@ Runtime 0.60.0 reports `decode_miss_budget` and `skipped_experts` through DeepSe
 ## GLM decode budget and trace provenance (reviewed 0.62.18)
 
 GLM 0.62.14 adds `skipped_experts` but does not report its active miss budget. Please expose family/version, requested-versus-active budget and trace mode through optional structured fields with lifetimes and compatibility semantics. Zero drops cannot establish exact outputs. GLM/MiniMax routing-trace positions are per-run layer counters without request boundaries; a future viewer or manifest needs authoritative request association and collection/overhead metadata. Trace weights and predicted sets are routing evidence, not timing or critical-path evidence. Lab now records explicit next-launch budget intent and cumulative drops only.
+
+## 0.72.1 identity and failures
+
+Request structured per-server checkpoint/bank identity, active DI-1/FP8 settings, timestamped wired-governor history, and failed-request/traceback events with request IDs. The same DeepSeek HTTP model ID serves original and 1017 checkpoints. Startup evidence covers only Lab-owned processes; missing completion lines cannot identify failed requests or establish causal wired-pressure failures. Keep FP8 snapshot-numerics identity explicit before shared-snapshot comparisons.

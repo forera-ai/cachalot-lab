@@ -18,7 +18,7 @@ Copyright (c) 2026 forera.ai and contributors. Licensed under the [MIT License](
 
 Related Cachalot NVIDIA CUDA research is supported by GPU-compute credits from [CloudRift](https://www.cloudrift.ai/). [Support research](mailto:info@forera.ai?subject=Cachalot%20research%20support).
 
-The existing app launches or connects to local Cachalot, inspects live health and cache metrics, streams chat and reasoning, and provides API details. Lab 0.9.0 adds explicit default-off DeepSeek encoder-only prefill, retaining optional runtime energy evidence, saved request energy, and sampled DeepSeek decode aggregates. Event timelines, durable experiment comparisons, sweeps, and validated counterfactuals remain planned. Connections remain limited to the same Mac.
+The existing app launches or connects to local Cachalot, inspects live health and cache metrics, streams chat and reasoning, and provides API details. Lab 0.10.0 adds explicit default-off DeepSeek attention-output FP8 and observed managed checkpoint/bank identity, retaining optional runtime energy evidence, saved request energy, and sampled DeepSeek decode aggregates. Event timelines, durable experiment comparisons, sweeps, and validated counterfactuals remain planned. Connections remain limited to the same Mac.
 
 ## The app in use — 0.7.1
 
@@ -106,14 +106,14 @@ host readiness, connection health, and Lab-owned process state.
 
 ## Download
 
-**Current release:** [Cachalot Lab 0.9.0](https://github.com/forera-ai/cachalot-lab/releases/tag/v0.9.0) for Apple Silicon, macOS 14 or newer. This compatible minor release adds explicit default-off DeepSeek encoder-only prefill with output and quality warnings, retaining energy, sampled traces, and existing family controls. Existing profiles, conversations, preferences, and credential namespaces are preserved.
+**Current release:** [Cachalot Lab 0.10.0](https://github.com/forera-ai/cachalot-lab/releases/tag/v0.10.0) for Apple Silicon, macOS 14 or newer. This compatible minor release adds explicit default-off DeepSeek reference-parity numerics and process-scoped startup evidence with output and snapshot warnings, retaining energy, sampled traces, and existing family controls. Existing profiles, conversations, preferences, and credential namespaces are preserved.
 
-1. Download the signed and notarized [DMG](https://github.com/forera-ai/cachalot-lab/releases/download/v0.9.0/Cachalot-Lab-0.9.0-macOS-arm64.dmg).
+1. Download the signed and notarized [DMG](https://github.com/forera-ai/cachalot-lab/releases/download/v0.10.0/Cachalot-Lab-0.10.0-macOS-arm64.dmg).
 2. Open it and drag **Cachalot Lab** into **Applications**.
 3. Open Lab. It first tries an existing Cachalot server at `http://127.0.0.1:8011`.
 4. Use **Dive** to launch a local runtime, or enter another loopback port and optional API key in **API**.
 
-The release also includes a [ZIP](https://github.com/forera-ai/cachalot-lab/releases/download/v0.9.0/Cachalot-Lab-0.9.0-macOS-arm64.zip) and [SHA-256 checksums](https://github.com/forera-ai/cachalot-lab/releases/download/v0.9.0/SHA256SUMS). The [release notes](https://github.com/forera-ai/cachalot-lab/releases/tag/v0.9.0) state the exact scope and verification.
+The release also includes a [ZIP](https://github.com/forera-ai/cachalot-lab/releases/download/v0.10.0/Cachalot-Lab-0.10.0-macOS-arm64.zip) and [SHA-256 checksums](https://github.com/forera-ai/cachalot-lab/releases/download/v0.10.0/SHA256SUMS). The [release notes](https://github.com/forera-ai/cachalot-lab/releases/tag/v0.10.0) state the exact scope and verification.
 
 Lab does not install Cachalot, Python, or model weights. Prepare a model and environment using the [runtime documentation](https://github.com/forera-ai/cachalot). Dive needs the absolute path to a Python interpreter with Cachalot installed, the model directory, and any separate expert bank. You can also start the server yourself:
 
@@ -211,8 +211,8 @@ Briefs through 0.62.20 were reviewed against Cachalot 0.62.22 (`5faababa6bc09840
 
 Reviewed both new briefs through 0.64.0 against clean Cachalot **0.64.17**, commit `cf328cc8cef9da37c4348054ddb0c4128e09c570`, including source and changelog corrections. Optional fields remain unavailable on older/offline/partial servers. Energy request reports need the meter enabled; trace means require DeepSeek with tracing enabled. No routing NPZ or raw event viewer is shipped. See [runtime sync](docs/RUNTIME_SYNC.md) and [energy/trace evidence](docs/ENERGY_TRACE.md).
 
-## Runtime 0.67/0.69 adoption (Lab 0.9.0)
+## Runtime 0.71/0.72 adoption (Lab 0.10.0)
 
-Reviewed briefs through 0.69.0 against clean Cachalot **0.69.7**, commit `bd9bb457b1ef1346b7f71983c85051cea266ab1e`. Dive adds DeepSeek-only Encoder-only prefill (0.67+): Runtime default is Off, explicit On/Off writes 1/0, and inherited values are removed. Multi-call text prefill changes rounding and snapshot boundaries; it is output-changing, not yet quality-gated. Warnings remain visible for enabled drafts and saved profiles. Settings apply on next launch; active mode is unreported.
+Reviewed briefs through 0.72.1 against clean Cachalot **0.72.1**, commit `c2589255cace1075f36feb6f8788e4706d564cfa`. Dive adds nullable DeepSeek Attention output FP8 (0.71+), default Off, with output-changing and separate-snapshot-directory warnings. Existing Encoder-only prefill retains direct CLI default Off; serve.sh 0.72+ defaults On. Runtime's bounded gates found DI-1 differences within noise and FP8 quality-neutral; Lab makes no universal quality or speed claim. Since 0.72, DI-1 snapshots are mode-keyed; the FP8 knob is not. Dive shows observed checkpoint/bank basenames and DI-1 On only from the current owned startup log. Missing evidence and external server identity stay unreported. Budget 0 can garble integer tool arguments; Hermes retry behavior is not promised by Lab.
 
 The auxiliary Apple on-device model is a separate runtime CLI, off by default and outside serving. Lab does not launch it, route requests, compress prompts, or import its benchmark rows. Compression measured as a loss; routing is not validated for use. Runtime 0.68 requires MLX 0.32.4 and changes snapshot numerics tags; the first request may re-prefill once per model. Lab does not migrate or delete snapshots. See [runtime sync](docs/RUNTIME_SYNC.md).

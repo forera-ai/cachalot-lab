@@ -19,6 +19,7 @@ struct ManagedChild {
     profile_id: String,
     endpoint: String,
     ready: bool,
+    log_path: std::path::PathBuf,
 }
 
 #[derive(Default)]
@@ -30,6 +31,71 @@ struct SupervisorInner {
 #[derive(Default)]
 pub struct Supervisor(Mutex<SupervisorInner>);
 
+#[derive(Default, Serialize, Debug, PartialEq)]
+pub struct StartupEvidence {
+    checkpoint: Option<String>,
+    expert_bank: Option<String>,
+    encoder_only_prefill: Option<bool>,
+}
+
+// Only complete lines from the bounded startup prefix qualify. No HTTP model ID,
+// saved launch intent or old process log establishes observed checkpoint identity.
+fn parse_startup(text: &str) -> StartupEvidence {
+    let mut evidence = StartupEvidence::default();
+    for line in text
+        .split_inclusive('\n')
+        .filter(|line| line.ends_with('\n'))
+    {
+        let line = line.trim_end();
+        if line.contains("Uvicorn running on") {
+            break;
+        }
+        if let Some((version, path)) = line
+            .strip_prefix("cachalot ")
+            .and_then(|s| s.split_once(": loading "))
+        {
+            if !version.is_empty() && version.chars().all(|c| c.is_ascii_digit() || c == '.') {
+                let path = path
+                    .strip_prefix("GLM-5.3-Flash from ")
+                    .or_else(|| path.strip_prefix("MiniMax-M3 from "))
+                    .unwrap_or(path);
+                evidence.checkpoint = startup_basename(path);
+            }
+        }
+        if let Some(path) = line.strip_prefix("expert bank: ") {
+            // Runtime appends format/count metadata after the path.
+            evidence.expert_bank =
+                startup_basename(path.rsplit_once(" (").map_or(path, |(path, _)| path));
+        }
+        if line.starts_with("DI-1 encoder-only prefill on: ") {
+            evidence.encoder_only_prefill = Some(true);
+        }
+    }
+    evidence
+}
+
+fn startup_basename(path: &str) -> Option<String> {
+    if !Path::new(path).is_absolute() {
+        return None;
+    }
+    Path::new(path)
+        .file_name()
+        .and_then(|s| s.to_str())
+        .filter(|s| !s.is_empty())
+        .map(str::to_owned)
+}
+
+fn read_startup(path: &Path) -> StartupEvidence {
+    let Ok(file) = File::open(path) else {
+        return StartupEvidence::default();
+    };
+    let mut bytes = Vec::new();
+    if file.take(64 * 1024).read_to_end(&mut bytes).is_err() {
+        return StartupEvidence::default();
+    }
+    parse_startup(&String::from_utf8_lossy(&bytes))
+}
+
 #[derive(Serialize)]
 pub struct ManagedStatus {
     running: bool,
@@ -38,6 +104,7 @@ pub struct ManagedStatus {
     endpoint: Option<String>,
     pid: Option<u32>,
     last_exit_code: Option<i32>,
+    startup: Option<StartupEvidence>,
 }
 
 impl SupervisorInner {
@@ -64,6 +131,10 @@ impl SupervisorInner {
             endpoint: self.active.as_ref().map(|active| active.endpoint.clone()),
             pid: self.active.as_ref().map(|active| active.child.id()),
             last_exit_code: self.last_exit_code,
+            startup: self
+                .active
+                .as_ref()
+                .map(|active| read_startup(&active.log_path)),
         }
     }
 
@@ -293,6 +364,7 @@ pub fn start_managed_runtime(
         )
     })?;
     drop(reservation);
+    let startup_log_path = log_path(&app)?;
     let log = runtime_log(&app)?;
     let stderr = log
         .try_clone()
@@ -316,6 +388,7 @@ pub fn start_managed_runtime(
         profile_id: id,
         endpoint: launch.endpoint,
         ready: false,
+        log_path: startup_log_path,
     });
     inner.last_exit_code = None;
     Ok(inner.status())
@@ -348,6 +421,47 @@ pub(crate) fn stop_on_exit(app: &AppHandle) {
 mod tests {
     use super::*;
     use std::io::{Read, Write};
+
+    #[test]
+    fn startup_identity_is_observed_bounded_and_preserves_unknowns() {
+        let text = "cachalot 0.72.1: loading /models/DeepSeek-V4.1-Flash-1017\nexpert bank: /Users/me/DeepSeek-V4.1-Flash-1017-q2g128 (q2, 8 experts)\nDI-1 encoder-only prefill on: details\nINFO: Uvicorn running on http://127.0.0.1:8000\ncachalot 0.72.1: loading /wrong/other\n";
+        let observed = parse_startup(text);
+        assert_eq!(
+            observed.checkpoint.as_deref(),
+            Some("DeepSeek-V4.1-Flash-1017")
+        );
+        assert_eq!(
+            observed.expert_bank.as_deref(),
+            Some("DeepSeek-V4.1-Flash-1017-q2g128")
+        );
+        assert_eq!(observed.encoder_only_prefill, Some(true));
+        assert_eq!(parse_startup("no startup\n"), StartupEvidence::default());
+        assert_eq!(
+            parse_startup("cachalot 0.72.1: loading /partial"),
+            StartupEvidence::default()
+        );
+        assert_eq!(
+            parse_startup("cachalot bogus: loading /wrong\n"),
+            StartupEvidence::default()
+        );
+        assert_eq!(
+            parse_startup("cachalot 0.72.1: loading relative\n"),
+            StartupEvidence::default()
+        );
+        assert_eq!(
+            parse_startup("cachalot 0.45.1: loading MiniMax-M3 from /models/mini\n")
+                .checkpoint
+                .as_deref(),
+            Some("mini")
+        );
+        // A long request/log tail cannot displace the startup prefix.
+        let path = std::env::temp_dir().join(format!("lab-startup-{}", std::process::id()));
+        fs::write(&path, format!("{text}{}", "x".repeat(100_000))).unwrap();
+        assert_eq!(read_startup(&path), observed);
+        fs::remove_file(path).unwrap();
+        let idle = SupervisorInner::default().status();
+        assert!(idle.startup.is_none());
+    }
 
     #[test]
     fn checks_glm_bank_only_when_enabled() {
@@ -396,6 +510,7 @@ mod tests {
                 profile_id: "test".to_owned(),
                 endpoint: "http://127.0.0.1:8011".to_owned(),
                 ready: false,
+                log_path: std::env::temp_dir().join("lab-no-startup-log"),
             }),
             last_exit_code: None,
         };

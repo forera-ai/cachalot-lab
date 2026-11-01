@@ -12,7 +12,7 @@ const STORE_VERSION: u8 = 1;
 const MAX_STORE_BYTES: usize = 256 * 1024;
 const MAX_PROFILES: usize = 50;
 
-pub(crate) const CONTROLLED_ENV_KEYS: [&str; 29] = [
+pub(crate) const CONTROLLED_ENV_KEYS: [&str; 30] = [
     "CACHALOT_ENERGY",
     "CACHALOT_ENERGY_INTERVAL",
     "CACHALOT_TOKEN_TRACE",
@@ -21,6 +21,7 @@ pub(crate) const CONTROLLED_ENV_KEYS: [&str; 29] = [
     "CACHALOT_SYSTEM_DATE_REUSE",
     "CACHALOT_SYSTEM_DATE_REUSE_DAYS",
     "CACHALOT_PREFILL_ENCODER_ONLY",
+    "CACHALOT_ATTN_ACT_QUANT_O",
     "CACHALOT_MINIMAX_MISS_DROP",
     "CACHALOT_MINIMAX_MISS_SUB",
     "CACHALOT_MINIMAX_MISS_DROP_ARMED",
@@ -73,6 +74,8 @@ pub struct RuntimeTuning {
     deepseek_system_date_reuse: Option<bool>,
     #[serde(default)]
     deepseek_prefill_encoder_only: Option<bool>,
+    #[serde(default)]
+    deepseek_attn_act_quant_o: Option<bool>,
     // None inherits the installed runtime's default. Some(false) explicitly
     // selects the exact path, including on runtime >= 0.43.0.
     #[serde(default)]
@@ -335,7 +338,8 @@ fn validate(profile: &LaunchProfile) -> Result<(), String> {
     }
     if (tuning.deepseek_decode_drop_misses.is_some()
         || tuning.deepseek_system_date_reuse.is_some()
-        || tuning.deepseek_prefill_encoder_only.is_some())
+        || tuning.deepseek_prefill_encoder_only.is_some()
+        || tuning.deepseek_attn_act_quant_o.is_some())
         && profile.family != ModelFamily::Deepseek
     {
         return Err("DeepSeek tuning requires a DeepSeek profile family.".to_owned());
@@ -484,6 +488,10 @@ pub(crate) fn compile(profile: &LaunchProfile) -> Result<LaunchCommand, String> 
         (
             "CACHALOT_PREFILL_ENCODER_ONLY",
             tuning.deepseek_prefill_encoder_only,
+        ),
+        (
+            "CACHALOT_ATTN_ACT_QUANT_O",
+            tuning.deepseek_attn_act_quant_o,
         ),
     ] {
         if let Some(enabled) = enabled {
@@ -996,6 +1004,46 @@ mod tests {
                 .contains_key("CACHALOT_PREFILL_ENCODER_ONLY")
         );
         assert!(CONTROLLED_ENV_KEYS.contains(&"CACHALOT_PREFILL_ENCODER_ONLY"));
+    }
+
+    #[test]
+    fn attention_output_quantization_is_explicit_and_deepseek_only() {
+        let mut value = serde_json::to_value(sample()).expect("profile JSON");
+        value["family"] = serde_json::json!("deepseek");
+        for (choice, expected) in [(true, "1"), (false, "0")] {
+            value["tuning"]["deepseek_attn_act_quant_o"] = serde_json::json!(choice);
+            let profile: LaunchProfile = serde_json::from_value(value.clone()).expect("profile");
+            let command = compile(&profile).expect("explicit FP8 choice");
+            assert_eq!(
+                command
+                    .environment
+                    .get("CACHALOT_ATTN_ACT_QUANT_O")
+                    .map(String::as_str),
+                Some(expected)
+            );
+            let loaded = serde_json::from_slice(&serde_json::to_vec(&profile).expect("encode"))
+                .expect("decode");
+            assert_eq!(
+                compile(&loaded).expect("restored").environment,
+                command.environment
+            );
+            for family in ["auto", "glm", "minimax"] {
+                let mut other = value.clone();
+                other["family"] = serde_json::json!(family);
+                assert!(compile(&serde_json::from_value(other).expect("other family")).is_err());
+            }
+        }
+        value["tuning"]
+            .as_object_mut()
+            .unwrap()
+            .remove("deepseek_attn_act_quant_o");
+        assert!(
+            !compile(&serde_json::from_value(value).expect("older profile"))
+                .expect("legacy")
+                .environment
+                .contains_key("CACHALOT_ATTN_ACT_QUANT_O")
+        );
+        assert!(CONTROLLED_ENV_KEYS.contains(&"CACHALOT_ATTN_ACT_QUANT_O"));
     }
 
     #[test]

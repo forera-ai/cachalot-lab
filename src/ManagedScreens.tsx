@@ -509,12 +509,21 @@ export function DiveScreen({
                             }
                           />
                           <TriState
-                            label="Encoder-only prefill · Cachalot 0.67+ · default Off"
+                            label="Encoder-only prefill · 0.67+ · CLI Off; serve.sh 0.72+ On"
                             value={
                               draft.tuning.deepseek_prefill_encoder_only ?? null
                             }
                             onChange={(deepseek_prefill_encoder_only) =>
                               updateTuning({ deepseek_prefill_encoder_only })
+                            }
+                          />
+                          <TriState
+                            label="Attention output FP8 · reference parity · 0.71+ · default Off"
+                            value={
+                              draft.tuning.deepseek_attn_act_quant_o ?? null
+                            }
+                            onChange={(deepseek_attn_act_quant_o) =>
+                              updateTuning({ deepseek_attn_act_quant_o })
                             }
                           />
                           <TriState
@@ -528,21 +537,32 @@ export function DiveScreen({
                           />
                         </div>
                         <p className="panel-intro">
-                          Decode drops misses is faster but changes outputs and
-                          can lower quality. On drops every non-resident decode
-                          expert; Off selects exact decode. Cachalot 0.60
-                          serve.sh defaults to On; Lab launches the CLI
-                          directly, which defaults to Off. Runtime default
-                          preserves that CLI behavior.
+                          Decode drops misses (budget 0) drops non-resident
+                          experts and changes outputs. On one 1017 checkpoint
+                          replay, decode measured 10.82 tok/s versus 8.57 exact;
+                          integer tool arguments could become invalid JSON.
+                          Hermes repaired observed failures with a retry; Lab
+                          does not promise that repair. Off selects exact
+                          decode. serve.sh defaults to On; Lab's direct CLI
+                          defaults to Off.
                         </p>
                         <p className="panel-intro">
-                          Encoder-only prefill is output-changing, not yet
-                          quality-gated. On defers decoder work for multi-call
-                          text prompts to requested snapshot boundaries and the
-                          prompt end, changing rounding and which snapshots are
-                          retained. Off or Runtime default keeps the standard
-                          path. Older runtimes ignore this control. Active mode
-                          is not reported by the server.
+                          Encoder-only prefill is output-changing; runtime gate
+                          found differences within noise. Applies to multi-call
+                          DeepSeek text prefills. CLI and chat.sh default Off;
+                          serve.sh 0.72+ defaults On. Runtime default in Lab
+                          keeps CLI Off. Since 0.72, snapshots are keyed on this
+                          mode; switching can require one cold prefill. Active
+                          mode is shown only when its startup line is observed
+                          for this Lab-owned process.
+                        </p>
+                        <p className="panel-intro">
+                          Attention output FP8 changes outputs for reference
+                          parity. Runtime's bounded gate found quality-neutral
+                          results; this is not a universal quality guarantee.
+                          Default Off. Snapshots are not keyed on this setting:
+                          use a separate snapshot directory when changing it.
+                          Older runtimes ignore unsupported controls.
                         </p>
                         <p className="panel-intro">
                           System date reuse can avoid refilling a saved system
@@ -823,7 +843,16 @@ export function DiveScreen({
                   draft.tuning.deepseek_prefill_encoder_only === true && (
                     <p className="managed-notice">
                       Encoder-only prefill: output-changing next-launch setting,
-                      not yet quality-gated; active server mode is unreported.
+                      runtime gate within noise; requested setting, not proof of
+                      active mode.
+                    </p>
+                  )}
+                {draft.family === 'deepseek' &&
+                  draft.tuning.deepseek_attn_act_quant_o === true && (
+                    <p className="managed-notice">
+                      Attention output FP8: output-changing next-launch setting.
+                      Use a separate snapshot directory; snapshots do not
+                      identify this numerics mode.
                     </p>
                   )}
                 <div className="managed-actions">
@@ -892,9 +921,45 @@ export function DiveScreen({
                 selected.tuning.deepseek_prefill_encoder_only === true && (
                   <p className="panel-intro">
                     Encoder-only prefill · output-changing next-launch setting,
-                    not yet quality-gated; active server mode is unreported.
+                    runtime gate within noise; requested setting, not proof of
+                    active mode.
                   </p>
                 )}
+              {selected.family === 'deepseek' &&
+                selected.tuning.deepseek_decode_drop_misses === true && (
+                  <p className="panel-intro">
+                    Decode budget 0 · drops non-resident experts; can garble
+                    integer tool arguments. Next-launch intent; no automatic
+                    repair is promised.
+                  </p>
+                )}
+              {selected.family === 'deepseek' &&
+                selected.tuning.deepseek_attn_act_quant_o === true && (
+                  <p className="panel-intro">
+                    Attention output FP8 · output-changing next-launch setting;
+                    use a separate snapshot directory.
+                  </p>
+                )}
+              {ownsSelected && (
+                <section aria-label="Observed managed startup">
+                  <h3>Observed startup · PID {status.pid}</h3>
+                  <p className="panel-intro">
+                    Checkpoint: {status.startup?.checkpoint ?? 'Unreported'}
+                    <br />
+                    Expert bank: {status.startup?.expert_bank ?? 'Unreported'}
+                    <br />
+                    Encoder-only prefill:{' '}
+                    {status.startup?.encoder_only_prefill === true
+                      ? 'On · startup line observed'
+                      : 'Unreported · absence does not prove Off'}
+                  </p>
+                  <p className="panel-intro">
+                    Source: first 64 KiB of this process’s startup log. Model ID
+                    cannot distinguish checkpoint revisions. External servers do
+                    not expose this evidence.
+                  </p>
+                </section>
+              )}
               <div className="managed-actions">
                 {ownsSelected ? (
                   <button

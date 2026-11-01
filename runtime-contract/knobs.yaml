@@ -1,18 +1,30 @@
-# Verified against Cachalot 0.69.7 (bd9bb45). Null overrides in Lab profiles
+# Verified against Cachalot 0.72.1 (c258925). Null overrides in Lab profiles
 # inherit the runtime's version-specific default; zero has each knob's stated effect.
 knobs:
-  - key: CACHALOT_PREFILL_ENCODER_ONLY
+  - key: CACHALOT_ATTN_ACT_QUANT_O
     kind: env
     families: [deepseek-v4.1-flash]
     type: bool
     default: false
+    group: numerics
+    effect: changes-outputs
+    restart_required: true
+    since: 0.71.0
+    lab: Nullable DeepSeek-only switch. Explicit On/Off writes 1/0 after inherited-key removal; omitted older fields stay Off and family changes clear it.
+    summary: Attention output round-trips through FP8 before grouped wo_a, including decode, prefill and DSpark. Runtime bounded gate was quality-neutral; not a universal guarantee. Snapshot identity does not include this knob; use a separate snapshot directory when changing it. No active-mode telemetry or startup line exists.
+  - key: CACHALOT_PREFILL_ENCODER_ONLY
+    kind: env
+    families: [deepseek-v4.1-flash]
+    type: bool
+    default:
+      { direct_cli: false, chat_script: false, serve_script_since_0_72_0: true }
     group: prefill
     effect: changes-outputs
     restart_required: true
-    stability: experimental-not-quality-gated
+    stability: output-changing-runtime-gate-within-noise
     since: 0.67.0
-    lab: Nullable DeepSeek-only switch. On writes 1, Off writes 0, null omits after inherited key removal. Older profiles retain the default Off path; family changes clear it. Active mode is unreported.
-    summary: Only exact value 1 enables multi-call text prefill with deferred decoder work at requested snapshot boundaries and prompt end (last up to 2541 rows). Rounding and retained snapshot boundaries change. Single-call and image prompts stay on standard path; unsupported runtimes ignore the key. No speed or quality benefit is promised.
+    lab: Nullable DeepSeek-only switch. On writes 1, Off writes 0, null omits after inherited key removal. Older profiles retain the default Off path; family changes clear it. Active On mode is shown only from the current owned process startup line; missing line stays unknown.
+    summary: Only exact value 1 enables multi-call text prefill with deferred decoder work at requested snapshot boundaries and prompt end (last up to 2541 rows). Rounding and retained snapshot boundaries change. Single-call and image prompts stay on standard path; unsupported runtimes ignore the key. Since 0.72.0 snapshot tags are 0.68.0-di1 when on and 0.68.0 when off; switching may cold-prefill once. No Lab speed or quality benefit is promised.
   - key: CACHALOT_FP8_GEMV_DECODE
     kind: env
     families: [deepseek-v4.1-flash]
@@ -399,3 +411,12 @@ instrumentation:
     default: 4
     lab_range: [1, 65536]
     summary: Positional decode sampling interval; 1 records continuously. Inert while tracing is off. Upper bound is a Lab validation limit.
+
+script_checkpoint_selection:
+  since: 0.71.2
+  scripts: [serve.sh, chat.sh]
+  model: CACHALOT_MODEL_PATH, default unchanged
+  expert_bank: $HOME/<checkpoint-basename>-q2g128 if .cachalot-verified exists, otherwise beside checkpoint
+  hotlist: ~/cachalot-hotlist.json for original checkpoint; ~/cachalot-hotlist-<name>.json for other revisions if present; otherwise none
+  empty_hotlist: CACHALOT_HOTLIST= disables it
+  lab: Contract only. Lab launches CLI with explicit model paths; no script defaults or saved paths are rewritten. Observed checkpoint and bank basenames come only from owned startup logs. HTTP model ID is shared by both revisions.

@@ -1,5 +1,52 @@
 # Handoff
 
+## Release preparation — Cachalot Lab 0.10.0, 2026-11-01
+
+User authorized brief adoption and complete release round. Latest published Lab is
+0.9.0; 0.10.0 is a compatible minor release for a new numerics control and managed
+startup evidence. Planned release: https://github.com/forera-ai/cachalot-lab/releases/tag/v0.10.0.
+Last reviewed runtime: clean **0.72.1**, commit `c2589255cace1075f36feb6f8788e4706d564cfa`,
+briefs through **0.72.1**. Source confirms script-only defaults and snapshot rules;
+no Lab launch defaults, profiles, data identities or storage versions are migrated.
+
+Acceptance: explicit FP8 On/Off/default compiles 1/0/omission, validates DeepSeek
+family, strips inheritance, persists and clears on family changes; DI-1 labels
+distinguish CLI Off and serve.sh On; observed checkpoint/bank/DI-1 scoped to owned
+PID and missing evidence unknown; tool-call warning retains benchmark scope.
+First regression failed because the new FP8 control was absent. Focused form,
+compiler/serde and bounded-startup parser checks pass. New UI fallback test covers
+other profiles, stopped processes and missing mode announcements.
+
+Graph tools unavailable in this tool surface; local MCP CLI list_projects refused
+because an incompatible active generation owns the session. No graph claims or
+coverage certification made. Targeted full source reads used for profiles,
+supervisor and Dive, plus runtime cli.py, scripts, FP8 and snapshot identity.
+Jev advisory scope check supports qualified evidence; publication remains governed
+by direct review and fresh release gates. Code Work and Production Code Review
+skills govern implementation and review.
+
+Wired plotting is a suggestion, deferred pending timestamped structured evidence;
+raw logs retained. Missing [request] lines are not failure proof; client errors
+remain visible. No silent tuning, quality/performance certification or automatic
+repair is claimed. Live-family/quality/performance, Lab overhead and saved-key
+restart checks remain unverified. Fresh local build/install/native inspection,
+exact-source notarization, public asset/CI verification and release installation
+will be recorded before completion.
+
+Local gates: 56 frontend, seven mock HTTP/SSE, 36 Rust tests pass (existing
+isolated Keychain test ignored), plus types/lint/format/clippy and signed native
+production build. Production Code Review found no material issue; React control
+and evidence changes preserve existing hooks, bounded state and text labels.
+Native inspection used an isolated synthetic owned server: Ready/auto-connect,
+checkpoint and bank basenames, DI-1 announcement, profile isolation, stop clears
+evidence, and FP8 Off save/preview all passed. Expanded tuning scroll/layout and
+output/snapshot warnings inspected in System-dark standard window. All five
+original app-data files restored byte-identical; no real model or credential
+action. Previous app, data, installation hashes and native report are recoverable
+under `.release/local-0.10.0-2026-11-01/`. Surface/minimum-size native checks remain
+unverified. Known optional rust-objcopy missing-libLLVM warning persists; signed
+build and strict signature verification succeed.
+
 ## Start here — Cachalot Lab 0.9.0 published, 2026-10-30
 
 Published [v0.9.0](https://github.com/forera-ai/cachalot-lab/releases/tag/v0.9.0)

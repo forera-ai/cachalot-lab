@@ -1,4 +1,16 @@
 patterns:
+  - id: deepseek_checkpoint
+    since: 0.72.1
+    regex: '^cachalot [0-9.]+: loading (?P<path>/.+)$'
+    meaning: Lab shows basename from current owned process startup prefix only, not version compatibility or an external server identity.
+  - id: deepseek_expert_bank
+    since: 0.72.1
+    regex: '^expert bank: (?P<path>/.+) \(.*\)$'
+    meaning: Lab shows observed bank basename from owned startup prefix, separate from requested model path.
+  - id: deepseek_encoder_only_prefill
+    since: 0.72.0
+    regex: '^DI-1 encoder-only prefill on: .+$'
+    meaning: Presence in current owned startup prefix proves announced On; absence remains unknown, never Off.
   - id: glm_decode_miss_budget
     since: 0.62.14
     families: [glm-5.3-flash]
