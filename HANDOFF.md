@@ -1,5 +1,37 @@
 # Handoff
 
+## Release continuation — Cachalot Lab 0.11.1, 2026-11-01
+
+0.11.0 is published from `ed332d4ea4b99fdff1130380b03a2736cf222a41` and its
+annotated tag. All seven public assets downloaded and matched local/GitHub hashes;
+public latest confirmed; public DMG installed and natively launched as 0.11.0,
+original raw logs preserved with no invented failure cards. Original app-data
+remains byte-identical. App and DMG notarizations accepted; see
+[0.11.0 report](https://github.com/forera-ai/cachalot-lab/releases/download/v0.11.0/RELEASE-REPORT.md).
+
+Both [main CI](https://github.com/forera-ai/cachalot-lab/actions/runs/41318615610)
+and [tag CI](https://github.com/forera-ai/cachalot-lab/actions/runs/41318615735)
+were cancelled before any steps by GitHub's scheduled macOS 14 runner brownout.
+Check-run annotations identify retirement on November 2, 2026; verified against
+[official notice](https://github.com/actions/runner-images/issues/13518).
+This is an infrastructure cancellation, not a test failure or successful hosted
+verification. Do not claim 0.11.0 hosted CI passed.
+
+The user's complete-release request requires a working hosted gate. 0.11.1 is a
+compatible maintenance patch changing CI to supported macOS 15 plus synchronized
+version/docs only; no app logic/runtime contract/settings/storage change. The
+0.11.0 source/tag/binaries stay fixed. App minimum remains macOS 14, whose exact
+minimum behavior is not newly certified. Planned release:
+https://github.com/forera-ai/cachalot-lab/releases/tag/v0.11.1.
+
+Runtime baseline stays clean-reviewed **0.72.3**,
+`77aee2e1a63fd7f29c0968a5a5c66601459d65d3`, briefs through **0.72.2**.
+Fresh exact-source build/sign/notarization, native installation, hosted CI and
+public verification remain required for the patch. Native 0.11.0 failure/guidance
+checks below cover unchanged application logic; 0.11.1 installation/version/data
+preservation will be freshly checked. No independent model quality/performance,
+Lab overhead or saved-key restart certification.
+
 ## Release preparation — Cachalot Lab 0.11.0, 2026-11-01
 
 User authorized 0.72.2 brief implementation and complete release round. Latest

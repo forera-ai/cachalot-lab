@@ -53,7 +53,7 @@ This local test installation does not make an uncommitted build a release.
 
 ## Scope
 
-The [0.11.0 release](https://github.com/forera-ai/cachalot-lab/releases/tag/v0.11.0)
+The [0.11.1 release](https://github.com/forera-ai/cachalot-lab/releases/tag/v0.11.1)
 adds explicit failed-request cards with collapsed traceback excerpts in Logs and
 Dive. It corrects DI-1 evidence: older quality gates ran with stale slots; the
 fixed 0.72.3 1017 gate was within noise, a scoped result. Runtime 0.72.2 changes
@@ -92,3 +92,7 @@ The script refuses an existing output directory to prevent accidental overwrite.
 Release from the exact commit recorded in `SOURCE_COMMIT`. After verification, push that commit and an annotated `v<version>` tag, then create or update the GitHub Release with the DMG, ZIP, checksums, source commit, notarization receipts, and verification report. Release notes must state minimum macOS, architecture, runtime requirements, working features, and limitations. Do not upload the temporary notary submission ZIP.
 
 After publishing, compare GitHub's asset SHA-256 digests with local `SHA256SUMS`, confirm the release is public, and inspect the repository CI run. The 0.1.0 release used this procedure; its [verification report](https://github.com/forera-ai/cachalot-lab/releases/download/v0.1.0/RELEASE-REPORT.md) records the exact commit, hashes, and Apple submission IDs.
+
+## Hosted runner maintenance (0.11.1)
+
+Both initial 0.11.0 CI runs were cancelled before steps because GitHub's macOS 14 image was in its scheduled November 1 brownout and retires November 2 ([official notice](https://github.com/actions/runner-images/issues/13518)). 0.11.0 local exact-source and artifact gates passed; hosted CI did not execute. Its tag/source/binaries remain immutable. 0.11.1 moves only the workflow runner to macOS 15 plus synchronized version/documentation updates, then rebuilds fresh signed/notarized assets. The app's macOS 14 deployment minimum remains unchanged; hosted macOS 15 builds do not certify minimum-OS behavior.

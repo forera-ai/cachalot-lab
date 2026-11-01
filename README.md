@@ -106,14 +106,14 @@ host readiness, connection health, and Lab-owned process state.
 
 ## Download
 
-**Current release:** [Cachalot Lab 0.11.0](https://github.com/forera-ai/cachalot-lab/releases/tag/v0.11.0) for Apple Silicon, macOS 14 or newer. This compatible minor release adds failed-request cards with collapsed traceback excerpts and correct DI-1 quality/snapshot guidance, retaining energy, sampled traces, and existing family controls. Existing profiles, conversations, preferences, and credential namespaces are preserved.
+**Current release:** [Cachalot Lab 0.11.1](https://github.com/forera-ai/cachalot-lab/releases/tag/v0.11.1) for Apple Silicon, macOS 14 or newer. This compatible minor release adds failed-request cards with collapsed traceback excerpts and correct DI-1 quality/snapshot guidance, retaining energy, sampled traces, and existing family controls. Existing profiles, conversations, preferences, and credential namespaces are preserved.
 
-1. Download the signed and notarized [DMG](https://github.com/forera-ai/cachalot-lab/releases/download/v0.11.0/Cachalot-Lab-0.11.0-macOS-arm64.dmg).
+1. Download the signed and notarized [DMG](https://github.com/forera-ai/cachalot-lab/releases/download/v0.11.1/Cachalot-Lab-0.11.1-macOS-arm64.dmg).
 2. Open it and drag **Cachalot Lab** into **Applications**.
 3. Open Lab. It first tries an existing Cachalot server at `http://127.0.0.1:8011`.
 4. Use **Dive** to launch a local runtime, or enter another loopback port and optional API key in **API**.
 
-The release also includes a [ZIP](https://github.com/forera-ai/cachalot-lab/releases/download/v0.11.0/Cachalot-Lab-0.11.0-macOS-arm64.zip) and [SHA-256 checksums](https://github.com/forera-ai/cachalot-lab/releases/download/v0.11.0/SHA256SUMS). The [release notes](https://github.com/forera-ai/cachalot-lab/releases/tag/v0.11.0) state the exact scope and verification.
+The release also includes a [ZIP](https://github.com/forera-ai/cachalot-lab/releases/download/v0.11.1/Cachalot-Lab-0.11.1-macOS-arm64.zip) and [SHA-256 checksums](https://github.com/forera-ai/cachalot-lab/releases/download/v0.11.1/SHA256SUMS). The [release notes](https://github.com/forera-ai/cachalot-lab/releases/tag/v0.11.1) state the exact scope and verification.
 
 Lab does not install Cachalot, Python, or model weights. Prepare a model and environment using the [runtime documentation](https://github.com/forera-ai/cachalot). Dive needs the absolute path to a Python interpreter with Cachalot installed, the model directory, and any separate expert bank. You can also start the server yourself:
 
@@ -218,3 +218,5 @@ Reviewed briefs through 0.72.2 against clean Cachalot **0.72.3**, commit `77aee2
 The auxiliary Apple on-device model is a separate runtime CLI, off by default and outside serving. Lab does not launch it, route requests, compress prompts, or import its benchmark rows. Compression measured as a loss; routing is not validated for use. Runtime 0.68 requires MLX 0.32.4 and changes snapshot numerics tags; the first request may re-prefill once per model. Lab does not migrate or delete snapshots. See [runtime sync](docs/RUNTIME_SYNC.md).
 
 Logs and Dive runtime output show each complete `[request failed] Type: message` marker (Cachalot 0.72.2+) with collapsible traceback excerpts. Original raw output stays available. Evidence is only the latest 64 KiB of Lab-owned output; no request ID or cumulative failure count is available. Older logs, incomplete writes and missing completion lines do not establish failures. External server logs are unavailable to this viewer.
+
+0.11.1 retains the 0.11.0 adoption and moves hosted CI to macOS 15 because GitHub's macOS 14 runner retires November 2, 2026 ([runner notice](https://github.com/actions/runner-images/issues/13518)). App deployment minimum remains macOS 14; minimum-OS behavior is not newly validated by CI.

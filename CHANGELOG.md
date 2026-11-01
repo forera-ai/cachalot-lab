@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.11.1] - 2026-11-01
+
+Compatible maintenance patch for hosted release verification; retains every 0.11.0 brief-adoption feature.
+
+- Move CI from retiring macOS 14 runner to supported macOS 15 after GitHub cancelled both 0.11.0 runs before any steps during its scheduled brownout. App deployment minimum remains macOS 14; this does not certify minimum-OS behavior.
+- Preserve immutable 0.11.0 source/tag and verified signed/notarized artifacts; publish freshly built 0.11.1 binaries from this patch commit. No application logic, runtime contract, settings or storage change.
+
 ## [0.11.0] - 2026-11-01
 
 Compatible minor release for explicit failed-request inspection. Existing data formats, runtime defaults, controls and raw logs remain compatible.
