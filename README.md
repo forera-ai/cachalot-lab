@@ -106,7 +106,7 @@ host readiness, connection health, and Lab-owned process state.
 
 ## Download
 
-**Current release:** [Cachalot Lab 0.11.1](https://github.com/forera-ai/cachalot-lab/releases/tag/v0.11.1) for Apple Silicon, macOS 14 or newer. This compatible minor release adds failed-request cards with collapsed traceback excerpts and correct DI-1 quality/snapshot guidance, retaining energy, sampled traces, and existing family controls. Existing profiles, conversations, preferences, and credential namespaces are preserved.
+**Current release:** [Cachalot Lab 0.11.1](https://github.com/forera-ai/cachalot-lab/releases/tag/v0.11.1) for Apple Silicon, macOS 14 or newer. This maintenance patch retains 0.11.0's failed-request cards with collapsed traceback excerpts and corrected DI-1 quality/snapshot guidance, retaining energy, sampled traces, and existing family controls. Existing profiles, conversations, preferences, and credential namespaces are preserved.
 
 1. Download the signed and notarized [DMG](https://github.com/forera-ai/cachalot-lab/releases/download/v0.11.1/Cachalot-Lab-0.11.1-macOS-arm64.dmg).
 2. Open it and drag **Cachalot Lab** into **Applications**.

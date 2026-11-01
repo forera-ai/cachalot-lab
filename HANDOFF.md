@@ -1,5 +1,70 @@
 # Handoff
 
+## Start here — Cachalot Lab 0.11.1 published, 2026-11-01
+
+Published [v0.11.1](https://github.com/forera-ai/cachalot-lab/releases/tag/v0.11.1)
+from maintenance commit `bb05ae6b721ab24eb1dc3e30b4a5ba83491fdad2` and matching annotated tag,
+retaining 0.11.0's runtime adoption at `ed332d4ea4b99fdff1130380b03a2736cf222a41`.
+Patch moves CI from retiring macOS 14 to macOS 15; app minimum remains macOS 14,
+not newly minimum-OS certified. Application/mock/test source unchanged from
+0.11.0, proven by git diff; no runtime policy, settings or storage changes.
+This receipt follow-up changes documentation only; released source/tag/binaries
+remain fixed.
+
+Runtime source-reviewed **0.72.3**, `77aee2e1a63fd7f29c0968a5a5c66601459d65d3`,
+briefs through **0.72.2**. Failed-request cards/collapsed tracebacks and original
+raw output ship in Logs/Dive, with bounded/older/partial fallback and no invented
+IDs/counts/absence-based failures. DI-1 guidance distinguishes buggy older quality
+gates from scoped fixed 0.72.3 evidence and explains 0.68.0-di1.1 cold-prefill
+transition, full-prefill 0.68.0 unchanged. No snapshot deletion or silent tuning.
+
+Fresh exact-source 0.11.1 gates passed 63 frontend, eight HTTP/SSE, 36 Rust tests
+(one existing isolated Keychain test ignored), types/lint/format/clippy and signed
+production/native builds. App/DMG notarization/stapling, strict signatures,
+Hardened Runtime, secure timestamp, Gatekeeper, DMG integrity and payload equality
+passed.
+
+- App notarization `c3fac36a-1313-4095-a0e4-d2bc22903019` — Accepted.
+- DMG notarization `c4683b53-4877-4a93-9c8c-051c4f22f0de` — Accepted.
+- Installed executable SHA-256 `1a22018dbc218fad903f4d0682e22b517dd7711fe5f7c0900419774174523405`.
+
+```
+7876c5ba4a3f889983ab705fd15c8e0212aa1773b222b8e058bf1a6c37055dd1  Cachalot-Lab-0.11.1-macOS-arm64.zip
+e6a0801e9a7d0c5a9697a702090478c136c3910127145c5f646105f4a62a1ccf  Cachalot-Lab-0.11.1-macOS-arm64.dmg
+```
+
+All seven public assets downloaded and matched local/GitHub hashes; unauthenticated
+latest API confirms 0.11.1. App installed from downloaded public DMG; all five
+bundle files match the notarized app/ZIP/DMG. Native 0.11.1 launch confirmed original
+MiniMax profile, no synthetic profile, original legacy logs and no invented failure
+cards. App left on Cockpit with existing external DeepSeek connection; no model
+process action, generation, credential or preference change. All five original
+app-data files remain byte-identical to pre-pass backup.
+
+Native 0.11.0 synthetic Logs/Dive checks cover unchanged patch application source:
+KeyError/ValueError, default collapse/expand, raw preservation, bounded scrolling,
+DI-1 editor and saved warnings. Patch install/version/original-data checks were
+fresh. No independent live quality/performance, overhead, Surface/minimum-window,
+minimum-OS or authenticated saved-key restart certification. Tracebacks remain
+excerpts; structured failure IDs/external logs and wired-history charts remain
+future contracts.
+
+0.11.0 was also published and installed with verified signed/notarized artifacts,
+but its main/tag hosted runs were cancelled before steps by GitHub's scheduled
+macOS 14 runner brownout ([official notice](https://github.com/actions/runner-images/issues/13518)).
+They did not pass; 0.11.1 restores hosted verification. Prior source/tag/binaries
+remain immutable and report records the cancellation.
+
+Installer reuses verified prior layout with fresh app payload and fresh DMG
+signing/notarization. Finder layout inspected; existing show-hidden-files exposes
+metadata, no global preference changed. Previous public app is recoverable under
+`.release/0.11.1/before-release-Cachalot Lab.app`; original 0.10.0 app/data and native
+synthetic evidence under `.release/local-0.11.0-2026-11-01/`. Receipts/downloads/hashes
+in `.release/0.11.1/`, orchestration logs in `.release/work-0.11.1/`. See
+[verification report](https://github.com/forera-ai/cachalot-lab/releases/download/v0.11.1/RELEASE-REPORT.md).
+
+Exact-source CI passed on [main](https://github.com/forera-ai/cachalot-lab/actions/runs/41319287823) and [v0.11.1](https://github.com/forera-ai/cachalot-lab/actions/runs/41319288280) using macOS 15, including native app builds. All release gates complete.
+
 ## Release continuation — Cachalot Lab 0.11.1, 2026-11-01
 
 0.11.0 is published from `ed332d4ea4b99fdff1130380b03a2736cf222a41` and its
