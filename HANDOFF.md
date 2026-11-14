@@ -1,5 +1,62 @@
 # Handoff
 
+## Start here — Cachalot Lab 0.12.0 published, 2026-11-14
+
+Published [v0.12.0](https://github.com/forera-ai/cachalot-lab/releases/tag/v0.12.0)
+from implementation `c1fdb27644fd1e9c3177554c4352c766184f100d` and matching annotated
+tag. This follow-up updates documentation only; released source/tag/binaries stay
+fixed. Minor version adds eight explicit launch controls and bounded runtime
+evidence. Reviewed clean runtime **0.85.2**,
+`a8638c1860d32484ce518596190830f96d14eec7`, briefs through **0.85.1**; runtime
+checkout unchanged. See [adoption contract](docs/RUNTIME_085.md).
+
+DeepSeek DI-2/tool-exact/vision and GLM vision/pins/read-ahead/prediction/logging
+are nullable next-launch controls. Saved paths, profile version and direct CLI
+defaults remain compatible. DI-2 requires explicit DI-1 On; output/snapshot/version
+warnings are visible. Rare-expert skip stays unexposed after failed quality gate;
+GLM prefill prediction stays Off with speed benefit closed within machine noise.
+Owned startup announcements preserve unknowns. Collapsed GLM table shows latest
+100 complete individual layer waits within recent 64 KiB, retaining raw logs;
+no request/chunk boundaries, sums, latency contribution or critical path invented.
+
+Fresh exact-source checks passed 65 frontend, eight HTTP/SSE and 39 Rust tests
+(one existing isolated Keychain test ignored), types/lint/format/clippy and
+production/native builds. Native synthetic controls/save/preview and bounded
+layer-table inspection passed in Abyss at 1380 × 860. Existing optional LLVM
+stripping warning remains nonfatal; strict signatures pass.
+
+- App notarization `0d4c416f-54dd-4fb5-96db-2b4e27cd7e47` — Accepted.
+- DMG notarization `bdc06340-e21f-4841-9698-9430320edcc5` — Accepted.
+- Installed executable SHA-256 `3898fdd12d5e12752af82eb2621981434156c907897e5124c99381d789d20795`.
+
+```
+fe56f937ab4fe38a553fac5fa92ab9e4b9d216a6abb99d5507c24d380405c84d  Cachalot-Lab-0.12.0-macOS-arm64.zip
+8de0497f6a0187bd55f7420d497db3684e218ffe6d972c5e7472aea82b9ca32b  Cachalot-Lab-0.12.0-macOS-arm64.dmg
+```
+
+App/DMG signing, Hardened Runtime, timestamp, notarization/stapling, Gatekeeper,
+DMG integrity and payload equality passed. Seven public assets downloaded without
+authentication and matched local/GitHub SHA-256; unauthenticated latest confirms
+0.12.0. Public DMG installed at `/Applications/Cachalot Lab.app`; all five bundle
+files match notarized app/ZIP/local DMG. Native public launch verified version,
+original MiniMax profile and legacy raw logs without invented failure/layer data.
+All five original app-data files remain byte-identical; app left open on Cockpit
+offline. No runtime launch/stop/generation, credential or inference-setting change.
+
+Exact-source CI passed on [main](https://github.com/forera-ai/cachalot-lab/actions/runs/43637112419)
+and [v0.12.0](https://github.com/forera-ai/cachalot-lab/actions/runs/43637112416),
+including native builds on macOS 15. All release gates complete. This is not new
+minimum-OS/Surface/minimum-window, live-model quality/performance, overhead or
+authenticated saved-key restart certification; those limits remain open.
+
+Headless packaging reused verified prior Finder metadata/background/Applications
+alias with fresh exact-source app payload; new DMG signing/notarization verified.
+Finder layout inspected; existing hidden-files preference exposes metadata, no
+global preference changed. Original 0.11.1 app/data and local inspection receipts:
+`.release/local-0.12.0-2026-11-14/`. Final artifacts/downloads/hashes/notary receipts:
+`.release/0.12.0/`. Orchestration and headless continuation:
+`.release/work-0.12.0/`. Published [verification report](https://github.com/forera-ai/cachalot-lab/releases/download/v0.12.0/RELEASE-REPORT.md).
+
 ## Start here — Cachalot Lab 0.12.0 preparation, 2026-11-14
 
 Owner authorized runtime brief adoption and complete release round. Planned

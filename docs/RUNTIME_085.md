@@ -70,8 +70,8 @@ output stays unchanged; a poll replaces the excerpt and rows can be omitted.
 
 Collection is explicitly Off by default and can emit about 380 lines for a cold
 15.6k-token block. Runtime logging, polling, and rendering overhead are unmeasured.
-No new collector, endpoint, durable history, export, request, or storage schema is
-added. Existing local log retention/privacy rules apply; no credentials or prompt
+No new collector, endpoint, durable history, export, or polling request is
+added. Launch fields extend the existing profile document without changing its version. Existing local log retention/privacy rules apply; no credentials or prompt
 capture fields are added.
 
 ## Other reviewed changes
