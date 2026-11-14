@@ -36,6 +36,10 @@ pub struct StartupEvidence {
     checkpoint: Option<String>,
     expert_bank: Option<String>,
     encoder_only_prefill: Option<bool>,
+    decoder_keep: Option<u16>,
+    decode_tool_exact: Option<bool>,
+    vision_min_pixels: Option<u32>,
+    glm_vision_min_pixels: Option<u32>,
 }
 
 // Only complete lines from the bounded startup prefix qualify. No HTTP model ID,
@@ -69,6 +73,39 @@ fn parse_startup(text: &str) -> StartupEvidence {
         }
         if line.starts_with("DI-1 encoder-only prefill on: ") {
             evidence.encoder_only_prefill = Some(true);
+        }
+        if let Some(path) = line.strip_prefix("GLM expert bank: ") {
+            evidence.expert_bank = startup_basename(path);
+        }
+        if let Some(rows) = line
+            .strip_prefix("DI-2 bounded replay on: the decoder half replays only the last ")
+            .and_then(|s| s.split_once(" rows with windows cut at the replay start "))
+            .and_then(|(n, _)| n.parse::<u16>().ok())
+            .filter(|n| (128..=2541).contains(n))
+        {
+            evidence.decoder_keep = Some(rows);
+        }
+        if line.starts_with("tool-call blocks decode exact: the miss budget is lifted ") {
+            evidence.decode_tool_exact = Some(true);
+        }
+        for (prefix, target) in [
+            (
+                "vision upscale: images under ",
+                &mut evidence.vision_min_pixels,
+            ),
+            (
+                "GLM vision upscale: still images under ",
+                &mut evidence.glm_vision_min_pixels,
+            ),
+        ] {
+            if let Some(value) = line
+                .strip_prefix(prefix)
+                .and_then(|s| s.split_once(" pixels are upscaled "))
+                .and_then(|(n, _)| n.replace(',', "").parse::<u32>().ok())
+                .filter(|n| *n > 0)
+            {
+                *target = Some(value);
+            }
         }
     }
     evidence
@@ -421,6 +458,22 @@ pub(crate) fn stop_on_exit(app: &AppHandle) {
 mod tests {
     use super::*;
     use std::io::{Read, Write};
+
+    #[test]
+    fn observes_new_startup_settings_without_inferring_missing_modes() {
+        let evidence = parse_startup("GLM expert bank: /Users/me/GLM-bank\nDI-2 bounded replay on: the decoder half replays only the last 140 rows with windows cut at the replay start (approximate)\ntool-call blocks decode exact: the miss budget is lifted from opener\nvision upscale: images under 810,000 pixels are upscaled before the tower\n");
+        assert_eq!(evidence.expert_bank.as_deref(), Some("GLM-bank"));
+        assert_eq!(evidence.decoder_keep, Some(140));
+        assert_eq!(evidence.decode_tool_exact, Some(true));
+        assert_eq!(evidence.vision_min_pixels, Some(810000));
+        assert_eq!(evidence.glm_vision_min_pixels, None);
+        assert_eq!(
+            parse_startup("vision upscale: images under 810,000 pixels are upscaled partial")
+                .vision_min_pixels,
+            None
+        );
+        assert_eq!(parse_startup("INFO: Uvicorn running on endpoint\nvision upscale: images under 810,000 pixels are upscaled after ready\n").vision_min_pixels, None);
+    }
 
     #[test]
     fn startup_identity_is_observed_bounded_and_preserves_unknowns() {

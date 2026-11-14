@@ -4,6 +4,15 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { DEFAULT_RUNTIME_PORT, type RuntimeConnection } from './runtime'
 
 export type RuntimeTuning = {
+  deepseek_prefill_decoder_keep: number | null
+  deepseek_decode_tool_exact: boolean | null
+  deepseek_vision_min_pixels: number | null
+  glm_vision_min_pixels: number | null
+  glm_block_pins: number | null
+  glm_speculate_min_tokens: number | null
+  glm_prefill_predict_topk: number | null
+  glm_prefill_log: boolean | null
+
   energy_enabled: boolean | null
   energy_interval_seconds: number | null
   token_trace_enabled: boolean | null
@@ -60,6 +69,10 @@ export type ManagedStatus = {
     checkpoint: string | null
     expert_bank: string | null
     encoder_only_prefill: boolean | null
+    decoder_keep?: number | null
+    decode_tool_exact?: boolean | null
+    vision_min_pixels?: number | null
+    glm_vision_min_pixels?: number | null
   } | null
 }
 
@@ -79,6 +92,15 @@ export function newProfile(): LaunchProfile {
     default_temperature: null,
     snapshot_dir: null,
     tuning: {
+      deepseek_prefill_decoder_keep: null,
+      deepseek_decode_tool_exact: null,
+      deepseek_vision_min_pixels: null,
+      glm_vision_min_pixels: null,
+      glm_block_pins: null,
+      glm_speculate_min_tokens: null,
+      glm_prefill_predict_topk: null,
+      glm_prefill_log: null,
+
       energy_enabled: null,
       energy_interval_seconds: null,
       token_trace_enabled: null,

@@ -1,5 +1,56 @@
 # Handoff
 
+## Start here — Cachalot Lab 0.12.0 preparation, 2026-11-14
+
+Owner authorized runtime brief adoption and complete release round. Planned
+[v0.12.0](https://github.com/forera-ai/cachalot-lab/releases/tag/v0.12.0) is a minor
+release for additive controls and log evidence; latest published at preparation
+was 0.11.1. Read every new brief after 0.72.2 through **0.85.1**, compared clean
+runtime **0.85.2**, `a8638c1860d32484ce518596190830f96d14eec7`, source/changelog.
+0.85.2 changes measurements/instruments only; runtime source left untouched.
+
+Eight nullable launch controls preserve direct CLI defaults, saved paths and
+profile schema. DeepSeek DI-2 requires explicit DI-1 On; output/snapshot/version
+warnings remain visible outside tuning. GLM prediction stays Off with benefit
+closed within machine noise. Rare-expert skip failed its quality gate and remains
+contract-only. Startup modes/GLM bank come only from complete owned startup lines;
+unknown stays unknown. Collapsed layer-wait table shows latest 100 complete rows
+within recent 64 KiB, preserves raw logs and creates no request/chunk totals,
+latency contribution or critical path. See [adoption](docs/RUNTIME_085.md).
+
+Graph Verify review: Lab generation 2026-10-30T16:40:15Z had stale metadata/new-file
+gaps, so exact source reads and literal searches supplied current evidence.
+Runtime generation 2026-11-13T18:05:00Z matched material paths with no recorded
+gaps (best-effort, not completeness proof). Jev corroborated closed-lever and
+attribution triage; source evidence governs implementation and publication.
+
+Native installation, exact-source release build, notarization, publication,
+public-asset verification and CI remain pending at this preparation checkpoint.
+No live generation/quality/performance, overhead or authenticated saved-key
+restart certification is claimed. Existing open backlog remains open.
+
+Precommit verification: 65 frontend, 39 Rust tests (one existing isolated Keychain
+test ignored), eight HTTP/SSE tests, TypeScript, ESLint, Prettier, Rust formatting,
+clippy, production frontend and fresh Developer ID signed native builds passed.
+Production/React diff review found no remaining actionable defects. Final graph
+coverage generation `2026-11-14T20:12:30Z` matches all changed code paths with no
+recorded gaps; docs Finder metadata is excluded, not source.
+
+Installed local 0.12.0 matches all four fresh bundle files; strict signature
+verification passed. Executable SHA-256
+`a7df8297152cc3823c597a1dd7a02e38b380e0a6f0b2e01237d9533c3e5d1926`.
+Rollback app, original data, installation/restoration receipts live under
+`.release/local-0.12.0-2026-11-14/`. Native synthetic inspection verified DeepSeek
+140/tool-exact/810000 intent and exact environment preview; GLM 0 pins/512
+threshold/0 prediction/log On/810000 intent, save, controls and preview. Logs
+default-collapsed table expanded to exactly 100 of 120 synthetic observations,
+starting at visible line 22; measured scope, warning and unchanged raw evidence
+were inspected in Abyss at the standard 1380 × 860 window. Controls wrap and
+scroll; minimum-size/Surface remain unverified. No runtime launched/stopped or
+generation sent. All five original app-data files restored byte-for-byte after
+synthetic inspection. Local test build is signed, not notarized or published;
+exact committed-source release gate follows.
+
 ## Start here — Cachalot Lab 0.11.1 published, 2026-11-01
 
 Published [v0.11.1](https://github.com/forera-ai/cachalot-lab/releases/tag/v0.11.1)

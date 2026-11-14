@@ -53,15 +53,15 @@ This local test installation does not make an uncommitted build a release.
 
 ## Scope
 
-The [0.11.1 release](https://github.com/forera-ai/cachalot-lab/releases/tag/v0.11.1)
-adds explicit failed-request cards with collapsed traceback excerpts in Logs and
-Dive. It corrects DI-1 evidence: older quality gates ran with stale slots; the
-fixed 0.72.3 1017 gate was within noise, a scoped result. Runtime 0.72.2 changes
-DI-1 snapshot identity to 0.68.0-di1.1 and can require one cold prefill; full-prefill
-0.68.0 is unchanged. Saved data and launch defaults remain compatible. No model
-quality/performance, Lab overhead or authenticated saved-key restart is certified.
-Apple Silicon, macOS 14+; Python/runtime/checkpoints not bundled. Runtime 0.68+
-needs MLX 0.32.4. Detailed wired-history and structured failure IDs remain planned.
+The [0.12.0 release](https://github.com/forera-ai/cachalot-lab/releases/tag/v0.12.0)
+adds eight explicit runtime launch controls, observed startup modes/GLM bank, and
+a collapsed bounded GLM prefill layer-wait table. Reviewed runtime 0.85.2,
+briefs through 0.85.1. Direct CLI defaults and saved data remain compatible;
+no silent inference policy change. See [adoption and limits](RUNTIME_085.md).
+Individual store waits are not request latency or exposed stalls. Model quality,
+live family performance, logging/Lab overhead and saved-key restart remain
+uncertified. Apple Silicon, macOS 14+; Python/runtime/checkpoints not bundled.
+Runtime 0.68+ requires MLX 0.32.4. Detailed timelines and comparisons stay planned.
 
 ## One-time signing setup
 

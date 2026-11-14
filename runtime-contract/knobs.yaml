@@ -1,6 +1,84 @@
-# Verified against Cachalot 0.72.3 (77aee2e). Null overrides in Lab profiles
+# Verified against Cachalot 0.85.2 (a8638c1). Null overrides in Lab profiles
 # inherit the runtime's version-specific default; zero has each knob's stated effect.
 knobs:
+  - key: CACHALOT_PREFILL_DECODER_KEEP
+    kind: env
+    families: [deepseek]
+    since: 0.74.0
+    default: { direct_cli: null, serve_script_since_0_75_0: 140 }
+    restart_required: true
+    lab: Inherited key removed before explicit profile choices; older omitted fields keep CLI defaults; family changes clear field.
+    summary: Lab nullable 128–2541 rows, requires explicit DI-1 On. Output-changing bounded replay, -keepN snapshot key, cold first use possible. Empty retains exact DI-1 tail. Scoped long gate within noise.
+  - key: CACHALOT_DECODE_TOOL_EXACT
+    kind: env
+    families: [deepseek]
+    since: 0.76.0
+    default: { direct_cli: false, serve_script_since_0_77_0: true }
+    restart_required: true
+    lab: Inherited key removed before explicit profile choices; older omitted fields keep CLI defaults; family changes clear field.
+    summary: Lab nullable bool. Lifts enabled miss budget from DSML opener through reply end; output-changing, cold tool calls may slow down. Inert without budget.
+  - key: CACHALOT_VISION_MIN_PIXELS
+    kind: env
+    families: [deepseek]
+    since: 0.79.0
+    default: { direct_cli: 0, serve_script_since_0_80_0: 810000 }
+    restart_required: true
+    lab: Inherited key removed before explicit profile choices; older omitted fields keep CLI defaults; family changes clear field.
+    summary: Lab nullable 0–16000000 (Lab upper limit). Output-changing for small images; at or below 295936 keeps checkpoint preprocessing. Image span keys include nonstandard minimum; token ceiling unchanged.
+  - key: CACHALOT_GLM_VISION_MIN_PIXELS
+    kind: env
+    families: [glm]
+    since: 0.81.0
+    default: 0
+    restart_required: true
+    lab: Inherited key removed before explicit profile choices; older omitted fields keep CLI defaults; family changes clear field.
+    summary: Lab nullable 0–16000000 (Lab upper limit), 0 off. Changes still-image outputs and token counts, digest keys include minimum; video unchanged.
+  - key: CACHALOT_GLM_BLOCK_PINS
+    kind: env
+    families: [glm]
+    since: 0.83.0
+    default: 3
+    restart_required: true
+    lab: Inherited key removed before explicit profile choices; older omitted fields keep CLI defaults; family changes clear field.
+    summary: Lab nullable 0–8 (Lab limit), 0 off. Bit-identical; last chunk boundaries in a system block persist to disk, about 0.3 GiB each, at most eight. MiniMax keeps none.
+  - key: CACHALOT_GLM_SPECULATE_MIN_TOKENS
+    kind: env
+    families: [glm]
+    reviewed: 0.85.2
+    default: { direct_cli: 128, serve_script_since_0_84_0: 512 }
+    restart_required: true
+    lab: Inherited key removed before explicit profile choices; older omitted fields keep CLI defaults; family changes clear field.
+    summary: Existing runtime knob; Lab exposes nullable 0–1048576 (Lab limit). Whole next-layer read-ahead from threshold; below it reads only routed experts unless prediction explicitly selected. Bit-identical.
+  - key: CACHALOT_GLM_PREFILL_PREDICT_TOPK
+    kind: env
+    families: [glm]
+    since: 0.85.0
+    default: 0
+    restart_required: true
+    lab: Inherited key removed before explicit profile choices; older omitted fields keep CLI defaults; family changes clear field.
+    summary: Lab nullable 0–288, 0 off. Predicted union read-ahead below whole-layer threshold; bit-identical. 0.85.1 closed speed lever within machine variation; no gain promised.
+  - key: CACHALOT_GLM_PREFILL_LOG
+    kind: env
+    families: [glm]
+    since: 0.85.1
+    default: false
+    restart_required: true
+    lab: Inherited key removed before explicit profile choices; older omitted fields keep CLI defaults; family changes clear field.
+    summary: Lab nullable bool. Explicit 1 prints one stderr line per prefill layer call. About 380 lines per cold block; overhead unmeasured. Individual waits, no request/chunk attribution.
+  - key: CACHALOT_PREFILL_RARE_SKIP
+    kind: env
+    families: [deepseek]
+    since: 0.78.0
+    default: null
+    lab: Contract only, unexposed; Lab does not set or remove this key. Quality gate failed in 0.78.1 and lever closed.
+    summary: Unset/empty/0/off/exact disables. Positive integer drops experts routed by at most k rows, rescales remaining weights, changes outputs and appends -rarekmN snapshot tag.
+  - key: CACHALOT_PREFILL_RARE_MIN_ROWS
+    kind: env
+    families: [deepseek]
+    since: 0.78.0
+    default: 1024
+    lab: Contract only, unexposed; not set or removed by Lab.
+    summary: Minimum prefill call rows for the failed rare-skip experiment; runtime clamps to at least 1.
   - key: CACHALOT_ATTN_ACT_QUANT_O
     kind: env
     families: [deepseek-v4.1-flash]
@@ -415,7 +493,7 @@ instrumentation:
 script_checkpoint_selection:
   since: 0.71.2
   scripts: [serve.sh, chat.sh]
-  model: CACHALOT_MODEL_PATH, default unchanged
+  model: CACHALOT_MODEL_PATH; since 0.73.0 defaults to DeepSeek-V4.1-Flash-1017
   expert_bank: $HOME/<checkpoint-basename>-q2g128 if .cachalot-verified exists, otherwise beside checkpoint
   hotlist: ~/cachalot-hotlist.json for original checkpoint; ~/cachalot-hotlist-<name>.json for other revisions if present; otherwise none
   empty_hotlist: CACHALOT_HOTLIST= disables it

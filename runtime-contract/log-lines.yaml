@@ -1,4 +1,28 @@
 patterns:
+  - id: deepseek_di2_replay
+    since: 0.74.0
+    prefix: 'DI-2 bounded replay on: the decoder half replays only the last N rows with windows cut at the replay start '
+    meaning: Complete owned startup line proves announced N rows, 128–2541; missing remains unknown. Not proof of per-request use.
+  - id: deepseek_tool_exact
+    since: 0.76.0
+    prefix: 'tool-call blocks decode exact: the miss budget is lifted '
+    meaning: Owned startup announcement of On; missing remains unknown. Inert without enabled decode budget.
+  - id: deepseek_vision_upscale
+    since: 0.79.0
+    prefix: 'vision upscale: images under N pixels are upscaled '
+    meaning: Owned startup announcement, comma-formatted integer minimum; output-changing for small images.
+  - id: glm_vision_upscale
+    since: 0.81.0
+    prefix: 'GLM vision upscale: still images under N pixels are upscaled '
+    meaning: Separate GLM minimum from owned startup; output-changing for still images only.
+  - id: glm_prefill_layer
+    since: 0.85.1
+    example: '[prefill-layer] layer=12 rows=2048 routed=288 ahead=whole:288 wait_ms=301.4'
+    meaning: Opt-in measured store hand-back wait per layer call; ahead kind is none/whole/pred/given. No request/chunk IDs or exposed-stall semantics. Lab shows last 100 complete rows within recent 64 KiB; never sums by assumed 42-line groups. Raw output preserved; overhead unmeasured.
+  - id: deepseek_rare_skip
+    since: 0.78.0
+    example: '[request] ... rare_skip=123/0.25% ... finish=length'
+    meaning: Optional suffix after experiment applies; cumulative experts skipped and cumulative dropped mass percentage, not request-specific. Raw only; percentage differences are not per-request mass. Lever failed quality gate in 0.78.1.
   - id: failed_stream_request
     since: 0.72.2
     regex: '^\[request failed\] (?P<type>[A-Za-z_][\w.]*): ?(?P<message>.*)$'
@@ -60,7 +84,7 @@ patterns:
     since: 0.49.0
     families: [glm-5.3-flash]
     regex: '^GLM expert bank: (?P<path>.+)$'
-    meaning: GLM selected a contiguous bank at startup. Logs displays the raw line; Lab does not infer live telemetry or compatibility from it.
+    meaning: GLM selected a contiguous bank at startup. Dive shows basename from complete current owned startup prefix; missing/external remains unknown. No live telemetry or compatibility inference.
   - id: loop_guard
     since: 0.40.0
     families: [glm-5.3-flash, minimax-m3]
@@ -92,3 +116,8 @@ token_trace:
   since: 0.64.0
   startup: 'token trace on (CACHALOT_TOKEN_TRACE): one decode token in N is recorded ...'
   limits: No per-request log field. GLM/MiniMax print unsupported notice and ignore knob.
+
+context_cap:
+  since: 0.77.1
+  chat: Oversized output cap shortens to remaining context room; reaching it reports finish=length. Prompt with no room still fails.
+  completions: /v1/completions still rejects oversized prompt plus output.

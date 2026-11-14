@@ -49,6 +49,17 @@ it('saves, reopens, and clears optional GLM controls when family changes', async
   await user.type(topk, '0')
   await user.type(limit, '3')
   await user.type(budget, '2')
+  await user.type(screen.getByLabelText(/GLM vision minimum pixels/), '810000')
+  await user.type(screen.getByLabelText(/GLM block snapshot pins/), '0')
+  await user.type(
+    screen.getByLabelText(/GLM whole-layer read-ahead threshold/),
+    '512',
+  )
+  await user.type(screen.getByLabelText(/GLM prefill predicted experts/), '5')
+  await user.selectOptions(
+    screen.getByLabelText(/GLM per-layer prefill log/),
+    'true',
+  )
   await user.selectOptions(scheduling, '-1')
   await user.click(screen.getByText(/Runtime tuning/))
   expect(screen.getByText(/Decode budget 2:/)).toBeVisible()
@@ -64,6 +75,11 @@ it('saves, reopens, and clears optional GLM controls when family changes', async
           glm_predict_limit: 3,
           glm_decode_miss_budget: 2,
           glm_predict_after_demand: -1,
+          glm_vision_min_pixels: 810000,
+          glm_block_pins: 0,
+          glm_speculate_min_tokens: 512,
+          glm_prefill_predict_topk: 5,
+          glm_prefill_log: true,
         }),
       }),
     }),
@@ -74,6 +90,8 @@ it('saves, reopens, and clears optional GLM controls when family changes', async
   await user.click(screen.getByRole('button', { name: 'Edit' }))
   await user.click(screen.getByText(/Runtime tuning/))
   expect(screen.getByLabelText(/GLM prefetch experts/)).toHaveValue(0)
+  expect(screen.getByLabelText(/GLM block snapshot pins/)).toHaveValue(0)
+  expect(screen.getByLabelText(/GLM per-layer prefill log/)).toHaveValue('true')
   expect(screen.getByLabelText(/GLM decode miss budget/)).toHaveValue(2)
   expect(screen.getByLabelText(/GLM prefetch scheduling/)).toHaveValue('-1')
   await user.selectOptions(screen.getByLabelText('Model family'), 'minimax')
@@ -85,6 +103,11 @@ it('saves, reopens, and clears optional GLM controls when family changes', async
   expect(profiles[0]?.tuning.glm_bank_enabled).toBeNull()
   expect(profiles[0]?.tuning.glm_predict_topk).toBeNull()
   expect(profiles[0]?.tuning.glm_decode_miss_budget).toBeNull()
+  expect(profiles[0]?.tuning.glm_vision_min_pixels).toBeNull()
+  expect(profiles[0]?.tuning.glm_block_pins).toBeNull()
+  expect(profiles[0]?.tuning.glm_speculate_min_tokens).toBeNull()
+  expect(profiles[0]?.tuning.glm_prefill_predict_topk).toBeNull()
+  expect(profiles[0]?.tuning.glm_prefill_log).toBeNull()
 })
 
 it('keeps omitted fields empty when editing an older GLM profile', async () => {
@@ -137,6 +160,15 @@ it('saves DeepSeek choices, preserves inherited defaults, and clears family-spec
   await user.selectOptions(drops, 'true')
   await user.selectOptions(dates, 'false')
   await user.selectOptions(encoder, 'true')
+  await user.type(screen.getByLabelText(/DI-2 decoder replay rows/), '140')
+  await user.selectOptions(
+    screen.getByLabelText(/Exact tool-call decode/),
+    'true',
+  )
+  await user.type(
+    screen.getByLabelText(/DeepSeek vision minimum pixels/),
+    '810000',
+  )
   await user.selectOptions(parity, 'true')
   await user.click(screen.getByText(/Runtime tuning/))
   expect(
@@ -148,6 +180,9 @@ it('saves DeepSeek choices, preserves inherited defaults, and clears family-spec
   )
   expect(profiles[0]?.tuning.deepseek_system_date_reuse).toBe(false)
   expect(profiles[0]?.tuning.deepseek_attn_act_quant_o).toBe(true)
+  expect(profiles[0]?.tuning.deepseek_prefill_decoder_keep).toBe(140)
+  expect(profiles[0]?.tuning.deepseek_decode_tool_exact).toBe(true)
+  expect(profiles[0]?.tuning.deepseek_vision_min_pixels).toBe(810000)
   expect(profiles[0]?.tuning).toHaveProperty(
     'deepseek_prefill_encoder_only',
     true,
@@ -161,6 +196,9 @@ it('saves DeepSeek choices, preserves inherited defaults, and clears family-spec
   expect(screen.getByLabelText(/System date reuse/)).toHaveValue('false')
   expect(screen.getByLabelText(/Encoder-only prefill/)).toHaveValue('true')
   expect(screen.getByLabelText(/Attention output FP8/)).toHaveValue('true')
+  expect(screen.getByLabelText(/DI-2 decoder replay rows/)).toHaveValue(140)
+  expect(screen.getByLabelText(/Exact tool-call decode/)).toHaveValue('true')
+  await user.clear(screen.getByLabelText(/DI-2 decoder replay rows/))
   await user.selectOptions(
     screen.getByLabelText(/Attention output FP8/),
     'false',
@@ -193,6 +231,9 @@ it('saves DeepSeek choices, preserves inherited defaults, and clears family-spec
   expect(profiles[0]?.tuning.deepseek_decode_drop_misses).toBeNull()
   expect(profiles[0]?.tuning.deepseek_system_date_reuse).toBeNull()
   expect(profiles[0]?.tuning.deepseek_attn_act_quant_o).toBeNull()
+  expect(profiles[0]?.tuning.deepseek_prefill_decoder_keep).toBeNull()
+  expect(profiles[0]?.tuning.deepseek_decode_tool_exact).toBeNull()
+  expect(profiles[0]?.tuning.deepseek_vision_min_pixels).toBeNull()
   expect(profiles[0]?.tuning).toHaveProperty(
     'deepseek_prefill_encoder_only',
     null,

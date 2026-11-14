@@ -2068,3 +2068,21 @@ pre:focus-visible,
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
+/* Per-layer observations stay inside the existing bounded log disclosure. */
+.prefill-layer-table {
+  max-height: 320px;
+  overflow: auto;
+}
+
+.prefill-layer-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+.prefill-layer-table th,
+.prefill-layer-table td {
+  padding: 8px 12px;
+  text-align: left;
+  white-space: nowrap;
+}

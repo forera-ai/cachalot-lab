@@ -1,11 +1,20 @@
-# Reviewed committed runtime: 0.72.3 at 77aee2e. The HTTP response does not expose
+# Reviewed committed runtime: 0.85.2 at a8638c1. The HTTP response does not expose
 # package version or active numerics mode, so external-server mode stays unknown.
 reviewed_runtime:
-  version: 0.72.3
-  commit: 77aee2e1a63fd7f29c0968a5a5c66601459d65d3
+  version: 0.85.2
+  commit: a8638c1860d32484ce518596190830f96d14eec7
 brief_inbox: docs/lab/briefs
-# Briefs reviewed through 0.72.2; source/changelog corrections through 0.72.3.
+# Briefs reviewed through 0.85.1; source/changelog through 0.85.2. See docs/RUNTIME_085.md.
 features:
+  deepseek_di2_decoder_keep: '>=0.74.0'
+  deepseek_tool_exact_decode: '>=0.76.0'
+  chat_context_cap_shortening: '>=0.77.1'
+  deepseek_vision_min_pixels: '>=0.79.0'
+  glm_vision_min_pixels: '>=0.81.0'
+  glm_block_pins: '>=0.83.0'
+  glm_script_short_prefill_threshold_512: '>=0.84.0'
+  glm_prefill_predict_topk: '>=0.85.0'
+  glm_prefill_layer_log: '>=0.85.1'
   failed_stream_request_log: '>=0.72.2'
   deepseek_di1_stale_slot_snapshot_fix: '>=0.72.2'
   deepseek_fixed_di1_quality_rerun: '>=0.72.3'
@@ -48,6 +57,19 @@ features:
   deepseek_disk_chunk_pins: '>=0.59.0'
   deepseek_system_date_reuse: '>=0.60.0'
 launch_defaults:
+  deepseek_script_checkpoint_since_0_73_0: DeepSeek-V4.1-Flash-1017
+  deepseek_direct_cli_decoder_keep: null
+  deepseek_serve_script_decoder_keep_since_0_75_0: 140
+  deepseek_direct_cli_tool_exact: false
+  deepseek_serve_script_tool_exact_since_0_77_0: true
+  deepseek_direct_cli_vision_min_pixels: null
+  deepseek_serve_script_vision_min_pixels_since_0_80_0: 810000
+  glm_vision_min_pixels: null
+  glm_block_pins: 3
+  glm_direct_cli_speculate_min_tokens: 128
+  glm_serve_script_speculate_min_tokens_since_0_84_0: 512
+  glm_prefill_predict_topk: 0
+  glm_prefill_log: false
   deepseek_direct_cli_prefill_encoder_only: false
   deepseek_chat_script_prefill_encoder_only: false
   deepseek_serve_script_prefill_encoder_only_since_0_72_0: true

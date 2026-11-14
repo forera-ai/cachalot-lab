@@ -3,6 +3,21 @@ import userEvent from '@testing-library/user-event'
 import { beforeEach, expect, it, vi } from 'vitest'
 import { ManagedLog } from './ManagedScreens'
 
+it('shows bounded opt-in GLM layer observations with raw evidence and no inferred request total', async () => {
+  const user = userEvent.setup()
+  const log =
+    '[prefill-layer] layer=12 rows=2048 routed=288 ahead=whole:288 wait_ms=301.4\n'
+  invoke.mockResolvedValue(log)
+  render(<ManagedLog />)
+  const summary = await screen.findByText('GLM prefill layer waits')
+  expect(screen.getByRole('table', { hidden: true })).not.toBeVisible()
+  await user.click(summary)
+  expect(screen.getByRole('table')).toBeVisible()
+  expect(screen.getByRole('cell', { name: '301.4' })).toBeInTheDocument()
+  expect(screen.getByText(/not request latency or exposed stall/)).toBeVisible()
+  expect(screen.getByLabelText('Managed runtime output').textContent).toBe(log)
+})
+
 const { invoke } = vi.hoisted(() => ({ invoke: vi.fn() }))
 vi.mock('@tauri-apps/api/core', () => ({ invoke, isTauri: () => true }))
 beforeEach(() => invoke.mockReset())

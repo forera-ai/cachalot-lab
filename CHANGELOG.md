@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.12.0] - 2026-11-14
+
+Compatible minor release for eight explicit launch controls and bounded runtime evidence. Existing saved profiles and direct CLI defaults stay compatible.
+
+- Review all briefs through 0.85.1 against clean Cachalot 0.85.2 (`a8638c1`); distinguish launcher defaults from Lab direct CLI behavior.
+- Add DeepSeek DI-2 replay, exact tool-call decode, and vision upscale controls with output-changing, snapshot, version, and dependency guidance.
+- Add GLM vision upscale, block snapshot pins, whole-layer read-ahead threshold, prefill prediction, and opt-in per-layer logging controls. Prediction stays Off; runtime closed its speed benefit within machine variation.
+- Show observed DI-2/tool/vision startup evidence and GLM bank identity only for the current owned process; preserve unknowns.
+- Show a collapsed GLM layer-wait table, latest 100 complete observations within the existing 64 KiB output. Retain raw logs; no invented request/chunk IDs, request totals, exposed stalls or critical path. Logging overhead remains unmeasured.
+- Record changed context-cap behavior and closed rare-expert-skip experiment without adding silent policy changes or unsupported quality/performance claims. See [adoption and limits](docs/RUNTIME_085.md).
+
 ## [0.11.1] - 2026-11-01
 
 Compatible maintenance patch for hosted release verification; retains every 0.11.0 brief-adoption feature.

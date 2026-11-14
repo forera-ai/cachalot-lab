@@ -105,3 +105,7 @@ DeepSeek encoder-only prefill is an explicit default-off next-launch setting wit
 Lab 0.10.0 adds explicit FP8 reference-parity intent and bounded owned-startup identity/DI-1 evidence. Detailed wired-history visualization and server failure instrumentation remain future contract work.
 
 Lab 0.11.0 adds bounded explicit failed-request log inspection with collapsed traceback excerpts and corrects DI-1 snapshot/quality evidence using runtime 0.72.2/0.72.3. Request-correlated structured events and detailed timelines remain separate contracts.
+
+## Runtime 0.85 adoption — Lab 0.12.0
+
+Reviewed clean Cachalot 0.85.2 (`a8638c1860d32484ce518596190830f96d14eec7`), briefs through 0.85.1. [Adoption contract](RUNTIME_085.md) specifies eight nullable family controls, direct CLI versus script defaults, DI-2 dependency/snapshot behavior, output-changing tool/vision warnings, observed startup unknowns and bounded GLM layer waits. Existing profile format, explicit model/bank paths and raw logs are preserved; family changes clear new tuning. No silent policy change. Layer waits have no request/chunk IDs and cannot establish latency contributions or critical paths. Collection overhead and live model quality/performance remain unverified; durable comparisons/timelines stay planned. Rare-expert skip remains contract-only after its failed gate; prefill prediction stays Off.

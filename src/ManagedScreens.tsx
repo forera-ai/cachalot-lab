@@ -10,7 +10,7 @@ import {
 import { Eye, Pencil, Play, Plus, Square, Trash2 } from 'lucide-react'
 
 import { ModelDiscovery } from './ModelDiscovery'
-import { parseLoggedFailures } from './managedLog'
+import { parseLoggedFailures, parsePrefillLayers } from './managedLog'
 import { DEFAULT_RUNTIME_PORT, type RuntimeConnection } from './runtime'
 
 type LaunchCommand = {
@@ -518,6 +518,37 @@ export function DiveScreen({
                               updateTuning({ deepseek_prefill_encoder_only })
                             }
                           />
+                          <OptionalNumber
+                            label="DI-2 decoder replay rows · 0.74+ · empty exact tail; serve.sh 140"
+                            value={
+                              draft.tuning.deepseek_prefill_decoder_keep ?? null
+                            }
+                            min={128}
+                            max={2541}
+                            onChange={(deepseek_prefill_decoder_keep) =>
+                              updateTuning({ deepseek_prefill_decoder_keep })
+                            }
+                          />
+                          <TriState
+                            label="Exact tool-call decode · 0.76+ · CLI Off; serve.sh On"
+                            value={
+                              draft.tuning.deepseek_decode_tool_exact ?? null
+                            }
+                            onChange={(deepseek_decode_tool_exact) =>
+                              updateTuning({ deepseek_decode_tool_exact })
+                            }
+                          />
+                          <OptionalNumber
+                            label="DeepSeek vision minimum pixels · 0.79+ · CLI Off; serve.sh 810000"
+                            value={
+                              draft.tuning.deepseek_vision_min_pixels ?? null
+                            }
+                            min={0}
+                            max={16000000}
+                            onChange={(deepseek_vision_min_pixels) =>
+                              updateTuning({ deepseek_vision_min_pixels })
+                            }
+                          />
                           <TriState
                             label="Attention output FP8 · reference parity · 0.71+ · default Off"
                             value={
@@ -546,6 +577,21 @@ export function DiveScreen({
                           does not promise that repair. Off selects exact
                           decode. serve.sh defaults to On; Lab's direct CLI
                           defaults to Off.
+                        </p>
+                        <p className="panel-intro">
+                          DI-2 requires explicit encoder-only prefill On. Empty
+                          keeps its exact 2,541-row tail; 128–2,541 selects
+                          bounded replay. Approximate, output-changing; 1017
+                          long-gate results were within noise, not a universal
+                          guarantee. Snapshots use a separate -keepN key; first
+                          use can cold-prefill once. Exact tool-call decode
+                          lifts a selected miss budget from the DSML opener
+                          through reply end; cold tool calls may slow down.
+                          Vision minimum pixels changes small-image outputs and
+                          prompt token counts, with the runtime token ceiling
+                          retained. 0 restores checkpoint preprocessing; text is
+                          unchanged. These controls require the runtime versions
+                          shown; older runtimes can ignore them.
                         </p>
                         <p className="panel-intro">
                           Encoder-only prefill changes outputs. 0.71.0–0.72.1
@@ -642,6 +688,55 @@ export function DiveScreen({
                                 unchanged. Next launch only; older runtimes
                                 ignore this control.
                               </p>
+                              <OptionalNumber
+                                label="GLM vision minimum pixels · 0.81+ · 0 off"
+                                value={
+                                  draft.tuning.glm_vision_min_pixels ?? null
+                                }
+                                min={0}
+                                max={16000000}
+                                onChange={(glm_vision_min_pixels) =>
+                                  updateTuning({ glm_vision_min_pixels })
+                                }
+                              />
+                              <OptionalNumber
+                                label="GLM block snapshot pins · 0.83+ · default 3; 0 off"
+                                value={draft.tuning.glm_block_pins ?? null}
+                                min={0}
+                                max={8}
+                                onChange={(glm_block_pins) =>
+                                  updateTuning({ glm_block_pins })
+                                }
+                              />
+                              <OptionalNumber
+                                label="GLM whole-layer read-ahead threshold · 0.84+ · CLI 128; script 512"
+                                value={
+                                  draft.tuning.glm_speculate_min_tokens ?? null
+                                }
+                                min={0}
+                                max={1048576}
+                                onChange={(glm_speculate_min_tokens) =>
+                                  updateTuning({ glm_speculate_min_tokens })
+                                }
+                              />
+                              <OptionalNumber
+                                label="GLM prefill predicted experts · 0.85+ · default 0 off"
+                                value={
+                                  draft.tuning.glm_prefill_predict_topk ?? null
+                                }
+                                min={0}
+                                max={288}
+                                onChange={(glm_prefill_predict_topk) =>
+                                  updateTuning({ glm_prefill_predict_topk })
+                                }
+                              />
+                              <TriState
+                                label="GLM per-layer prefill log · 0.85.1+ · default Off"
+                                value={draft.tuning.glm_prefill_log ?? null}
+                                onChange={(glm_prefill_log) =>
+                                  updateTuning({ glm_prefill_log })
+                                }
+                              />
                               <OptionalNumber
                                 label="GLM prefetch experts · CLI default 5; 0 off"
                                 value={draft.tuning.glm_predict_topk ?? null}
@@ -798,16 +893,25 @@ export function DiveScreen({
                         </div>
                         {draft.family === 'glm' && (
                           <p className="panel-intro">
-                            Optional GLM overrides apply on the next launch.
-                            Empty fields use runtime defaults; older runtimes
-                            ignore these controls. A bank needs bank.json; Off
-                            retains its saved path but uses checkpoint experts.
-                            Bank reads and prefetch preserve model outputs. Lab
-                            uses the direct CLI: empty prefetch remains 5;
-                            serve-glm.sh defaults to 0 since 0.62.14. Empty
-                            decode budget stays off in Lab; serve-glm.sh
-                            defaults to 2 since 0.62.20 and changes outputs. Its
-                            automatic bank selection is not applied here.
+                            Vision upscale changes still-image outputs and adds
+                            prompt tokens; video is unchanged. Block pins
+                            preserve outputs and add bounded disk snapshots
+                            (about 0.3 GiB each, at most eight). Read-ahead
+                            controls preserve outputs. Prefill prediction
+                            remains off: its speed benefit was closed within
+                            machine variation. Per-layer logging is explicit
+                            instrumentation; overhead is unmeasured and a cold
+                            block can emit about 380 lines. Optional GLM
+                            overrides apply on the next launch. Empty fields use
+                            runtime defaults; older runtimes ignore these
+                            controls. A bank needs bank.json; Off retains its
+                            saved path but uses checkpoint experts. Bank reads
+                            and prefetch preserve model outputs. Lab uses the
+                            direct CLI: empty prefetch remains 5; serve-glm.sh
+                            defaults to 0 since 0.62.14. Empty decode budget
+                            stays off in Lab; serve-glm.sh defaults to 2 since
+                            0.62.20 and changes outputs. Its automatic bank
+                            selection is not applied here.
                           </p>
                         )}
                         {draft.family === 'minimax' && (
@@ -862,6 +966,7 @@ export function DiveScreen({
                       identify this numerics mode.
                     </p>
                   )}
+                <NewRuntimeWarnings profile={draft} />
                 <div className="managed-actions">
                   <button className="primary-button" disabled={busy}>
                     Save profile
@@ -948,6 +1053,7 @@ export function DiveScreen({
                     use a separate snapshot directory.
                   </p>
                 )}
+              <NewRuntimeWarnings profile={selected} />
               {ownsSelected && (
                 <section aria-label="Observed managed startup">
                   <h3>Observed startup · PID {status.pid}</h3>
@@ -960,6 +1066,27 @@ export function DiveScreen({
                     {status.startup?.encoder_only_prefill === true
                       ? 'On · startup line observed'
                       : 'Unreported · absence does not prove Off'}
+                  </p>
+                  <p className="panel-intro">
+                    DI-2 replay:{' '}
+                    {status.startup?.decoder_keep != null
+                      ? `${status.startup.decoder_keep} rows · startup line observed`
+                      : 'Unreported'}
+                    <br />
+                    Exact tool-call decode:{' '}
+                    {status.startup?.decode_tool_exact === true
+                      ? 'On · startup line observed'
+                      : 'Unreported'}
+                    <br />
+                    DeepSeek vision minimum:{' '}
+                    {status.startup?.vision_min_pixels != null
+                      ? `${status.startup.vision_min_pixels} pixels · startup line observed`
+                      : 'Unreported'}
+                    <br />
+                    GLM vision minimum:{' '}
+                    {status.startup?.glm_vision_min_pixels != null
+                      ? `${status.startup.glm_vision_min_pixels} pixels · startup line observed`
+                      : 'Unreported'}
                   </p>
                   <p className="panel-intro">
                     Source: first 64 KiB of this process’s startup log. Model ID
@@ -1129,6 +1256,48 @@ export function DiveScreen({
   )
 }
 
+function NewRuntimeWarnings({ profile }: { profile: LaunchProfile }) {
+  const tuning = profile.tuning
+  return (
+    <>
+      {profile.family === 'deepseek' &&
+        tuning.deepseek_prefill_decoder_keep != null && (
+          <p className="managed-notice">
+            DI-2 replay {tuning.deepseek_prefill_decoder_keep} rows ·
+            approximate, output-changing next-launch intent. Requires
+            encoder-only prefill On; separate snapshot key, possible cold
+            prefill. Runtime 0.74+ required; active mode needs its startup line.
+          </p>
+        )}
+      {profile.family === 'deepseek' &&
+        tuning.deepseek_decode_tool_exact === true && (
+          <p className="managed-notice">
+            Exact tool-call decode · next-launch intent. Lifts a selected decode
+            miss budget after the tool-call opener; changes outputs and may slow
+            cold tool calls. Requires Cachalot 0.76+.
+          </p>
+        )}
+      {((profile.family === 'deepseek' &&
+        (tuning.deepseek_vision_min_pixels ?? 0) > 295936) ||
+        (profile.family === 'glm' &&
+          (tuning.glm_vision_min_pixels ?? 0) > 0)) && (
+        <p className="managed-notice">
+          Vision upscale · output-changing next-launch intent for small images;
+          adds prompt tokens under the runtime ceiling. DeepSeek requires 0.79+,
+          GLM 0.81+. This setting does not add media attachments to Lab Chat.
+        </p>
+      )}
+      {profile.family === 'glm' && tuning.glm_prefill_log === true && (
+        <p className="managed-notice">
+          GLM layer logging · next-launch collection, runtime 0.85.1+. About 380
+          lines per cold block; overhead unmeasured. Recent log excerpt remains
+          bounded.
+        </p>
+      )}
+    </>
+  )
+}
+
 export function ManagedLog({ compact = false }: { compact?: boolean }) {
   const [log, setLog] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -1146,6 +1315,7 @@ export function ManagedLog({ compact = false }: { compact?: boolean }) {
     return () => window.clearInterval(timer)
   }, [refresh])
   const failures = parseLoggedFailures(log)
+  const layers = parsePrefillLayers(log)
   return (
     <section className="info-panel managed-log-panel">
       <span className="section-kicker">MANAGED RUNTIME LOG</span>
@@ -1188,6 +1358,56 @@ export function ManagedLog({ compact = false }: { compact?: boolean }) {
             </article>
           ))}
         </section>
+      )}
+      {layers.length > 0 && (
+        <details className="profile-options">
+          <summary>
+            GLM prefill layer waits <span>Measured · visible excerpt</span>
+          </summary>
+          <p className="panel-intro">
+            Question: which layer calls waited longest for experts? Source:
+            Cachalot 0.85.1+ stderr, CACHALOT_GLM_PREFILL_LOG=1. Latest 100
+            complete observations within this 64 KiB excerpt; older rows may be
+            omitted. Wait is store hand-back time, not request latency or
+            exposed stall. No request/chunk IDs; repeated row counts do not
+            establish chunk boundaries. Collection overhead unmeasured. Read
+            ahead shows kind and expert count: none, whole next layer, predicted
+            union, or caller-given list.
+          </p>
+          <div
+            className="prefill-layer-table"
+            tabIndex={0}
+            role="region"
+            aria-label="GLM prefill layer observations"
+          >
+            <table>
+              <thead>
+                <tr>
+                  <th>Line</th>
+                  <th>Layer</th>
+                  <th>Rows</th>
+                  <th>Routed experts</th>
+                  <th>Read ahead</th>
+                  <th>Wait (ms)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {layers.map((layer) => (
+                  <tr key={layer.line}>
+                    <td>{layer.line}</td>
+                    <td>{layer.layer}</td>
+                    <td>{layer.rows}</td>
+                    <td>{layer.routed}</td>
+                    <td>
+                      {layer.ahead}:{layer.aheadCount}
+                    </td>
+                    <td>{layer.waitMs.toFixed(1)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </details>
       )}
       <pre
         className={`managed-log ${compact ? 'is-compact' : ''}`}

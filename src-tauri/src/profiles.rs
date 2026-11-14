@@ -12,7 +12,15 @@ const STORE_VERSION: u8 = 1;
 const MAX_STORE_BYTES: usize = 256 * 1024;
 const MAX_PROFILES: usize = 50;
 
-pub(crate) const CONTROLLED_ENV_KEYS: [&str; 30] = [
+pub(crate) const CONTROLLED_ENV_KEYS: [&str; 38] = [
+    "CACHALOT_PREFILL_DECODER_KEEP",
+    "CACHALOT_DECODE_TOOL_EXACT",
+    "CACHALOT_VISION_MIN_PIXELS",
+    "CACHALOT_GLM_VISION_MIN_PIXELS",
+    "CACHALOT_GLM_BLOCK_PINS",
+    "CACHALOT_GLM_SPECULATE_MIN_TOKENS",
+    "CACHALOT_GLM_PREFILL_PREDICT_TOPK",
+    "CACHALOT_GLM_PREFILL_LOG",
     "CACHALOT_ENERGY",
     "CACHALOT_ENERGY_INTERVAL",
     "CACHALOT_TOKEN_TRACE",
@@ -60,6 +68,23 @@ pub enum ModelFamily {
 
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 pub struct RuntimeTuning {
+    #[serde(default)]
+    deepseek_prefill_decoder_keep: Option<u16>,
+    #[serde(default)]
+    deepseek_decode_tool_exact: Option<bool>,
+    #[serde(default)]
+    deepseek_vision_min_pixels: Option<u32>,
+    #[serde(default)]
+    glm_vision_min_pixels: Option<u32>,
+    #[serde(default)]
+    glm_block_pins: Option<u16>,
+    #[serde(default)]
+    glm_speculate_min_tokens: Option<u32>,
+    #[serde(default)]
+    glm_prefill_predict_topk: Option<u16>,
+    #[serde(default)]
+    glm_prefill_log: Option<bool>,
+
     #[serde(default)]
     energy_enabled: Option<bool>,
     #[serde(default)]
@@ -339,7 +364,10 @@ fn validate(profile: &LaunchProfile) -> Result<(), String> {
     if (tuning.deepseek_decode_drop_misses.is_some()
         || tuning.deepseek_system_date_reuse.is_some()
         || tuning.deepseek_prefill_encoder_only.is_some()
-        || tuning.deepseek_attn_act_quant_o.is_some())
+        || tuning.deepseek_attn_act_quant_o.is_some()
+        || tuning.deepseek_prefill_decoder_keep.is_some()
+        || tuning.deepseek_decode_tool_exact.is_some()
+        || tuning.deepseek_vision_min_pixels.is_some())
         && profile.family != ModelFamily::Deepseek
     {
         return Err("DeepSeek tuning requires a DeepSeek profile family.".to_owned());
@@ -349,10 +377,50 @@ fn validate(profile: &LaunchProfile) -> Result<(), String> {
         || tuning.glm_bank_enabled.is_some()
         || tuning.glm_predict_topk.is_some()
         || tuning.glm_predict_limit.is_some()
-        || tuning.glm_predict_after_demand.is_some())
+        || tuning.glm_predict_after_demand.is_some()
+        || tuning.glm_vision_min_pixels.is_some()
+        || tuning.glm_block_pins.is_some()
+        || tuning.glm_speculate_min_tokens.is_some()
+        || tuning.glm_prefill_predict_topk.is_some()
+        || tuning.glm_prefill_log.is_some())
         && profile.family != ModelFamily::Glm
     {
         return Err("GLM tuning requires a GLM profile family.".to_owned());
+    }
+    if tuning
+        .deepseek_prefill_decoder_keep
+        .is_some_and(|v| !(128..=2541).contains(&v))
+    {
+        return Err("DI-2 decoder replay must be between 128 and 2541 rows.".to_owned());
+    }
+    if tuning.deepseek_prefill_decoder_keep.is_some()
+        && tuning.deepseek_prefill_encoder_only != Some(true)
+    {
+        return Err("DI-2 requires explicit encoder-only prefill On.".to_owned());
+    }
+    if [
+        tuning.deepseek_vision_min_pixels,
+        tuning.glm_vision_min_pixels,
+    ]
+    .into_iter()
+    .flatten()
+    .any(|v| v > 16_000_000)
+    {
+        return Err("Vision minimum pixels must be between 0 and 16000000 (Lab limit).".to_owned());
+    }
+    if tuning.glm_block_pins.is_some_and(|v| v > 8) {
+        return Err("GLM block pins must be between 0 and 8 (Lab limit).".to_owned());
+    }
+    if tuning
+        .glm_speculate_min_tokens
+        .is_some_and(|v| v > 1_048_576)
+    {
+        return Err(
+            "GLM read-ahead threshold must be between 0 and 1048576 tokens (Lab limit).".to_owned(),
+        );
+    }
+    if tuning.glm_prefill_predict_topk.is_some_and(|v| v > 288) {
+        return Err("GLM prefill prediction must be between 0 and 288 experts.".to_owned());
     }
     if tuning
         .glm_decode_miss_budget
@@ -482,6 +550,49 @@ pub(crate) fn compile(profile: &LaunchProfile) -> Result<LaunchCommand, String> 
     }
     let tuning = &profile.tuning;
     let mut environment = BTreeMap::new();
+    if let Some(value) = tuning.deepseek_prefill_decoder_keep {
+        environment.insert(
+            "CACHALOT_PREFILL_DECODER_KEEP".to_owned(),
+            value.to_string(),
+        );
+    }
+    if let Some(value) = tuning.deepseek_decode_tool_exact {
+        environment.insert(
+            "CACHALOT_DECODE_TOOL_EXACT".to_owned(),
+            if value { "1" } else { "0" }.to_owned(),
+        );
+    }
+    if let Some(value) = tuning.deepseek_vision_min_pixels {
+        environment.insert("CACHALOT_VISION_MIN_PIXELS".to_owned(), value.to_string());
+    }
+    if let Some(value) = tuning.glm_vision_min_pixels {
+        environment.insert(
+            "CACHALOT_GLM_VISION_MIN_PIXELS".to_owned(),
+            value.to_string(),
+        );
+    }
+    if let Some(value) = tuning.glm_block_pins {
+        environment.insert("CACHALOT_GLM_BLOCK_PINS".to_owned(), value.to_string());
+    }
+    if let Some(value) = tuning.glm_speculate_min_tokens {
+        environment.insert(
+            "CACHALOT_GLM_SPECULATE_MIN_TOKENS".to_owned(),
+            value.to_string(),
+        );
+    }
+    if let Some(value) = tuning.glm_prefill_predict_topk {
+        environment.insert(
+            "CACHALOT_GLM_PREFILL_PREDICT_TOPK".to_owned(),
+            value.to_string(),
+        );
+    }
+    if let Some(value) = tuning.glm_prefill_log {
+        environment.insert(
+            "CACHALOT_GLM_PREFILL_LOG".to_owned(),
+            if value { "1" } else { "0" }.to_owned(),
+        );
+    }
+
     for (key, enabled) in [
         ("CACHALOT_ENERGY", tuning.energy_enabled),
         ("CACHALOT_TOKEN_TRACE", tuning.token_trace_enabled),
@@ -732,6 +843,88 @@ pub(crate) fn find_profile(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn adopts_runtime_085_without_changing_legacy_launch_defaults() {
+        let mut profile = sample();
+        let original = compile(&profile).unwrap();
+        assert!(original.environment.is_empty());
+        profile.family = ModelFamily::Deepseek;
+        profile.tuning = serde_json::from_value(serde_json::json!({
+            "deepseek_prefill_encoder_only": true,
+            "deepseek_prefill_decoder_keep": 140,
+            "deepseek_decode_tool_exact": true,
+            "deepseek_vision_min_pixels": 810000
+        }))
+        .unwrap();
+        let env = compile(&profile).unwrap().environment;
+        assert_eq!(env["CACHALOT_PREFILL_DECODER_KEEP"], "140");
+        assert_eq!(env["CACHALOT_DECODE_TOOL_EXACT"], "1");
+        assert_eq!(env["CACHALOT_VISION_MIN_PIXELS"], "810000");
+        profile.tuning.deepseek_prefill_encoder_only = Some(false);
+        assert!(compile(&profile).err().unwrap().contains("encoder-only"));
+        profile.tuning.deepseek_prefill_encoder_only = Some(true);
+        for keep in [0, 127, 2542] {
+            profile.tuning.deepseek_prefill_decoder_keep = Some(keep);
+            assert!(compile(&profile).is_err());
+        }
+        profile.family = ModelFamily::Glm;
+        profile.tuning = serde_json::from_value(serde_json::json!({
+            "glm_vision_min_pixels": 810000, "glm_block_pins": 0,
+            "glm_speculate_min_tokens": 512, "glm_prefill_predict_topk": 5,
+            "glm_prefill_log": true
+        }))
+        .unwrap();
+        let env = compile(&profile).unwrap().environment;
+        for (key, value) in [
+            ("CACHALOT_GLM_VISION_MIN_PIXELS", "810000"),
+            ("CACHALOT_GLM_BLOCK_PINS", "0"),
+            ("CACHALOT_GLM_SPECULATE_MIN_TOKENS", "512"),
+            ("CACHALOT_GLM_PREFILL_PREDICT_TOPK", "5"),
+            ("CACHALOT_GLM_PREFILL_LOG", "1"),
+        ] {
+            assert_eq!(env[key], value);
+            assert!(CONTROLLED_ENV_KEYS.contains(&key));
+        }
+        profile.family = ModelFamily::Minimax;
+        assert!(compile(&profile).is_err());
+    }
+
+    #[test]
+    fn runtime_085_validates_bounds_and_explicit_off() {
+        for (family, field, value) in [
+            (ModelFamily::Glm, "glm_prefill_predict_topk", 289),
+            (ModelFamily::Glm, "glm_block_pins", 9),
+            (ModelFamily::Glm, "glm_speculate_min_tokens", 1_048_577),
+            (ModelFamily::Glm, "glm_vision_min_pixels", 16_000_001),
+            (
+                ModelFamily::Deepseek,
+                "deepseek_vision_min_pixels",
+                16_000_001,
+            ),
+        ] {
+            let mut profile = sample();
+            profile.family = family;
+            let mut json = serde_json::Map::new();
+            json.insert(field.to_owned(), serde_json::json!(value));
+            profile.tuning = serde_json::from_value(json.into()).unwrap();
+            assert!(compile(&profile).is_err(), "{field}");
+        }
+        let mut profile = sample();
+        profile.family = ModelFamily::Deepseek;
+        profile.tuning.deepseek_decode_tool_exact = Some(false);
+        profile.tuning.deepseek_vision_min_pixels = Some(0);
+        let env = compile(&profile).unwrap().environment;
+        assert_eq!(env["CACHALOT_DECODE_TOOL_EXACT"], "0");
+        assert_eq!(env["CACHALOT_VISION_MIN_PIXELS"], "0");
+        for key in [
+            "CACHALOT_PREFILL_DECODER_KEEP",
+            "CACHALOT_DECODE_TOOL_EXACT",
+            "CACHALOT_VISION_MIN_PIXELS",
+        ] {
+            assert!(CONTROLLED_ENV_KEYS.contains(&key));
+        }
+    }
 
     fn sample() -> LaunchProfile {
         LaunchProfile {

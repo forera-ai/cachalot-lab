@@ -18,7 +18,7 @@ Copyright (c) 2026 forera.ai and contributors. Licensed under the [MIT License](
 
 Related Cachalot NVIDIA CUDA research is supported by GPU-compute credits from [CloudRift](https://www.cloudrift.ai/). [Support research](mailto:info@forera.ai?subject=Cachalot%20research%20support).
 
-The existing app launches or connects to local Cachalot, inspects live health and cache metrics, streams chat and reasoning, and provides API details. Lab 0.11.0 adds explicit failed-request inspection and corrected DI-1 evidence, retaining DeepSeek attention-output FP8 and observed managed checkpoint/bank identity, optional runtime energy evidence, saved request energy, and sampled DeepSeek decode aggregates. Event timelines, durable experiment comparisons, sweeps, and validated counterfactuals remain planned. Connections remain limited to the same Mac.
+The existing app launches or connects to local Cachalot, inspects live health and cache metrics, streams chat and reasoning, and provides API details. Lab 0.12.0 adds explicit runtime 0.85 launch controls and bounded GLM prefill layer-wait evidence, retaining failed-request inspection, corrected DI-1 evidence, DeepSeek attention-output FP8 and observed managed checkpoint/bank identity, optional runtime energy evidence, saved request energy, and sampled DeepSeek decode aggregates. Event timelines, durable experiment comparisons, sweeps, and validated counterfactuals remain planned. Connections remain limited to the same Mac.
 
 ## The app in use — 0.7.1
 
@@ -106,14 +106,14 @@ host readiness, connection health, and Lab-owned process state.
 
 ## Download
 
-**Current release:** [Cachalot Lab 0.11.1](https://github.com/forera-ai/cachalot-lab/releases/tag/v0.11.1) for Apple Silicon, macOS 14 or newer. This maintenance patch retains 0.11.0's failed-request cards with collapsed traceback excerpts and corrected DI-1 quality/snapshot guidance, retaining energy, sampled traces, and existing family controls. Existing profiles, conversations, preferences, and credential namespaces are preserved.
+**Current release:** [Cachalot Lab 0.12.0](https://github.com/forera-ai/cachalot-lab/releases/tag/v0.12.0) for Apple Silicon, macOS 14 or newer. This minor release adds explicit DeepSeek DI-2/tool-call/vision and GLM snapshot/read-ahead/logging controls, observed startup evidence, and a bounded GLM layer-wait table, retaining failed-request inspection, energy, sampled traces, and existing family controls. Existing profiles, conversations, preferences, and credential namespaces are preserved.
 
-1. Download the signed and notarized [DMG](https://github.com/forera-ai/cachalot-lab/releases/download/v0.11.1/Cachalot-Lab-0.11.1-macOS-arm64.dmg).
+1. Download the signed and notarized [DMG](https://github.com/forera-ai/cachalot-lab/releases/download/v0.12.0/Cachalot-Lab-0.12.0-macOS-arm64.dmg).
 2. Open it and drag **Cachalot Lab** into **Applications**.
 3. Open Lab. It first tries an existing Cachalot server at `http://127.0.0.1:8011`.
 4. Use **Dive** to launch a local runtime, or enter another loopback port and optional API key in **API**.
 
-The release also includes a [ZIP](https://github.com/forera-ai/cachalot-lab/releases/download/v0.11.1/Cachalot-Lab-0.11.1-macOS-arm64.zip) and [SHA-256 checksums](https://github.com/forera-ai/cachalot-lab/releases/download/v0.11.1/SHA256SUMS). The [release notes](https://github.com/forera-ai/cachalot-lab/releases/tag/v0.11.1) state the exact scope and verification.
+The release also includes a [ZIP](https://github.com/forera-ai/cachalot-lab/releases/download/v0.12.0/Cachalot-Lab-0.12.0-macOS-arm64.zip) and [SHA-256 checksums](https://github.com/forera-ai/cachalot-lab/releases/download/v0.12.0/SHA256SUMS). The [release notes](https://github.com/forera-ai/cachalot-lab/releases/tag/v0.12.0) state the exact scope and verification.
 
 Lab does not install Cachalot, Python, or model weights. Prepare a model and environment using the [runtime documentation](https://github.com/forera-ai/cachalot). Dive needs the absolute path to a Python interpreter with Cachalot installed, the model directory, and any separate expert bank. You can also start the server yourself:
 
@@ -219,4 +219,8 @@ The auxiliary Apple on-device model is a separate runtime CLI, off by default an
 
 Logs and Dive runtime output show each complete `[request failed] Type: message` marker (Cachalot 0.72.2+) with collapsible traceback excerpts. Original raw output stays available. Evidence is only the latest 64 KiB of Lab-owned output; no request ID or cumulative failure count is available. Older logs, incomplete writes and missing completion lines do not establish failures. External server logs are unavailable to this viewer.
 
-0.11.1 retains the 0.11.0 adoption and moves hosted CI to macOS 15 because GitHub's macOS 14 runner retires November 2, 2026 ([runner notice](https://github.com/actions/runner-images/issues/13518)). App deployment minimum remains macOS 14; minimum-OS behavior is not newly validated by CI.
+0.11.1 retained the 0.11.0 adoption and moved hosted CI to macOS 15 because GitHub's macOS 14 runner retires November 2, 2026 ([runner notice](https://github.com/actions/runner-images/issues/13518)). App deployment minimum remains macOS 14; minimum-OS behavior is not newly validated by CI.
+
+### Runtime adoption in 0.12.0
+
+Reviewed briefs through 0.85.1 against clean Cachalot 0.85.2 (`a8638c1860d32484ce518596190830f96d14eec7`). Eight nullable next-launch controls preserve direct CLI defaults and saved profile paths. DI-2, tool-exact and vision upscale carry output/snapshot/version warnings. GLM layer logs are opt-in; the collapsed table shows individual store waits within a bounded excerpt, without request totals or critical-path claims. Rare-expert skip remains unexposed after its failed gate; prefill prediction stays Off with no speed claim. See [complete adoption contract and limitations](docs/RUNTIME_085.md).

@@ -16,7 +16,7 @@ Do not rewrite Lab to satisfy this direction. Preserve streaming chat, reasoning
 
 The checked-out 0.5.0 foundation is Tauri 2, React 19, and TypeScript. Rust owns loopback HTTP, secrets, native sampling, local persistence, and the managed child. React presents state and bounded live histories. Runtime and host histories currently retain about two minutes in memory; saved conversations are durable conversation records, not reproducible experiment records. The production navigation contains Cockpit, Chat, Dive, API, Doctor, Logs, and Settings. A dedicated benchmark archive and experiment comparison workflow are future work, not an existing capability to replace.
 
-Whole-Mac and whole-drive observations are valuable context. They must retain their scope and must not become model-specific measurements through relabeling. The current source review remains Cachalot 0.72.3, commit `77aee2e1a63fd7f29c0968a5a5c66601459d65d3`, with briefs through 0.72.2. See [runtime sync](RUNTIME_SYNC.md) for tested versus source-reviewed paths.
+Whole-Mac and whole-drive observations are valuable context. They must retain their scope and must not become model-specific measurements through relabeling. The current source review remains Cachalot 0.85.2, commit `a8638c1860d32484ce518596190830f96d14eec7`, with briefs through 0.85.1. See [runtime sync](RUNTIME_SYNC.md) for tested versus source-reviewed paths.
 
 ## Ownership
 

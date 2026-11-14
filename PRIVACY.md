@@ -19,3 +19,14 @@ API credentials remain session-only by default. Explicit Save key in Keychain st
 Optional runtime energy and sampled decode aggregates arrive through the existing loopback stats poll. Lab keeps them only in the current snapshot; it does not create a durable energy/trace archive or run a privileged power sampler. Energy may include other apps and the display. The runtime owns collection and its buffers.
 
 When a chat response includes `usage.cachalot.energy`, the raw source, interval, request/decode windows and system/component energy remain in the existing saved message usage. Conversation limits remain 20 MiB total, 200 conversations and 1000 messages per conversation. Deleting the conversation removes its saved energy usage. Instrumentation choices persist with launch profiles and apply on the next launch. No credentials are added to these records. No new export or remote telemetry is introduced.
+
+## Runtime 0.85 layer diagnostics (Lab 0.12.0)
+
+GLM per-layer prefill logging is an explicit next-launch setting, Off by default.
+It records layer/row/expert counts, read-ahead kind/count and store wait in the
+existing local managed log. Logs and Dive display up to 100 complete observations
+from the latest 64 KiB excerpt, alongside unchanged raw output; no separate
+history, upload or export is added. Logging can emit about 380 lines per cold
+block and its overhead is unmeasured. Existing log retention and local-path
+privacy rules above apply. New saved controls contain numeric/boolean intent;
+startup evidence is process-scoped and not saved as a new experiment record.
